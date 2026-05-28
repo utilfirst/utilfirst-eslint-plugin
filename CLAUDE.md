@@ -41,8 +41,7 @@ src/
 
 ## Consumer linking
 
-- Sibling repos in `/Users/yenbekbay/Developer/` consume this plugin via `link:../utilfirst-eslint-plugin` in their `package.json`. `file:` would trigger pnpm's ignored-build-scripts gate
-- Once a version ships to npm, consumers swap `link:` for `^X.Y.Z`
+- Sibling repos in `/Users/yenbekbay/Developer/` consume this plugin from npm at `^X.Y.Z`. For local iteration against unpublished changes, swap to `link:../utilfirst-eslint-plugin` (not `file:`, which triggers pnpm's ignored-build-scripts gate)
 
 ## Release
 
