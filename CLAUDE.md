@@ -31,8 +31,8 @@ src/
 
 ## Spec source
 
-- The blank-lines rule's spec lives in two places: as a comment at the top of `src/rules/consistent-blank-lines.ts` and in `docs/rules/consistent-blank-lines.md`. Both mirror the "Blank lines" section of `~/.claude/CLAUDE.md`
-- When the global spec changes, update both copies. The rule's behavior is the source of truth for users, the global CLAUDE.md is the source of truth for the spec text
+- The blank-lines rule's spec lives in two places: as a comment at the top of `src/rules/consistent-blank-lines.ts` and in `docs/rules/consistent-blank-lines.md`. The rule's behavior is the source of truth for users, `docs/rules/consistent-blank-lines.md` is the source of truth for the spec text
+- When the spec changes, update both copies in this repo
 
 ## Lifecycle scripts
 
