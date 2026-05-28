@@ -33,13 +33,13 @@
     "fix": "pnpm run --sequential '/^fix:[^:]+$/'",
     "fix:eslint": "pnpm run lint:eslint --fix",
     "fix:prettier": "pnpm run lint:prettier --write",
-    "postinstall": "if [ -z \"$CI\" ]; then simple-git-hooks; fi",
     "lint": "pnpm run --sequential '/^lint:[^:]+$/'",
     "lint:eslint": "eslint .",
     "lint:prettier": "prettier --check .",
     "lint:publint": "publint",
     "lint:typecheck": "tsc --pretty --noEmit",
     "prepack": "pnpm run build",
+    "setup-hooks": "simple-git-hooks",
     "test": "vitest run"
   },
   "simple-git-hooks": {

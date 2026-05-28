@@ -45,9 +45,10 @@ export default [
 
 ```sh
 pnpm install
-pnpm test      # vitest + @typescript-eslint/rule-tester
-pnpm run build # tsdown → dist/
-pnpm run lint  # eslint + prettier + publint + tsc
+pnpm run setup-hooks # one-time: wire pre-commit via simple-git-hooks
+pnpm test            # vitest + @typescript-eslint/rule-tester
+pnpm run build       # tsdown → dist/
+pnpm run lint        # eslint + prettier + publint + tsc
 ```
 
 ## License
