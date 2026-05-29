@@ -1,9 +1,10 @@
 import type { TSESLint } from "@typescript-eslint/utils";
+import pkg from "../package.json" with { type: "json" };
 import { consistentBlankLines } from "./rules/consistent-blank-lines.ts";
 
 const meta = {
   name: "@utilfirst/eslint-plugin",
-  version: "0.1.0",
+  version: pkg.version,
 } as const;
 
 const rules = {
