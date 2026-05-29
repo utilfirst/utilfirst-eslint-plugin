@@ -6,7 +6,6 @@
       "Bash(pnpm run fix:eslint)",
       "Bash(pnpm run fix:prettier)",
       "Bash(pnpm run lint)",
-      "Bash(pnpm run lint:attw)",
       "Bash(pnpm run lint:eslint)",
       "Bash(pnpm run lint:prettier)",
       "Bash(pnpm run lint:publint)",
