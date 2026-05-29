@@ -5,10 +5,12 @@ Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v
 ## Directory layout
 
 ```
-.github/workflows/                  ci.yml (lint + build + test on PR), publish.yml (tag-triggered OIDC publish)
+.github/workflows/
+├── ci.yml                          Lint + build + test on PR
+└── publish.yml                     Tag-triggered OIDC publish
 docs/rules/                         Per-rule spec docs, linked from each rule's meta.docs.url
 src/
-├── index.ts                        Plugin entry: meta, rules map, configs.recommended (assigns key "utilfirst")
+├── index.ts                        Plugin entry: meta, rules map, configs.recommended
 └── rules/                          One file per rule, with colocated `*.test.ts` siblings
 ```
 
@@ -31,7 +33,7 @@ src/
 
 ## Spec source
 
-- The blank-lines rule's spec lives in two places: as a comment at the top of `src/rules/consistent-blank-lines.ts` and in `docs/rules/consistent-blank-lines.md`. The rule's behavior is the source of truth for users, `docs/rules/consistent-blank-lines.md` is the source of truth for the spec text
+- The blank-lines rule's spec lives in two places: as a comment at the top of `src/rules/consistent-blank-lines.ts` and in `docs/rules/consistent-blank-lines.md`. The rule's behavior is the source of truth for users. `docs/rules/consistent-blank-lines.md` is the source of truth for the spec text
 - When the spec changes, update both copies in this repo
 
 ## Lifecycle scripts
