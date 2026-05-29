@@ -116,9 +116,9 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
     schema: [],
     messages: {
       extra:
-        "Unexpected blank line between statements that continue the same paragraph.",
+        "Unexpected blank line between items that continue the same paragraph.",
       missing:
-        "Expected a blank line between statements that start new paragraphs.",
+        "Expected a blank line between items that start a new paragraph.",
     },
   },
   defaultOptions: [],
@@ -544,12 +544,7 @@ function isGuardIf(stmt: TSESTree.Node): boolean {
   );
 }
 
-function blockAlwaysTerminates(
-  node: TSESTree.Node | null | undefined,
-): boolean {
-  if (!node) {
-    return false;
-  }
+function blockAlwaysTerminates(node: TSESTree.Node): boolean {
   if (TERMINATING_STATEMENT_TYPES.has(node.type)) {
     return true;
   }
@@ -558,8 +553,11 @@ function blockAlwaysTerminates(
     return last ? blockAlwaysTerminates(last) : false;
   }
   if (node.type === AST_NODE_TYPES.IfStatement) {
+    if (!node.alternate) {
+      return false;
+    }
+
     return (
-      Boolean(node.alternate) &&
       blockAlwaysTerminates(node.consequent) &&
       blockAlwaysTerminates(node.alternate)
     );
@@ -612,11 +610,7 @@ function collectIntroducedOrAssignedNames(
   return set;
 }
 
-function collectBindingNames(node: TSESTree.Node | null, set: Set<string>) {
-  if (!node) {
-    return;
-  }
-
+function collectBindingNames(node: TSESTree.Node, set: Set<string>) {
   switch (node.type) {
     case AST_NODE_TYPES.Identifier:
       set.add(node.name);
@@ -813,20 +807,6 @@ function isDeclarationOrPropertyKey(idNode: TSESTree.Identifier): boolean {
     return true;
   }
   if (
-    parent.type === AST_NODE_TYPES.MethodDefinition &&
-    parent.key === idNode &&
-    !parent.computed
-  ) {
-    return true;
-  }
-  if (
-    parent.type === AST_NODE_TYPES.PropertyDefinition &&
-    parent.key === idNode &&
-    !parent.computed
-  ) {
-    return true;
-  }
-  if (
     IMPORT_SPECIFIER_TYPES.has(parent.type) &&
     "local" in parent &&
     parent.local === idNode
@@ -874,12 +854,6 @@ function isInBindingPosition(idNode: TSESTree.Identifier): boolean {
     if (p.type === AST_NODE_TYPES.Property) {
       // Computed keys are reference expressions, not bindings.
       if (p.computed && p.key === cur) {
-        return false;
-      }
-
-      // Non-shorthand: only the value side is a binding. Shorthand: key/value share a node
-      // and both sit in value position.
-      if (!p.shorthand && p.value !== cur) {
         return false;
       }
 

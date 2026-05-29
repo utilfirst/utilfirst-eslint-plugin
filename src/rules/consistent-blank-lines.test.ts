@@ -230,6 +230,10 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `if (x) {}\nif (y) run();\n`,
     },
     {
+      name: "if with a nested no-else terminator is not a guard",
+      code: `if (x) {\n  if (a) return;\n}\nif (y) run();\n`,
+    },
+    {
       name: "expression then expression stays together",
       code: `doA();\ndoB();\n`,
     },
