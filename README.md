@@ -37,9 +37,9 @@ export default [
 
 ## Rules
 
-| Rule                                                               | Description                                                                          | Fixable |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------- |
-| [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md) | Insert blank lines between statement-list and JSXChild items that start new thoughts | yes     |
+| Rule                                                               | Description                                                                           | Fixable |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | ------- |
+| [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md) | Insert blank lines between statement-list and JSXChild items that start a new thought | yes     |
 
 ## Develop
 
