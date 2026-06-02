@@ -2,6 +2,7 @@
 const config = {
   quoteProps: "consistent",
   plugins: [
+    "@utilfirst/prettier-plugin",
     "prettier-plugin-organize-imports",
     "prettier-plugin-packagejson",
     "prettier-plugin-sh",

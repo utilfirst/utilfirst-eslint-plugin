@@ -21,6 +21,9 @@ importers:
       '@typescript-eslint/rule-tester':
         specifier: ^8.59.3
         version: 8.60.0(eslint@10.4.0)(typescript@6.0.3)
+      '@utilfirst/prettier-plugin':
+        specifier: ^0.1.0
+        version: 0.1.0(prettier@3.8.3)
       '@vitest/coverage-v8':
         specifier: ^4.1.7
         version: 4.1.7(vitest@4.1.7)
@@ -567,6 +570,12 @@ packages:
   '@typescript-eslint/visitor-keys@8.60.0':
     resolution: {integrity: sha512-9WI52t8ZGLVGrPMBet25yAftqY/n95+zmoUUtJBBQTKDSKUu7OsPTroT2op7U9JatkoRccL0YkWDNMFfC4Sjxg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@utilfirst/prettier-plugin@0.1.0':
+    resolution: {integrity: sha512-OLHlqUWHtGIB7EWZa//5h5q47N20vxOFhuBA97oYKQLuK/bLi1+lV4USJmcGWPpeHRnmbG++0VL9ahrdR/vfPQ==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      prettier: ^3.0.0
 
   '@vitest/coverage-v8@4.1.7':
     resolution: {integrity: sha512-qsYPeXc5Q9dFLd1i8Ap+Bx8sQgcp+rFVQo4R0dDsWNBzl26ldVF1qOO+RL24K7FDrR6pA+50XedRLSoSG24bVQ==}
@@ -1868,6 +1877,10 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.60.0
       eslint-visitor-keys: 5.0.1
+
+  '@utilfirst/prettier-plugin@0.1.0(prettier@3.8.3)':
+    dependencies:
+      prettier: 3.8.3
 
   '@vitest/coverage-v8@4.1.7(vitest@4.1.7)':
     dependencies:
