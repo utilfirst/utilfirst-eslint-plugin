@@ -19,7 +19,8 @@ src/
 
 ## Workflow
 
-- After finishing a set of related changes, also run `pnpm test`
+- After any file change: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
+- After finishing a set of related changes: `pnpm test` and `pnpm run lint:typecheck`
 - After cloning: `pnpm run setup-hooks` to wire the simple-git-hooks pre-commit
 
 ## Build and bundling
