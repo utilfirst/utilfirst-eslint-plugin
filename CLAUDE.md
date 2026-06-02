@@ -1,6 +1,3 @@
-@~/.claude/rule-bundles/ci-cd.md
-@~/.claude/rule-bundles/typescript.md
-
 # @utilfirst/eslint-plugin
 
 Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v9/v10 peer.
