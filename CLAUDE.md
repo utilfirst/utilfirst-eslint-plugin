@@ -69,6 +69,14 @@ src/
 - Each release: bump `version` in `package.json`, tag `vX.Y.Z`, push the tag. `publish.yml` builds, runs lint + test, packs, publishes with OIDC + automatic provenance, then emits release notes via changelogithub. `meta.version` derives from `package.json` at build time, so the bump is the only version edit
 - No `NPM_TOKEN`. The `release` environment is the gate
 
+## Boundaries
+
+- Ask first before bumping the major version (consumers across the fleet are pinned to `^X.Y.Z`, so a major bump is a fleet-wide migration).
+- Ask first before adding a new rule to `configs.recommended` (every consumer picks it up on the next install).
+- Never publish manually (`npm publish` from a laptop). The OIDC trusted publisher in `publish.yml` is the only sanctioned release path.
+- Never tag a release without `pnpm test` and `pnpm run lint:typecheck` green locally.
+- Never commit `.npmrc` with auth tokens or any other npm credentials.
+
 ## Excluded tooling
 
 - `@arethetypeswrong/cli` is not wired up. `@andrewbranch/untar.js` (attw's tar reader) throws `Cannot read properties of undefined (reading 'filename')` on Node 24 across attw 0.15-0.18 for this package's tarball shape. `publint` covers the publishing surface (exports, types, file list)
