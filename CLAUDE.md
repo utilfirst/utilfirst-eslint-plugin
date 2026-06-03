@@ -2,6 +2,20 @@
 
 Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v9/v10 peer.
 
+## Stack
+
+- TypeScript, tsdown for bundling, vitest + `@typescript-eslint/rule-tester` for tests
+- Peer: `eslint@^9 || ^10`
+- Runtime dep: `@typescript-eslint/utils` (marked `external` in `tsdown.config.ts` to keep the bundle small)
+- pnpm 11, Node ≥20.19 (toolchain pinned to Node 24 in `mise.toml`)
+
+## Commands
+
+- `pnpm install`: install dependencies
+- `pnpm run setup-hooks`: wire the `simple-git-hooks` pre-commit (run once after clone)
+- `pnpm run build`: bundle via tsdown to `dist/index.js` + `dist/index.d.ts`
+- `pnpm test`: run vitest
+
 ## Directory layout
 
 ```
@@ -18,7 +32,6 @@ src/
 
 - After any file change: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
 - After finishing a set of related changes: `pnpm test` and `pnpm run lint:typecheck`
-- After cloning: `pnpm run setup-hooks` to wire the simple-git-hooks pre-commit
 
 ## Build and bundling
 
