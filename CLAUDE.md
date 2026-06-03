@@ -39,7 +39,6 @@ src/
 - Ask first before adding a new rule to `configs.recommended` (every consumer picks it up on the next install).
 - Never publish manually (`npm publish` from a laptop). The OIDC trusted publisher in `publish.yml` is the only sanctioned release path.
 - Never tag a release without `pnpm test` and `pnpm run lint:typecheck` green locally.
-- Never commit `.npmrc` with auth tokens or any other npm credentials.
 
 ## Build and bundling
 
