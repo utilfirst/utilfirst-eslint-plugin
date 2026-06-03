@@ -2,6 +2,18 @@
 
 Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v9/v10 peer.
 
+## Directory layout
+
+```
+.github/workflows/
+├── ci.yml                          Lint + build + test on PR
+└── publish.yml                     Tag-triggered OIDC publish
+docs/rules/                         Per-rule spec docs, linked from each rule's meta.docs.url
+src/
+├── index.ts                        Plugin entry: meta, rules map, configs.recommended
+└── rules/                          One file per rule, with colocated `*.test.ts` siblings
+```
+
 ## Stack
 
 - TypeScript, tsdown for bundling, vitest + `@typescript-eslint/rule-tester` for tests
@@ -15,18 +27,6 @@ Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v
 - `pnpm run setup-hooks`: wire the `simple-git-hooks` pre-commit (run once after clone)
 - `pnpm run build`: bundle via tsdown to `dist/index.js` + `dist/index.d.ts`
 - `pnpm test`: run vitest
-
-## Directory layout
-
-```
-.github/workflows/
-├── ci.yml                          Lint + build + test on PR
-└── publish.yml                     Tag-triggered OIDC publish
-docs/rules/                         Per-rule spec docs, linked from each rule's meta.docs.url
-src/
-├── index.ts                        Plugin entry: meta, rules map, configs.recommended
-└── rules/                          One file per rule, with colocated `*.test.ts` siblings
-```
 
 ## Workflow
 
