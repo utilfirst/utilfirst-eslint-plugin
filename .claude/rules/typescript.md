@@ -28,7 +28,6 @@
 - Sort imports alphabetically by module specifier (case-insensitive) within each blank-line-separated group (TypeScript Organize Imports sorts within each group)
 - Suppress individual lint violations inline with `// eslint-disable-next-line <rule> -- <reason>` rather than adding a file-pattern override (overrides are appropriate when a rule doesn't fit a whole class of files, but using them to silence a single call site disables the rule across every future file matching the pattern)
 - Tighten an optional field to `T` or `T | null` when every consumer `??`-hedges the same value (the boundary is looser than every consumer needs, and the same hedge repeats at each call site)
-- Use `:` in a script name only when a parent script batch-runs the group (`lint` running every `lint:*`, `fix` running every `fix:*`), and `-` for standalone scripts (`lingui-compile`, `prisma-generate`)
 - Use a plain union for structurally different narrowings (e.g., `string | number`), optional fields when one shape is a strict subset, or a discriminated union when alternatives overlap with a kind tag (preferred over tuples like `[error, data]` or partial objects like `{ error?, data? }` for outcome modeling, since the kind tag makes states mutually exclusive)
 - Use a block body in arrow functions for side-effect calls (the implicit form would leak the call's return value into the arrow's signature)
 - Use double quotes for string literals, and single quotes only to avoid escaping a double quote
@@ -43,5 +42,4 @@
 - Use template literals only for string interpolation or multi-line strings
 - Use `type` aliases for object shapes rather than `interface` declarations, except when declaration merging is required (e.g., `declare module` to augment a library type)
 - Use union literals or constant objects for named sets rather than `enum`, except `const enum` for inlined constants and ambient enums in declaration files (TypeScript `enum` emits runtime objects and resists mapped types, intersections, and structural assignability across enum boundaries)
-- When a generated artifact (Lingui catalogs, Prisma client) is needed for build output, chain its generator into `build` before the bundler step rather than relying on `postinstall`
 - Wrap async expressions in `try/catch` only when you intend to recover, transform, or log, and let errors propagate otherwise
