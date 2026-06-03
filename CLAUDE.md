@@ -33,13 +33,6 @@ src/
 - After any file change: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
 - After finishing a set of related changes: `pnpm test` and `pnpm run lint:typecheck`
 
-## Conventions
-
-- ESM-only, flat config only; the package ships one default export from `src/index.ts` (`meta`, `rules`, `configs.recommended`)
-- Mark `@typescript-eslint/utils` external in `tsdown.config.ts`; bundling it inflates the package from 18 kB to 495 kB
-- Mirror the blank-lines rule spec in two places: the comment at the top of `src/rules/consistent-blank-lines.ts` and `docs/rules/consistent-blank-lines.md`. Update both on spec change
-- Test rules with `@typescript-eslint/rule-tester` and bind vitest hooks per file (`RuleTester.afterAll = afterAll`, etc.)
-
 ## Build and bundling
 
 - `pnpm run build` runs tsdown. `prepack` chains it before `npm pack`/`publish`
