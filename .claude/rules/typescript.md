@@ -1,6 +1,6 @@
 # TypeScript
 
-- Anchor multi-line inference chains with a return type or named intermediate (without an anchor, readers must trace the chain to see the resolved type)
+- Anchor multi-line inference chains with a return type or named intermediate (without an anchor, the resolved type lives only at the bottom of the chain and editor hovers surface intermediate `any`s instead of the final shape)
 - Avoid type assertions (`as`) unless narrowing or reading from unsafe values
 - Await all Promise-returning calls, or prefix with `void` to explicitly discard the result (an unhandled rejection bypasses surrounding try/catch and surfaces as an `unhandledRejection` event)
 - Blank line: insert above any item whose leading comment block spans multiple lines
