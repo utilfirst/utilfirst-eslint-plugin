@@ -1,6 +1,5 @@
 # TypeScript
 
-- Add trailing commas to all multi-line parameter lists, argument lists, destructuring patterns, and object/array literals (omitting them adds noise to diffs when the last item changes)
 - Anchor multi-line inference chains with a return type or named intermediate (without an anchor, readers must trace the chain to see the resolved type)
 - Avoid type assertions (`as`) unless narrowing or reading from unsafe values
 - Await all Promise-returning calls, or prefix with `void` to explicitly discard the result (an unhandled rejection bypasses surrounding try/catch and surfaces as an `unhandledRejection` event)
@@ -17,8 +16,7 @@
 - Express business-logic fallbacks in the function body rather than as destructuring defaults, except no-op safe defaults for optional fields like `({ items = [] }) => ...` (signature defaults sit in the parameter list while the body logic that uses them sits below the opening brace)
 - Express conditional optional fields as a branched call or a conditional spread (`...(cond ? { x: value } : {})`) rather than `{ x: cond ? value : undefined }` (under `exactOptionalPropertyTypes`, an explicit `undefined` doesn't satisfy `x?: T`)
 - Group imports as side-effect (`import "x";`) first, then non-relative (bare specifiers and path aliases like `@/`), then relative (`./`, `../`), separated by blank lines
-- Ignore `*.tsbuildinfo` from `.gitignore` (TypeScript writes this incremental-build cache next to `tsconfig.json` whenever `--incremental` is on)
-- Mark type-only specifiers inline with the `type` keyword: `import { type Foo, type Bar, baz } from "x"`. Use a top-level `import type { ... } from "x"` instead when the source package has no runtime entry (e.g. `@types/mdast`), since `import/no-unresolved` rejects the inline form for those
+- Mark type-only specifiers inline with the `type` keyword: `import { type Foo, type Bar, baz } from "x"`, falling back to a top-level `import type { ... } from "x"` when the source package has no runtime entry (e.g. `@types/mdast`) since `import/no-unresolved` rejects the inline form for those
 - Place constants and types near their usage if not reused across files
 - Prefer a single named object parameter for functions with 3+ inputs
 - Prefer named exports in all modules except where the framework requires default exports (Next.js and Expo Router special files like `page.tsx`, `_layout.tsx`)
@@ -26,20 +24,18 @@
 - Separate order-sensitive side-effect imports with an additional blank line (the sort within each group would otherwise reorder them)
 - Set TypeScript `strict` mode with `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, and `verbatimModuleSyntax` (each tightens a soundness gap the bare `strict` flag leaves open)
 - Sort imports alphabetically by module specifier (case-insensitive) within each blank-line-separated group (TypeScript Organize Imports sorts within each group)
-- Suppress individual lint violations inline with `// eslint-disable-next-line <rule> -- <reason>` rather than adding a file-pattern override (overrides are appropriate when a rule doesn't fit a whole class of files, but using them to silence a single call site disables the rule across every future file matching the pattern)
+- Suppress individual lint violations inline with `// eslint-disable-next-line <rule> -- <reason>` rather than adding a file-pattern override (an override on a single call site disables the rule across every future file the pattern matches)
 - Tighten an optional field to `T` or `T | null` when every consumer `??`-hedges the same value (the boundary is looser than every consumer needs, and the same hedge repeats at each call site)
 - Use a plain union for structurally different narrowings (e.g., `string | number`), optional fields when one shape is a strict subset, or a discriminated union when alternatives overlap with a kind tag (preferred over tuples like `[error, data]` or partial objects like `{ error?, data? }` for outcome modeling, since the kind tag makes states mutually exclusive)
 - Use a block body in arrow functions for side-effect calls (the implicit form would leak the call's return value into the arrow's signature)
-- Use double quotes for string literals, and single quotes only to avoid escaping a double quote
-- Use `for...of` over an indexed `for` loop when the index is only used to access the array element
+- Use `normalizeException(err).message` when reading the message off a caught value (the catch parameter may not be an `Error` instance)
 - Use function declarations for top-level named functions, and arrow functions for anonymous functions or inline callbacks
 - Use implicit return in arrow functions when the body expression is the return value
 - Use relative paths for sibling imports rather than `@/`-style aliases, unless crossing package boundaries
 - Use `return await` when returning a promise inside a `try/catch` block (returning without `await` moves the rejection outside the catch handler)
 - Use shorthand syntax in object literals when key and value names match
-- Use strict equality except when using `== null` or `!= null` intentionally
-- Use `T[]` syntax for array types rather than `Array<T>`
 - Use template literals only for string interpolation or multi-line strings
 - Use `type` aliases for object shapes rather than `interface` declarations, except when declaration merging is required (e.g., `declare module` to augment a library type)
 - Use union literals or constant objects for named sets rather than `enum`, except `const enum` for inlined constants and ambient enums in declaration files (TypeScript `enum` emits runtime objects and resists mapped types, intersections, and structural assignability across enum boundaries)
+- Validate request bodies with `z.safeParse` at handler boundaries (the discriminated result avoids the throw that bare `parse` would emit on invalid input)
 - Wrap async expressions in `try/catch` only when you intend to recover, transform, or log, and let errors propagate otherwise
