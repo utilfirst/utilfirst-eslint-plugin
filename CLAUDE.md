@@ -35,8 +35,8 @@ src/
 
 ## Boundaries
 
-- Ask first before bumping the major version (consumers across the fleet are pinned to `^X.Y.Z`, so a major bump is a fleet-wide migration).
-- Ask first before adding a new rule to `configs.recommended` (every consumer picks it up on the next install).
+- Ask first before bumping the major version (most consumers are pinned to `^X.Y.Z`, so a major bump forces an upgrade across projects that depend on this plugin).
+- Ask first before adding a new rule to `configs.recommended` (consumers that auto-upgrade pick it up on the next install).
 - Never publish manually (`npm publish` from a laptop). The OIDC trusted publisher in `publish.yml` is the only sanctioned release path.
 - Never tag a release without `pnpm test` and `pnpm run lint:typecheck` green locally.
 
@@ -53,17 +53,16 @@ src/
 
 ## Spec source
 
-- The blank-lines rule's spec lives in two places: as a comment at the top of `src/rules/consistent-blank-lines.ts` and in `docs/rules/consistent-blank-lines.md`. The rule's behavior is the source of truth for users; `docs/rules/consistent-blank-lines.md` is the source of truth for the spec text
-- When the spec changes, update both copies in this repo
+- The blank-lines rule's spec lives in two places: as a comment at the top of `src/rules/consistent-blank-lines.ts` and in `docs/rules/consistent-blank-lines.md`. The rule's behavior governs users; the spec doc is the canonical text. Update both on any spec change.
 
 ## Lifecycle scripts
 
-- No `prepare` and no `postinstall`. `simple-git-hooks` is wired through `pnpm run setup-hooks` instead. The earlier `postinstall`/`prepare` form tripped pnpm's `[ERR_PNPM_IGNORED_BUILDS]` gate on every consumer install, and the `false` opt-out in `pnpm-workspace.yaml` did not survive pnpm's auto-rewrite
+- Wire `simple-git-hooks` through `pnpm run setup-hooks` instead of `prepare` or `postinstall`. The hook-script form tripped pnpm's `[ERR_PNPM_IGNORED_BUILDS]` gate on every consumer install, and the `false` opt-out in `pnpm-workspace.yaml` did not survive pnpm's auto-rewrite.
 - `prepack` runs the build before pack/publish so the tarball always contains a fresh `dist/`
 
 ## Consumer linking
 
-- Sibling repos in `/Users/yenbekbay/Developer/` consume this plugin from npm at `^X.Y.Z`. For local iteration against unpublished changes, swap to `link:../utilfirst-eslint-plugin` (not `file:`, which triggers pnpm's ignored-build-scripts gate)
+- Sibling repos consume this plugin from npm at `^X.Y.Z`. For local iteration against unpublished changes, swap to `link:../utilfirst-eslint-plugin` (not `file:`, which triggers pnpm's ignored-build-scripts gate).
 
 ## GitHub Actions
 
@@ -73,7 +72,7 @@ src/
 
 - One-time setup: configure an npm trusted publisher on npmjs.com pointing at scope `@utilfirst`, repo `utilfirst/utilfirst-eslint-plugin`, workflow `publish.yml`, environment `release`. Create a matching `release` GitHub environment
 - First publish bootstraps the package via local `npm publish --provenance=false`, then add the trusted publisher to the now-existing package. Subsequent versions ride `publish.yml`. The bootstrap exists because npm's trusted publisher can't be configured for a non-existent package
-- Each release: bump `version` in `package.json`, tag `vX.Y.Z`, push the tag. `publish.yml` builds, runs lint + test, packs, publishes with OIDC + automatic provenance, then emits release notes via changelogithub. `meta.version` derives from `package.json` at build time, so the bump is the only version edit
+- Each release: bump `version` in `package.json`, tag `vX.Y.Z`, push the tag. `publish.yml` builds, runs lint + test, packs, publishes with OIDC + automatic provenance, then emits release notes via changelogithub. `meta.version` is set from `package.json` at build time, so the version bump is the only edit needed.
 - No `NPM_TOKEN`. The `release` environment is the gate
 
 ## Excluded tooling
