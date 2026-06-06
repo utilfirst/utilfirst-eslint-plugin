@@ -7,13 +7,13 @@
 - Blank line: insert above any multi-line declaration, multi-line `return`, or multi-line `throw`
 - Blank line: insert after a guard `if` (one whose then-branch terminates via `return`/`throw`/`break`/`continue`) when the next statement is not also a guard `if`
 - Blank line: insert between a hook-call statement (`const x = useFoo()` or bare `useFoo()`) and any adjacent non-hook statement
-- Blank line: omit between a single-line name introduction and the statement that first uses it, except when either is a `type` alias
-- Blank line: omit between an expression statement and an adjacent expression statement, single-line `return`/`throw`/`break`/`continue`, or non-guard `if`
 - Blank line: omit between consecutive hook-call statements
+- Blank line: omit between an expression statement and an adjacent expression statement, single-line `return`/`throw`/`break`/`continue`, or non-guard `if`
 - Blank line: omit between matching single-line declarations (consecutive `const`/`let` with matching shape but neither a hook-call statement, consecutive `type` aliases, consecutive non-guard `if`s)
+- Blank line: omit between a single-line name introduction and the statement that first uses it, except when either is a `type` alias
 - Break object type literals onto separate lines when they have more than one property
 - Constrain spread or returned objects with a defined type alias (without one, every consumer sees the inferred shape and downstream errors surface far from the construction site)
-- Express business-logic fallbacks in the function body rather than as destructuring defaults, except no-op safe defaults for optional fields like `({ items = [] }) => ...` (signature defaults sit in the parameter list while the body logic that uses them sits below the opening brace)
+- Express business-logic fallbacks in the function body rather than as destructuring defaults, except defaults whose value is the empty case for the field's domain like `({ items = [] }) => ...` (signature defaults sit in the parameter list while the body logic that uses them sits below the opening brace)
 - Express conditional optional fields as a branched call or a conditional spread (`...(cond ? { x: value } : {})`) rather than `{ x: cond ? value : undefined }` (under `exactOptionalPropertyTypes`, an explicit `undefined` doesn't satisfy `x?: T`)
 - Group imports as side-effect (`import "x";`) first, then non-relative (bare specifiers and path aliases like `@/`), then relative (`./`, `../`), separated by blank lines
 - Mark type-only specifiers inline with the `type` keyword: `import { type Foo, type Bar, baz } from "x"`, falling back to a top-level `import type { ... } from "x"` when the source package has no runtime entry (e.g. `@types/mdast`) since `import/no-unresolved` rejects the inline form for those
