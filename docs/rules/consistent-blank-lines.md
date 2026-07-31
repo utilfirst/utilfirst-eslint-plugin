@@ -11,6 +11,7 @@ Insert blank lines between statement-list and `JSXChild` items that start a new 
 
 For `Statement[]` (Program body, BlockStatement body, SwitchCase consequent, StaticBlock body), insert one blank line between two adjacent items (the earlier and the later) when the later starts a new thought, which is the case when its leading comments span multiple lines, or when none of these holds:
 - Both are imports, or both are re-exports (`export ... from`, `export *`), with any user-inserted blank line preserved.
+- Both are expression statements, with any user-inserted blank line preserved.
 - Neither is a hook-call statement (`const x = useFoo()` or a bare `useFoo()` expression statement), and _name flow_: the earlier is single-line and introduces or assigns a name that the later references, neither is a `type` alias, and the later is not a multi-line declaration, a multi-line `return`, or a multi-line `throw` (references inside the body of a nested function declaration, class declaration, or class expression don't count).
 - Neither is a hook-call statement, and _matching declarations_: both are single-line `const`/`let` with one declarator each and matching export-ness (`export const` with `export const`, plain `const` with plain `const`), with right-hand sides either both non-calls, or both calls (sharing a callee, or both zero-argument).
 - Neither is a hook-call statement, and _matching type aliases_: both are single-line `type` aliases with matching export-ness (`export type` with `export type`, plain `type` with plain `type`).

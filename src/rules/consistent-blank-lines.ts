@@ -5,6 +5,7 @@
 //
 //   - Both are imports, or both are re-exports (`export ... from`, `export *`), with any
 //     user-inserted blank line preserved.
+//   - Both are expression statements, with any user-inserted blank line preserved.
 //   - Neither is a hook-call statement (`const x = useFoo()` or a bare `useFoo()` expression
 //     statement), and _name flow_: the earlier is single-line and introduces or assigns a
 //     name that the later references, neither is a `type` alias, and the later is not a
@@ -139,7 +140,8 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
             () => sameParagraph(prev, next, sourceCode),
             () =>
               isImportPair(prev, next) ||
-              (isReExport(prev) && isReExport(next)),
+              (isReExport(prev) && isReExport(next)) ||
+              isExpressionStatementPair(prev, next),
           );
         }
       }
@@ -379,6 +381,16 @@ function isImportPair(
   return (
     prev.type === AST_NODE_TYPES.ImportDeclaration &&
     next.type === AST_NODE_TYPES.ImportDeclaration
+  );
+}
+
+function isExpressionStatementPair(
+  prev: TSESTree.Statement,
+  next: TSESTree.Statement,
+): boolean {
+  return (
+    prev.type === AST_NODE_TYPES.ExpressionStatement &&
+    next.type === AST_NODE_TYPES.ExpressionStatement
   );
 }
 

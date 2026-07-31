@@ -38,6 +38,14 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `export { a } from "a";\n\nexport { b } from "b";\n`,
     },
     {
+      name: "user-inserted blank between test calls is preserved",
+      code: `test("a", () => {});\n\ntest("b", () => {});\n`,
+    },
+    {
+      name: "user-inserted blank inside a switch-case consequent is preserved",
+      code: `switch (x) {\n  case 1:\n    doA();\n\n    doB();\n    break;\n}\n`,
+    },
+    {
       name: "name flow keeps single-line decls adjacent",
       code: `const x = 1;\nconst y = x + 1;\n`,
     },
@@ -468,12 +476,6 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `function f() {\n  const a = 1;\n\n  const b = 2;\n}\n`,
       output: `function f() {\n  const a = 1;\n  const b = 2;\n}\n`,
       errors: [{ messageId: "extra", line: 4, column: 3 }],
-    },
-    {
-      name: "extra blank inside a switch-case consequent is removed",
-      code: `switch (x) {\n  case 1:\n    doA();\n\n    doB();\n    break;\n}\n`,
-      output: `switch (x) {\n  case 1:\n    doA();\n    doB();\n    break;\n}\n`,
-      errors: [{ messageId: "extra", line: 5, column: 5 }],
     },
     {
       name: "multi-line JSX sibling forces a blank",
