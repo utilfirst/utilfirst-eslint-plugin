@@ -30,14 +30,16 @@ src/
 
 ## Workflow
 
-- After any file change: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
+- After changing an ESLint-supported file: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
+- After changing another Prettier-supported file: `pnpm exec prettier --write <file>`
 - After finishing a set of related changes: `pnpm test` and `pnpm run lint:typecheck`
 
 ## Boundaries
 
 - Ask first before bumping the major version (most consumers are pinned to `^X.Y.Z`, so a major bump forces an upgrade across projects that depend on this plugin).
 - Ask first before adding a new rule to `configs.recommended` (consumers that auto-upgrade pick it up on the next install).
-- Never publish manually (`npm publish` from a laptop). The OIDC trusted publisher in `publish.yml` is the only sanctioned release path.
+- Ask first before the one-time package bootstrap through local `npm publish --provenance=false`.
+- Never publish manually after the package has an npm trusted publisher. The OIDC publisher in `publish.yml` is the sanctioned release path.
 - Never tag a release without `pnpm test` and `pnpm run lint:typecheck` green locally.
 
 ## Build and bundling
@@ -71,7 +73,7 @@ src/
 ## Release
 
 - One-time setup: configure an npm trusted publisher on npmjs.com pointing at scope `@utilfirst`, repo `utilfirst/utilfirst-eslint-plugin`, workflow `publish.yml`, environment `release`. Create a matching `release` GitHub environment
-- First publish bootstraps the package via local `npm publish --provenance=false`, then add the trusted publisher to the now-existing package. Subsequent versions ride `publish.yml`. The bootstrap exists because npm's trusted publisher can't be configured for a non-existent package
+- The one-time package bootstrap needs explicit approval: publish via local `npm publish --provenance=false`, then add the trusted publisher to the now-existing package. Subsequent versions ride `publish.yml`. The bootstrap exists because npm's trusted publisher can't be configured for a non-existent package
 - Each release: bump `version` in `package.json`, tag `vX.Y.Z`, push the tag. `publish.yml` builds, runs lint + test, packs, publishes with OIDC + automatic provenance, then emits release notes via changelogithub. `meta.version` is set from `package.json` at build time, so the version bump is the only edit needed.
 - No `NPM_TOKEN`. The `release` environment is the gate
 
