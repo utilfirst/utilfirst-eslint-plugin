@@ -1,42 +1,49 @@
-// Insert one blank line between two adjacent statements (the earlier and the later) inside a
-// `Statement[]` block (Program body, BlockStatement body, SwitchCase consequent, StaticBlock
-// body) when the later starts a new thought, which is the case when its leading comments span
-// multiple lines, or when none of these holds:
+// Insert one blank line between two adjacent statements (the earlier and the
+// later) inside a `Statement[]` block (Program body, BlockStatement body,
+// SwitchCase consequent, StaticBlock body) when the later starts a new
+// thought, which is the case when its leading comments span multiple lines, or
+// when none of these holds:
 //
-//   - Both are imports, or both are re-exports (`export ... from`, `export *`), with any
-//     user-inserted blank line preserved.
-//   - Both are expression statements, with any user-inserted blank line preserved.
-//   - Neither is a hook-call statement (`const x = useFoo()` or a bare `useFoo()` expression
-//     statement), and _name flow_: the earlier is single-line and introduces or assigns a
-//     name that the later references, neither is a `type` alias, and the later is not a
-//     multi-line declaration, a multi-line `return`, or a multi-line `throw` (references
-//     inside the body of a nested function declaration, class declaration, or class
+//   - Both are imports, or both are re-exports (`export ... from`,
+//     `export *`), with any user-inserted blank line preserved.
+//   - Both are expression statements, with any user-inserted blank line
+//     preserved.
+//   - Neither is a hook-call statement (`const x = useFoo()` or a bare
+//     `useFoo()` expression statement), and _name flow_: the earlier is
+//     single-line and introduces or assigns a name that the later references,
+//     neither is a `type` alias, and the later is not a multi-line declaration,
+//     a multi-line `return`, or a multi-line `throw` (references inside the
+//     body of a nested function declaration, class declaration, or class
 //     expression don't count).
-//   - Neither is a hook-call statement, and _matching declarations_: both are single-line
-//     `const`/`let` with one declarator each and matching export-ness (`export const` with
-//     `export const`, plain `const` with plain `const`), with right-hand sides either both
-//     non-calls, or both calls (sharing a callee, or both zero-argument).
-//   - Neither is a hook-call statement, and _matching type aliases_: both are single-line
-//     `type` aliases with matching export-ness (`export type` with `export type`, plain
-//     `type` with plain `type`).
-//   - Neither is a hook-call statement, and both are `if`s, except when the earlier is a
-//     guard `if` (then-branch always terminates via `return`/`throw`/`break`/`continue`,
-//     recursively through `block`, `if`, `try`) and the later is not.
-//   - Neither is a hook-call statement, and the earlier is an expression statement while the
-//     later is an expression statement, a non-guard `if`, a single-line `return`, a
-//     single-line `throw`, `break`, or `continue`.
+//   - Neither is a hook-call statement, and _matching declarations_: both are
+//     single-line `const`/`let` with one declarator each and matching
+//     export-ness (`export const` with `export const`, plain `const` with plain
+//     `const`), with right-hand sides either both non-calls, or both calls
+//     (sharing a callee, or both zero-argument).
+//   - Neither is a hook-call statement, and _matching type aliases_: both are
+//     single-line `type` aliases with matching export-ness (`export type` with
+//     `export type`, plain `type` with plain `type`).
+//   - Neither is a hook-call statement, and both are `if`s, except when the
+//     earlier is a guard `if` (then-branch always terminates via
+//     `return`/`throw`/`break`/`continue`, recursively through `block`, `if`,
+//     `try`) and the later is not.
+//   - Neither is a hook-call statement, and the earlier is an expression
+//     statement while the later is an expression statement, a non-guard `if`,
+//     a single-line `return`, a single-line `throw`, `break`, or `continue`.
 //   - Both are hook-call statements and form matching declarations.
 //
-// For `JSXChild[]` (JSXElement and JSXFragment children, after filtering pure-whitespace
-// `JSXText`), comment-only `JSXExpressionContainer`s (those whose expression is
-// `JSXEmptyExpression`) attach as leading documentation to the next non-comment-only sibling.
-// Insert one blank line between two adjacent non-comment-only items (the earlier and the
-// later) when the later starts a new thought, which is the case when its leading
-// comment-only containers span multiple lines, or when none of these holds:
+// For `JSXChild[]` (JSXElement and JSXFragment children, after filtering
+// pure-whitespace `JSXText`), comment-only `JSXExpressionContainer`s (those
+// whose expression is `JSXEmptyExpression`) attach as leading documentation to
+// the next non-comment-only sibling. Insert one blank line between two
+// adjacent non-comment-only items (the earlier and the later) when the later
+// starts a new thought, which is the case when its leading comment-only
+// containers span multiple lines, or when none of these holds:
 //
-//   - The sibling list contains a literal-text node (a `JSXText` with non-whitespace
-//     content, or a `JSXExpressionContainer` whose expression yields a string literal
-//     directly, via a logical or conditional operator, or as a template literal).
+//   - The sibling list contains a literal-text node (a `JSXText` with
+//     non-whitespace content, or a `JSXExpressionContainer` whose expression
+//     yields a string literal directly, via a logical or conditional operator,
+//     or as a template literal).
 //   - Both the earlier and the later are single-line.
 
 import {
@@ -81,8 +88,8 @@ const FLOW_NEXT_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.ContinueStatement,
 ]);
 
-// Statement kinds that, when multi-line, always deserve their own paragraph regardless of
-// other coupling.
+// Statement kinds that, when multi-line, always deserve their own paragraph
+// regardless of other coupling.
 const HEAVY_NEXT_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.VariableDeclaration,
   AST_NODE_TYPES.FunctionDeclaration,
@@ -99,8 +106,9 @@ const TERMINATING_STATEMENT_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.ContinueStatement,
 ]);
 
-// `parent` is typed non-null on every TSESTree node, but the Program root has no parent at
-// runtime. This keeps the `undefined` reachable so guarded ascents terminate.
+// `parent` is typed non-null on every TSESTree node, but the Program root has
+// no parent at runtime. This keeps `undefined` reachable so guarded ascents
+// terminate.
 function parentOf(node: TSESTree.Node): TSESTree.Node | undefined {
   return (node as { parent?: TSESTree.Node }).parent;
 }
@@ -208,8 +216,8 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
         return;
       }
 
-      // Preserve user grouping (e.g., imports and re-exports): user-inserted blanks within
-      // the group are preserved rather than collapsed.
+      // Preserve user grouping (e.g., imports and re-exports): user-inserted
+      // blanks within the group are preserved rather than collapsed.
       if (paddingCount > targetPadding && shouldPreserveExtra()) {
         return;
       }
@@ -264,14 +272,14 @@ function sameParagraph(
   next: TSESTree.Statement,
   sourceCode: TSESLint.SourceCode,
 ): boolean {
-  // Multi-line leading comments document `next` as its own thing: a new paragraph regardless
-  // of declaration shape.
+  // Multi-line leading comments document `next` as its own thing: a new
+  // paragraph regardless of declaration shape.
   if (hasMultiLineLeadingComment(next, sourceCode)) {
     return false;
   }
 
-  // Hook-call statements form their own paragraph: they pair only with another hook-call
-  // var decl that satisfies (B).
+  // Hook-call statements form their own paragraph: they pair only with another
+  // hook-call variable declaration that satisfies (B).
   const prevHook = isHookStatement(prev);
   const nextHook = isHookStatement(next);
   if (prevHook || nextHook) {
@@ -406,28 +414,37 @@ function isMatchingVarDeclPair(
   prev: TSESTree.Statement,
   next: TSESTree.Statement,
 ): boolean {
-  const p = unwrapExport(prev);
-  const n = unwrapExport(next);
+  const previousDeclaration = unwrapExport(prev);
+  const nextDeclaration = unwrapExport(next);
   if (
-    p.type !== AST_NODE_TYPES.VariableDeclaration ||
-    n.type !== AST_NODE_TYPES.VariableDeclaration
+    previousDeclaration.type !== AST_NODE_TYPES.VariableDeclaration ||
+    nextDeclaration.type !== AST_NODE_TYPES.VariableDeclaration
   ) {
     return false;
   }
-  if (!isConstOrLet(p) || !isConstOrLet(n)) {
+  if (!isConstOrLet(previousDeclaration) || !isConstOrLet(nextDeclaration)) {
     return false;
   }
   if (isMultiLine(prev) || isMultiLine(next)) {
     return false;
   }
-  if (p.declarations.length !== 1 || n.declarations.length !== 1) {
+  if (
+    previousDeclaration.declarations.length !== 1 ||
+    nextDeclaration.declarations.length !== 1
+  ) {
     return false;
   }
-  if (!initsMatchByShape(p.declarations[0].init, n.declarations[0].init)) {
+  if (
+    !initsMatchByShape(
+      previousDeclaration.declarations[0].init,
+      nextDeclaration.declarations[0].init,
+    )
+  ) {
     return false;
   }
 
-  // `export const` (public) and plain `const` (local helper) belong to different paragraphs.
+  // `export const` (public) and plain `const` (local helper) belong to
+  // different paragraphs.
   return (
     (prev.type === AST_NODE_TYPES.ExportNamedDeclaration) ===
     (next.type === AST_NODE_TYPES.ExportNamedDeclaration)
@@ -438,11 +455,11 @@ function isMatchingTypeAliasPair(
   prev: TSESTree.Statement,
   next: TSESTree.Statement,
 ): boolean {
-  const p = unwrapExport(prev);
-  const n = unwrapExport(next);
+  const previousDeclaration = unwrapExport(prev);
+  const nextDeclaration = unwrapExport(next);
   if (
-    p.type !== AST_NODE_TYPES.TSTypeAliasDeclaration ||
-    n.type !== AST_NODE_TYPES.TSTypeAliasDeclaration
+    previousDeclaration.type !== AST_NODE_TYPES.TSTypeAliasDeclaration ||
+    nextDeclaration.type !== AST_NODE_TYPES.TSTypeAliasDeclaration
   ) {
     return false;
   }
@@ -450,7 +467,8 @@ function isMatchingTypeAliasPair(
     return false;
   }
 
-  // `export type` (public) and plain `type` (local helper) belong to different paragraphs.
+  // `export type` (public) and plain `type` (local helper) belong to different
+  // paragraphs.
   return (
     (prev.type === AST_NODE_TYPES.ExportNamedDeclaration) ===
     (next.type === AST_NODE_TYPES.ExportNamedDeclaration)
@@ -537,8 +555,8 @@ function calleesEqual(
     return false;
   }
 
-  // Chained calls: match when the underlying callees match. Arguments at intermediate levels
-  // are ignored, and final-level arguments are governed by initsMatchByShape.
+  // Chained calls match when their underlying callees match. Intermediate
+  // arguments are ignored, and final-level arguments use `initsMatchByShape`.
   if (
     a.type === AST_NODE_TYPES.CallExpression &&
     b.type === AST_NODE_TYPES.CallExpression
@@ -733,16 +751,16 @@ function thisResolvesOutsideRoot(
   thisNode: TSESTree.ThisExpression,
   root: TSESTree.Node,
 ): boolean {
-  let p = parentOf(thisNode);
-  while (p) {
+  let parent = parentOf(thisNode);
+  while (parent) {
     if (
-      p.type === AST_NODE_TYPES.FunctionDeclaration ||
-      p.type === AST_NODE_TYPES.FunctionExpression
+      parent.type === AST_NODE_TYPES.FunctionDeclaration ||
+      parent.type === AST_NODE_TYPES.FunctionExpression
     ) {
-      return !isInSubtree(p, root);
+      return !isInSubtree(parent, root);
     }
 
-    p = parentOf(p);
+    parent = parentOf(parent);
   }
 
   return true;
@@ -827,8 +845,9 @@ function isDeclarationOrPropertyKey(idNode: TSESTree.Identifier): boolean {
   }
 
   // Property key in a non-shorthand, non-computed `{key: value}` (whether in an
-  // ObjectExpression literal or an ObjectPattern destructure) is a property name string, not a
-  // value reference. Shorthand keys flow through so the value reference is captured.
+  // ObjectExpression literal or ObjectPattern destructure) is a property-name
+  // string, not a value reference. Shorthand keys flow through so the value
+  // reference is captured.
   if (
     parent.type === AST_NODE_TYPES.Property &&
     parent.key === idNode &&
@@ -837,7 +856,9 @@ function isDeclarationOrPropertyKey(idNode: TSESTree.Identifier): boolean {
   ) {
     return true;
   }
-  // Identifier inside a destructuring pattern is a binding name, not a reference.
+
+  // An identifier inside a destructuring pattern is a binding name, not a
+  // reference.
   if (isInBindingPosition(idNode)) {
     return true;
   }
@@ -847,45 +868,45 @@ function isDeclarationOrPropertyKey(idNode: TSESTree.Identifier): boolean {
 
 function isInBindingPosition(idNode: TSESTree.Identifier): boolean {
   let cur: TSESTree.Node = idNode;
-  let p = parentOf(cur);
-  while (p) {
+  let parent = parentOf(cur);
+  while (parent) {
     if (
-      FN_DECL_TYPES.has(p.type) &&
-      "params" in p &&
-      Array.isArray(p.params) &&
-      (p.params as TSESTree.Node[]).includes(cur)
+      FN_DECL_TYPES.has(parent.type) &&
+      "params" in parent &&
+      Array.isArray(parent.params) &&
+      (parent.params as TSESTree.Node[]).includes(cur)
     ) {
       return true;
     }
     if (
-      p.type === AST_NODE_TYPES.ObjectPattern ||
-      p.type === AST_NODE_TYPES.ArrayPattern
+      parent.type === AST_NODE_TYPES.ObjectPattern ||
+      parent.type === AST_NODE_TYPES.ArrayPattern
     ) {
       return true;
     }
-    if (p.type === AST_NODE_TYPES.Property) {
+    if (parent.type === AST_NODE_TYPES.Property) {
       // Computed keys are reference expressions, not bindings.
-      if (p.computed && p.key === cur) {
+      if (parent.computed && parent.key === cur) {
         return false;
       }
 
-      cur = p;
-      p = parentOf(p);
+      cur = parent;
+      parent = parentOf(parent);
       continue;
     }
-    if (p.type === AST_NODE_TYPES.AssignmentPattern) {
+    if (parent.type === AST_NODE_TYPES.AssignmentPattern) {
       // Right side is the default value (a reference expression).
-      if (p.right === cur) {
+      if (parent.right === cur) {
         return false;
       }
 
-      cur = p;
-      p = parentOf(p);
+      cur = parent;
+      parent = parentOf(parent);
       continue;
     }
-    if (p.type === AST_NODE_TYPES.RestElement) {
-      cur = p;
-      p = parentOf(p);
+    if (parent.type === AST_NODE_TYPES.RestElement) {
+      cur = parent;
+      parent = parentOf(parent);
       continue;
     }
 
@@ -900,8 +921,8 @@ function sameJsxParagraph(
   next: TSESTree.JSXChild,
   leading: TSESTree.JSXExpressionContainer[],
 ): boolean {
-  // Multi-line leading comment-only containers document `next` as its own thing: a new
-  // paragraph regardless of sibling shape.
+  // Multi-line leading comment-only containers document `next` as its own
+  // thing: a new paragraph regardless of sibling shape.
   const firstLeading = leading[0];
   const lastLeading = leading[leading.length - 1];
   if (
@@ -912,14 +933,15 @@ function sameJsxParagraph(
     return false;
   }
 
-  // Inline prose: a sibling list that mixes elements with literal-string spacers like {" "}
-  // or {", "} reads as one rendered text run.
+  // Inline prose: a sibling list that mixes elements with literal-string
+  // spacers like {" "} or {", "} reads as one rendered text run.
   if (siblingsIncludeLiteralText(next)) {
     return true;
   }
 
-  // A multi-line sibling next to anything else is a distinct visual chunk. The asymmetric
-  // weight reads as its own paragraph regardless of the lighter sibling's shape.
+  // A multi-line sibling next to anything else is a distinct visual chunk. The
+  // asymmetric weight reads as its own paragraph regardless of the lighter
+  // sibling's shape.
   return !(isMultiLine(prev) || isMultiLine(next));
 }
 
@@ -990,19 +1012,19 @@ function walk(
 
   fn(node);
 
-  const obj = node as unknown as Record<string, unknown>;
-  for (const key of Object.keys(obj)) {
+  const nodeFields = node as unknown as Record<string, unknown>;
+  for (const key of Object.keys(nodeFields)) {
     if (SKIP_KEYS.has(key)) {
       continue;
     }
 
-    // Only the body is opaque: params (and their default-value expressions) are walked, so
-    // names captured from the surrounding scope still count as references.
+    // Only the body is opaque: params and their default-value expressions are
+    // walked, so names captured from the surrounding scope still count.
     if (key === "body" && OPAQUE_BODY_TYPES.has(node.type)) {
       continue;
     }
 
-    const child = obj[key];
+    const child = nodeFields[key];
     if (Array.isArray(child)) {
       for (const c of child) {
         walk(c as TSESTree.Node | null, fn);
