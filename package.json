@@ -45,10 +45,6 @@
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged && pnpm run lint:typecheck"
   },
-  "lint-staged": {
-    "*": "prettier --ignore-unknown --write",
-    "*.{js,cjs,mjs,ts,tsx}": "eslint --fix"
-  },
   "dependencies": {
     "@typescript-eslint/utils": "^8.59.3"
   },
