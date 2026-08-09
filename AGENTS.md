@@ -6,6 +6,8 @@ Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v
 
 - After changing an ESLint-supported file: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
 - After changing another Prettier-supported file: `pnpm exec prettier --write <file>`
+- Update `README.md` in the same change when package installation, configuration usage, the published rule list, or development commands change.
+- Update `docs/rules/consistent-blank-lines.md` in the same change when `src/rules/consistent-blank-lines.ts` changes the rule's source-owned behavior or specification.
 - After finishing a set of related changes: `pnpm test` and `pnpm run lint:typecheck`
 
 ## Boundaries
@@ -24,7 +26,6 @@ Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v
 
 - Read `package.json` and `mise.toml` for the peer contract, dependencies, scripts, and toolchain versions.
 - Read `tsdown.config.ts` and the `package.json` exports before changing bundle output.
-- Update `docs/rules/consistent-blank-lines.md` with `src/rules/consistent-blank-lines.ts` when that rule's specification changes.
 - Read `.github/workflows/{ci,publish}.yml` before changing compatibility checks or release delivery.
 
 ```
