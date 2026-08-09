@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.9.1",
+    "@types/node": "^20.19.0",
     "@typescript-eslint/rule-tester": "^8.59.3",
     "@utilfirst/prettier-plugin": "^0.1.0",
     "@vitest/coverage-v8": "^4.1.7",
