@@ -2,32 +2,6 @@
 
 Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v9/v10 peer.
 
-## Directory layout
-
-```
-.github/workflows/
-├── ci.yml                          Lint + build + test on PR
-└── publish.yml                     Tag-triggered OIDC publish
-docs/rules/                         Per-rule spec docs, linked from each rule's meta.docs.url
-src/
-├── index.ts                        Plugin entry: meta, rules map, configs.recommended
-└── rules/                          One file per rule, with colocated `*.test.ts` siblings
-```
-
-## Stack
-
-- TypeScript, tsdown for bundling, vitest + `@typescript-eslint/rule-tester` for tests
-- Peer: `eslint@^9 || ^10`
-- Runtime dep: `@typescript-eslint/utils` (marked `external` in `tsdown.config.ts` to keep the bundle small)
-- pnpm 11, Node ≥20.19 (toolchain pinned to Node 24 in `mise.toml`)
-
-## Commands
-
-- `pnpm install`: install dependencies
-- `pnpm run setup-hooks`: wire the `simple-git-hooks` pre-commit (run once after clone)
-- `pnpm run build`: bundle via tsdown to `dist/index.js` + `dist/index.d.ts`
-- `pnpm test`: run vitest
-
 ## Workflow
 
 - After changing an ESLint-supported file: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
@@ -41,6 +15,34 @@ src/
 - Ask first before the one-time package bootstrap through local `npm publish --provenance=false`.
 - Never publish manually after the package has an npm trusted publisher. The OIDC publisher in `publish.yml` is the sanctioned release path.
 - Never tag a release without `pnpm test` and `pnpm run lint:typecheck` green locally.
+
+## Stack
+
+- ESM-only ESLint flat-config plugin bundled with tsdown and tested through Vitest plus the TypeScript ESLint rule tester.
+
+## Structure
+
+- Read `package.json` and `mise.toml` for the peer contract, dependencies, scripts, and toolchain versions.
+- Read `tsdown.config.ts` and the `package.json` exports before changing bundle output.
+- Update `docs/rules/consistent-blank-lines.md` with `src/rules/consistent-blank-lines.ts` when that rule's specification changes.
+- Read `.github/workflows/{ci,publish}.yml` before changing compatibility checks or release delivery.
+
+```
+.github/workflows/
+├── ci.yml                          Lint + build + test on PR
+└── publish.yml                     Tag-triggered OIDC publish
+docs/rules/                         Per-rule spec docs, linked from each rule's meta.docs.url
+src/
+├── index.ts                        Plugin entry: meta, rules map, configs.recommended
+└── rules/                          One file per rule, with colocated `*.test.ts` siblings
+```
+
+## Commands
+
+- `pnpm install`: install dependencies
+- `pnpm run setup-hooks`: wire the `simple-git-hooks` pre-commit (run once after clone)
+- `pnpm run build`: bundle via tsdown to `dist/index.js` + `dist/index.d.ts`
+- `pnpm test`: run vitest
 
 ## Build and bundling
 
@@ -62,21 +64,17 @@ src/
 - Wire `simple-git-hooks` through `pnpm run setup-hooks` instead of `prepare` or `postinstall`. The hook-script form tripped pnpm's `[ERR_PNPM_IGNORED_BUILDS]` gate on every consumer install, and the `false` opt-out in `pnpm-workspace.yaml` did not survive pnpm's auto-rewrite.
 - `prepack` runs the build before pack/publish so the tarball always contains a fresh `dist/`
 
-## Consumer linking
-
-- Sibling repos consume this plugin from npm at `^X.Y.Z`. For local iteration against unpublished changes, swap to `link:../utilfirst-eslint-plugin` (not `file:`, which triggers pnpm's ignored-build-scripts gate).
-
-## GitHub Actions
-
-- `ci.yml` runs a matrix over ESLint 9 and 10 because the peer range is `^9 || ^10` and the rule tester exercises whichever ESLint is installed. The 9 leg installs `eslint@9` over the frozen lockfile at runtime, then runs build and test only to verify rule compatibility. `pnpm run lint` runs on the 10 leg alone, because `eslint.config.mjs` imports `defineConfig` from `eslint/config`, which early 9.x releases lack
-
 ## Release
 
-- One-time setup: configure an npm trusted publisher on npmjs.com pointing at scope `@utilfirst`, repo `utilfirst/utilfirst-eslint-plugin`, workflow `publish.yml`, environment `release`. Create a matching `release` GitHub environment
-- The one-time package bootstrap needs explicit approval: publish via local `npm publish --provenance=false`, then add the trusted publisher to the now-existing package. Subsequent versions ride `publish.yml`. The bootstrap exists because npm's trusted publisher can't be configured for a non-existent package
-- Each release: bump `version` in `package.json`, tag `vX.Y.Z`, push the tag. `publish.yml` builds, runs lint + test, packs, publishes with OIDC + automatic provenance, then emits release notes via changelogithub. `meta.version` is set from `package.json` at build time, so the version bump is the only edit needed.
-- No `NPM_TOKEN`. The `release` environment is the gate
+- Configure the npm trusted publisher for scope `@utilfirst`, repository `utilfirst/utilfirst-eslint-plugin`, workflow `publish.yml`, and environment `release`. Create the matching GitHub environment.
+- Bootstrap the package only after approval with `npm publish --provenance=false`, then add the trusted publisher to the new package. Subsequent versions use `publish.yml`.
+- Bump `version` in `package.json`, tag `vX.Y.Z`, and push the tag for each release. The workflow builds, checks, packs, publishes through OIDC, and writes release notes.
+- Keep `NPM_TOKEN` out of the release path. The `release` environment is the gate.
 
 ## Excluded tooling
 
-- `@arethetypeswrong/cli` is not wired up. `@andrewbranch/untar.js` (attw's tar reader) throws `Cannot read properties of undefined (reading 'filename')` on Node 24 across attw 0.15-0.18 for this package's tarball shape. `publint` covers the publishing surface (exports, types, file list)
+- Keep `@arethetypeswrong/cli` out until its tar reader supports this package's tarball under the pinned Node toolchain. Use `publint` for exports, types, and package-file checks.
+
+## Consumer linking
+
+- Sibling repos consume this plugin from npm at `^X.Y.Z`. For local iteration against unpublished changes, swap to `link:../utilfirst-eslint-plugin` (not `file:`, which triggers pnpm's ignored-build-scripts gate).
