@@ -46,18 +46,19 @@ function load(): unknown {
   return input;
 }
 
-function configure(isEnabled: boolean): void {
-  consume(conditionalOptions, isEnabled);
-}
-
-function combine(first: string, second: string, third: string): string {
-  return first + second + third;
-}
+const owner = {
+  configure(isEnabled: boolean): void {
+    consume(conditionalOptions, isEnabled);
+  },
+  combine(first: string, second: string, third: string): string {
+    return first + second + third;
+  },
+};
 
 void Promise.resolve();
 
 // eslint-disable-next-line no-console
-console.log(combine("a", "b", "c"));
+console.log(owner.combine("a", "b", "c"));
 `;
 
 const ruleNames = Object.keys(plugin.rules);

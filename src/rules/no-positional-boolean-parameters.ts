@@ -2,7 +2,10 @@ import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 import { z } from "zod";
 
-type OwnedFunction = ESTree.ArrowFunctionExpression | ESTree.Function;
+import {
+  getOwnedFunctionName,
+  type OwnedFunction,
+} from "../shared/owned-function.ts";
 
 const OptionsSchema = z.object({
   allowFunctionNames: z.array(z.string()).optional(),
@@ -40,30 +43,13 @@ function parameterName(
     : sourceCode.getText(parameter);
 }
 
-function ownedFunctionName(node: OwnedFunction): string | null {
-  if (node.type === "FunctionDeclaration") {
-    return node.id?.name ?? null;
-  }
-  if (
-    (node.type === "ArrowFunctionExpression" ||
-      node.type === "FunctionExpression") &&
-    node.parent.type === "VariableDeclarator" &&
-    node.parent.init === node &&
-    node.parent.id.type === "Identifier"
-  ) {
-    return node.parent.id.name;
-  }
-
-  return null;
-}
-
-/** Disallow positional boolean flags on repository-owned named functions. */
+/** Disallow positional boolean flags on repository-owned named callables. */
 export const noPositionalBooleanParametersRule = defineRule({
   meta: {
     type: "suggestion",
     docs: {
       description:
-        "Disallow explicit boolean parameters on named function declarations and bindings.",
+        "Disallow explicit boolean parameters on repository-owned named callables.",
     },
     messages: {
       positionalBoolean:
@@ -86,7 +72,7 @@ export const noPositionalBooleanParametersRule = defineRule({
   },
   createOnce(context) {
     const checkFunction = (node: OwnedFunction) => {
-      const functionName = ownedFunctionName(node);
+      const functionName = getOwnedFunctionName(node);
       if (functionName === null) {
         return;
       }

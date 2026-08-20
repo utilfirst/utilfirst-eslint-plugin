@@ -1,8 +1,10 @@
-import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 import { z } from "zod";
 
-type OwnedFunction = ESTree.ArrowFunctionExpression | ESTree.Function;
+import {
+  getOwnedFunctionName,
+  type OwnedFunction,
+} from "../shared/owned-function.ts";
 
 const OptionsSchema = z.object({
   allowFunctionNames: z.array(z.string()).optional(),
@@ -12,30 +14,13 @@ const ContextOptionsSchema = z
   .union([OptionsSchema, z.array(OptionsSchema)])
   .nullable();
 
-function ownedFunctionName(node: OwnedFunction): string | null {
-  if (node.type === "FunctionDeclaration") {
-    return node.id?.name ?? null;
-  }
-  if (
-    (node.type === "ArrowFunctionExpression" ||
-      node.type === "FunctionExpression") &&
-    node.parent.type === "VariableDeclarator" &&
-    node.parent.init === node &&
-    node.parent.id.type === "Identifier"
-  ) {
-    return node.parent.id.name;
-  }
-
-  return null;
-}
-
-/** Require repository-owned named functions with 3+ inputs to use options. */
+/** Require repository-owned named callables with 3+ inputs to use options. */
 export const preferOptionsParameterRule = defineRule({
   meta: {
     type: "suggestion",
     docs: {
       description:
-        "Require named function declarations and bindings with three or more inputs to use one options object.",
+        "Require repository-owned named callables with three or more inputs to use one options object.",
     },
     messages: {
       preferOptions:
@@ -58,7 +43,7 @@ export const preferOptionsParameterRule = defineRule({
   },
   createOnce(context) {
     const checkFunction = (node: OwnedFunction) => {
-      const functionName = ownedFunctionName(node);
+      const functionName = getOwnedFunctionName(node);
 
       const parameterCount = node.params.filter(
         (parameter) =>

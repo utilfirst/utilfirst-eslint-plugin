@@ -37,10 +37,14 @@ ruleTester.run("prefer-options-parameter", rule, {
     "function load(first: string, second: string) {}",
     "function load(this: Owner, first: string, second: string) {}",
     "items.map((item, index, items) => item);",
-    "const owner = { load(first: string, second: string, third: string) {} };",
+    "const owner = { [methodName](first: string, second: string, third: string) {} };",
     {
       code: "function protocol(first: string, second: string, third: string) {}",
       options: [{ allowFunctionNames: ["protocol"] }],
+    },
+    {
+      code: "const owner = { load(first: string, second: string, third: string) {} };",
+      options: [{ allowFunctionNames: ["load"] }],
     },
   ],
   invalid: [
@@ -60,6 +64,28 @@ ruleTester.run("prefer-options-parameter", rule, {
     {
       code: "const load = function (first: string, second: string, ...rest: string[]) {};",
       errors: [{ messageId: "preferOptions" }],
+    },
+    {
+      code: "const owner = { load(first: string, second: string, third: string) {} };",
+      errors: [
+        {
+          messageId: "preferOptions",
+          data: { functionName: "load", parameterCount: 3 },
+        },
+      ],
+    },
+    {
+      code: "class Owner { load(first: string, second: string, third: string) {} }",
+      errors: [{ messageId: "preferOptions" }],
+    },
+    {
+      code: "class Owner { #load = (first: string, second: string, third: string) => {}; }",
+      errors: [
+        {
+          messageId: "preferOptions",
+          data: { functionName: "#load", parameterCount: 3 },
+        },
+      ],
     },
   ],
 });

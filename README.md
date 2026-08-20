@@ -130,7 +130,7 @@ export default [
 | [`no-known-value-widening`](./docs/rules.md#type-evidence)                           | Reject known values widened into broad target types                                   |
 | [`no-module-mocking`](./docs/rules.md#ownership-and-tests)                           | Reject Vitest and Jest mocking of repository-owned modules                            |
 | [`no-object-parameters`](./docs/rules.md#boundary-contracts)                         | Reject `object` function parameters                                                   |
-| [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)    | Reject positional boolean flags on named functions                                    |
+| [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)    | Reject positional boolean flags on named functions and methods                        |
 | [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                    | Reject `Reflect.apply`                                                                |
 | [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                      | Reject `Reflect.get`                                                                  |
 | [`no-runtime-typeof`](./docs/rules.md#boundary-contracts)                            | Keep runtime `typeof` checks inside explicit decoding boundaries                      |
@@ -141,7 +141,7 @@ export default [
 | [`no-unsafe-dictionary-type`](./docs/rules.md#boundary-contracts)                    | Reject dictionary contracts with broad value types                                    |
 | [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                     | Require rejection handling on `void`-marked detached call chains                      |
 | [`no-widen-then-assert`](./docs/rules.md#type-evidence)                              | Reject const flows that widen a known value before narrowing it                       |
-| [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)            | Require an options object for named functions with three or more inputs               |
+| [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)            | Require options objects for named functions and methods with three or more inputs     |
 | [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                     | Require a forcing reason on lint disable directives                                   |
 | [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)         | Require one `SAFETY:` comment for each outermost non-const assertion                  |
 

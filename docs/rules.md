@@ -34,10 +34,10 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 - `no-conditional-empty-object-spread` rejects conditional spreads that use `{}` to encode property omission. Create a typed object and add the property only in the branch where it is present so the mutation owns the presence transition.
 - `no-conditional-undefined-properties` rejects object properties whose conditional value is `undefined`. Omit the property through a branched call or a typed local object so presence has one meaning.
 - `no-enum-declarations` rejects repository-owned TypeScript enums, including const enums. Use literal unions or inferred constant objects. Ambient and declaration-file enums remain valid when a boundary requires them.
-- `no-positional-boolean-parameters` rejects boolean flags on repository-owned named function declarations and bindings. Use a named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
+- `no-positional-boolean-parameters` rejects boolean flags on repository-owned named functions and methods. Use a named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
 - `no-reflect-apply` rejects dynamic invocation through `Reflect.apply`. Call a typed function directly or place dynamic dispatch behind a named interface.
 - `no-reflect-get` rejects dynamic reads through `Reflect.get`. Use typed property access or parse a dynamic value into a named contract before reading it.
-- `prefer-options-parameter` rejects repository-owned named function declarations and bindings with three or more inputs. Replace the positional inputs with one named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
+- `prefer-options-parameter` rejects repository-owned named functions and methods with three or more inputs. Replace the positional inputs with one named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
 
 ## Async errors
 

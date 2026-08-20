@@ -36,11 +36,14 @@ ruleTester.run("no-positional-boolean-parameters", rule, {
   valid: [
     "function load(options: { isFresh: boolean }) {}",
     "items.filter((item, isSelected: boolean) => isSelected);",
-    "const owner = { load(isFresh: boolean) {} };",
-    "class Owner { load(isFresh: boolean) {} }",
+    "const owner = { [methodName](isFresh: boolean) {} };",
     {
       code: "function protocol(isFresh: boolean) {}",
       options: [{ allowFunctionNames: ["protocol"] }],
+    },
+    {
+      code: "const owner = { load(isFresh: boolean) {} };",
+      options: [{ allowFunctionNames: ["load"] }],
     },
   ],
   invalid: [
@@ -60,6 +63,28 @@ ruleTester.run("no-positional-boolean-parameters", rule, {
     {
       code: "const load = function (isFresh: boolean = false) {};",
       errors: [{ messageId: "positionalBoolean" }],
+    },
+    {
+      code: "const owner = { load(isFresh: boolean) {} };",
+      errors: [
+        {
+          messageId: "positionalBoolean",
+          data: { functionName: "load", parameter: "isFresh" },
+        },
+      ],
+    },
+    {
+      code: "class Owner { load(isFresh: boolean) {} }",
+      errors: [{ messageId: "positionalBoolean" }],
+    },
+    {
+      code: "class Owner { #load = (isFresh: boolean) => {}; }",
+      errors: [
+        {
+          messageId: "positionalBoolean",
+          data: { functionName: "#load", parameter: "isFresh" },
+        },
+      ],
     },
   ],
 });
