@@ -1,11 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { afterAll, describe, it } from "vitest";
 import plugin from "../index.ts";
-
-RuleTester.afterAll = afterAll;
-RuleTester.describe = describe;
-RuleTester.it = it;
-RuleTester.itOnly = it.only;
 
 const rule = plugin.rules["no-unhandled-detached-promises"];
 if (rule === undefined) {

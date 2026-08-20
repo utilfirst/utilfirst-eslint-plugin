@@ -1,17 +1,11 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import type { TSESLint } from "@typescript-eslint/utils";
-import { afterAll, describe, it } from "vitest";
 import plugin from "../index.ts";
 
 type ModuleMockRule = TSESLint.RuleModule<
   "moduleMock",
   [{ internalModulePrefixes?: string[] }]
 >;
-
-RuleTester.afterAll = afterAll;
-RuleTester.describe = describe;
-RuleTester.it = it;
-RuleTester.itOnly = it.only;
 
 function assertModuleMockRule(
   candidateRule: TSESLint.RuleModule<string>,

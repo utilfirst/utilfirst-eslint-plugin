@@ -1,12 +1,6 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import type { TSESLint } from "@typescript-eslint/utils";
-import { afterAll, describe, it } from "vitest";
 import plugin from "../index.ts";
-
-RuleTester.afterAll = afterAll;
-RuleTester.describe = describe;
-RuleTester.it = it;
-RuleTester.itOnly = it.only;
 
 type RuntimeTypeofRule = TSESLint.RuleModule<
   "runtimeTypeof",
