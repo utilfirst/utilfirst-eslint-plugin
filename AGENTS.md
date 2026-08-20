@@ -4,11 +4,11 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 
 ## Workflow
 
-- After changing an ESLint-supported file: `pnpm exec eslint --fix <file>` and `pnpm exec prettier --write <file>`
+- After changing an Oxlint-supported file: `pnpm exec oxlint --fix <file>` and `pnpm exec prettier --write <file>`
 - After changing another Prettier-supported file: `pnpm exec prettier --write <file>`
 - Update `README.md` in the same change when package installation, configuration usage, the published rule list, or development commands change.
 - Update `docs/rules/consistent-blank-lines.md` in the same change when `src/rules/consistent-blank-lines.ts` changes the rule's source-owned behavior or specification.
-- After finishing a set of related changes: `pnpm test` and `pnpm run lint:typecheck`
+- After finishing a set of related changes: `pnpm test` and `pnpm run lint:oxlint`
 
 ## Boundaries
 
@@ -16,7 +16,7 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 - Ask first before adding a new rule to `configs.recommended` (consumers that auto-upgrade pick it up on the next install).
 - Ask first before the one-time package bootstrap through local `npm publish --provenance=false`.
 - Never publish manually after the package has an npm trusted publisher. The OIDC publisher in `publish.yml` is the sanctioned release path.
-- Never tag a release without `pnpm test` and `pnpm run lint:typecheck` green locally.
+- Never tag a release without `pnpm test` and `pnpm run lint` green locally.
 
 ## Stack
 
@@ -25,6 +25,7 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 ## Structure
 
 - Read `package.json` and `mise.toml` for the peer contract, dependencies, scripts, and toolchain versions.
+- Let `.oxlintrc.json` own repository lint and type-check policy.
 - Read `tsdown.config.ts` and the `package.json` exports before changing bundle output.
 - Read `.github/workflows/{ci,publish}.yml` before changing compatibility checks or release delivery.
 
@@ -44,6 +45,7 @@ src/
 - `pnpm run setup-hooks`: wire the `simple-git-hooks` pre-commit (run once after clone)
 - `pnpm run build`: bundle via tsdown to `dist/index.js` + `dist/index.d.ts`
 - `pnpm test`: run vitest
+- `pnpm run lint`: run Oxlint with type checking, Prettier, and publint
 
 ## Build and bundling
 

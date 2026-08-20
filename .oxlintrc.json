@@ -1,0 +1,193 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "suspicious": "error"
+  },
+  "env": {
+    "builtin": true,
+    "es2024": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    ".pnpm-store/**",
+    ".tmp/**",
+    "dist/**",
+    "node_modules/**",
+    "pnpm-lock.yaml"
+  ],
+  "jsPlugins": [
+    {
+      "name": "utilfirst",
+      "specifier": "./src/index.ts"
+    }
+  ],
+  "options": {
+    "reportUnusedDisableDirectives": "error",
+    "typeAware": true,
+    "typeCheck": true
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx,mts,cts}"],
+      "rules": {
+        "constructor-super": "off",
+        "getter-return": "off",
+        "no-class-assign": "off",
+        "no-const-assign": "off",
+        "no-func-assign": "off",
+        "no-import-assign": "off",
+        "no-new-native-nonconstructor": "off",
+        "no-obj-calls": "off",
+        "no-setter-return": "off",
+        "no-this-before-super": "off",
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.{ts,tsx,mts,cts}"],
+      "rules": {
+        "typescript/no-unsafe-type-assertion": "off",
+        "typescript/strict-void-return": "off",
+        "typescript/require-await": "off"
+      }
+    },
+    {
+      "files": ["**/*.{js,cjs,mjs}"],
+      "rules": {
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off"
+      }
+    }
+  ],
+  "plugins": [
+    "eslint",
+    "import",
+    "node",
+    "oxc",
+    "promise",
+    "typescript",
+    "unicorn",
+    "vitest"
+  ],
+  "rules": {
+    "arrow-body-style": ["error", "as-needed"],
+    "curly": "error",
+    "eqeqeq": ["error", "smart"],
+    "import/export": "error",
+    "import/first": "error",
+    "import/max-dependencies": "off",
+    "import/no-duplicates": "error",
+    "import/no-unassigned-import": "off",
+    "max-lines-per-function": "off",
+    "max-lines": "off",
+    "no-else-return": "error",
+    "no-negated-condition": "off",
+    "no-nested-ternary": "error",
+    "no-shadow": "error",
+    "no-underscore-dangle": "off",
+    "no-useless-assignment": "error",
+    "object-shorthand": "error",
+    "prefer-const": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "promise/catch-or-return": "error",
+    "promise/no-nesting": "error",
+    "promise/no-return-in-finally": "error",
+    "promise/no-return-wrap": "error",
+    "promise/param-names": "error",
+    "require-await": "off",
+    "typescript/adjacent-overload-signatures": "error",
+    "typescript/array-type": "error",
+    "typescript/ban-tslint-comment": "error",
+    "typescript/class-literal-property-style": "error",
+    "typescript/consistent-generic-constructors": "error",
+    "typescript/consistent-indexed-object-style": "error",
+    "typescript/consistent-type-assertions": "error",
+    "typescript/consistent-type-definitions": ["error", "type"],
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "fixStyle": "inline-type-imports",
+        "prefer": "type-imports"
+      }
+    ],
+    "typescript/consistent-return": "off",
+    "typescript/dot-notation": "error",
+    "typescript/no-dynamic-delete": "error",
+    "typescript/no-empty-object-type": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-inferrable-types": "error",
+    "typescript/no-invalid-void-type": "error",
+    "typescript/no-namespace": "error",
+    "typescript/no-non-null-asserted-nullish-coalescing": "error",
+    "typescript/no-non-null-assertion": "off",
+    "typescript/no-require-imports": "error",
+    "typescript/no-unnecessary-condition": [
+      "error",
+      {
+        "allowConstantLoopConditions": true
+      }
+    ],
+    "typescript/non-nullable-type-assertion-style": "error",
+    "typescript/prefer-find": "error",
+    "typescript/prefer-for-of": "error",
+    "typescript/prefer-function-type": "error",
+    "typescript/prefer-literal-enum-member": "error",
+    "typescript/prefer-readonly-parameter-types": "off",
+    "typescript/prefer-reduce-type-parameter": "error",
+    "typescript/prefer-regexp-exec": "error",
+    "typescript/prefer-return-this-type": "error",
+    "typescript/prefer-string-starts-ends-with": "error",
+    "typescript/restrict-plus-operands": [
+      "error",
+      {
+        "allowAny": false,
+        "allowBoolean": false,
+        "allowNullish": false,
+        "allowNumberAndString": false,
+        "allowRegExp": false
+      }
+    ],
+    "typescript/return-await": ["error", "error-handling-correctness-only"],
+    "typescript/unified-signatures": "error",
+    "typescript/use-unknown-in-catch-callback-variable": "error",
+    "unicode-bom": ["error", "never"],
+    "unicorn/no-negated-condition": "off",
+    "utilfirst/consistent-blank-lines": "error",
+    "utilfirst/no-chained-type-assertions": "error",
+    "utilfirst/no-conditional-empty-object-spread": "error",
+    "utilfirst/no-conditional-undefined-properties": "error",
+    "utilfirst/no-enum-declarations": "error",
+    "utilfirst/no-known-value-widening": "error",
+    "utilfirst/no-module-mocking": "error",
+    "utilfirst/no-object-parameters": "error",
+    "utilfirst/no-positional-boolean-parameters": "error",
+    "utilfirst/no-reflect-apply": "error",
+    "utilfirst/no-reflect-get": "error",
+    "utilfirst/no-runtime-typeof": [
+      "error",
+      {
+        "allowInTypeGuards": true
+      }
+    ],
+    "utilfirst/no-shape-in-symbol-names": "error",
+    "utilfirst/no-unknown-parameters": "error",
+    "utilfirst/no-unknown-returns": "error",
+    "utilfirst/no-unknown-type-aliases": "error",
+    "utilfirst/no-unsafe-dictionary-type": "error",
+    "utilfirst/no-unhandled-detached-promises": "error",
+    "utilfirst/no-widen-then-assert": "error",
+    "utilfirst/prefer-options-parameter": "error",
+    "utilfirst/prefer-switch-discriminator-chain": "error",
+    "utilfirst/prefer-top-level-function-declarations": "error",
+    "utilfirst/require-lint-suppression-reason": "error",
+    "utilfirst/require-safety-comment-for-type-assertion": "error",
+    "vitest/no-conditional-in-test": "off"
+  }
+}

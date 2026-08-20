@@ -124,6 +124,7 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
       url: "https://github.com/utilfirst/utilfirst-eslint-plugin/blob/main/docs/rules/consistent-blank-lines.md",
     },
     fixable: "whitespace",
+    defaultOptions: [],
     schema: [],
     messages: {
       extra:
@@ -132,7 +133,6 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
         "Expected a blank line between items that start a new paragraph.",
     },
   },
-  defaultOptions: [],
   create(context) {
     const sourceCode = context.sourceCode;
 
@@ -367,7 +367,7 @@ function isHookCall(node: TSESTree.Node | null): boolean {
   return (
     node?.type === AST_NODE_TYPES.CallExpression &&
     node.callee.type === AST_NODE_TYPES.Identifier &&
-    /^use[A-Z]/.test(node.callee.name)
+    /^use[A-Z]/u.test(node.callee.name)
   );
 }
 
@@ -623,7 +623,7 @@ function blockAlwaysTerminates(node: TSESTree.Node): boolean {
     return true;
   }
   if (node.type === AST_NODE_TYPES.BlockStatement) {
-    const last = node.body[node.body.length - 1];
+    const last = node.body.at(-1);
     return last ? blockAlwaysTerminates(last) : false;
   }
   if (node.type === AST_NODE_TYPES.IfStatement) {
@@ -685,6 +685,7 @@ function collectIntroducedOrAssignedNames(
 }
 
 function collectBindingNames(node: TSESTree.Node, set: Set<string>) {
+  // oxlint-disable-next-line typescript/switch-exhaustiveness-check -- This walker intentionally ignores non-binding nodes.
   switch (node.type) {
     case AST_NODE_TYPES.Identifier:
       set.add(node.name);
@@ -712,6 +713,8 @@ function collectBindingNames(node: TSESTree.Node, set: Set<string>) {
       break;
     case AST_NODE_TYPES.AssignmentPattern:
       collectBindingNames(node.left, set);
+      break;
+    default:
       break;
   }
 }
@@ -757,11 +760,10 @@ function collectReferencedNames(
       }
     } else if (
       node.type === AST_NODE_TYPES.JSXIdentifier &&
-      isJsxComponentIdentifier(node)
+      isJsxComponentIdentifier(node) &&
+      resolvesOutsideRoot({ idNode: node, root, sourceCode })
     ) {
-      if (resolvesOutsideRoot({ idNode: node, root, sourceCode })) {
-        set.add(node.name);
-      }
+      set.add(node.name);
     }
   });
   return set;
@@ -815,7 +817,7 @@ function thisResolvesOutsideRoot(
 }
 
 function isJsxComponentIdentifier(node: TSESTree.JSXIdentifier): boolean {
-  if (!/^[A-Z]/.test(node.name)) {
+  if (!/^[A-Z]/u.test(node.name)) {
     return false;
   }
 
@@ -921,10 +923,13 @@ function isInBindingPosition(idNode: TSESTree.Identifier): boolean {
     if (
       FN_DECL_TYPES.has(parent.type) &&
       "params" in parent &&
-      Array.isArray(parent.params) &&
-      parent.params.some((parameter) => parameter === cur)
+      Array.isArray(parent.params)
     ) {
-      return true;
+      for (const parameter of parent.params) {
+        if (parameter === cur) {
+          return true;
+        }
+      }
     }
     if (
       parent.type === AST_NODE_TYPES.ObjectPattern ||
@@ -976,7 +981,8 @@ function sameJsxParagraph({
   // Multi-line leading comment-only containers document `next` as its own
   // thing: a new paragraph regardless of sibling shape.
   const firstLeading = leading[0];
-  const lastLeading = leading[leading.length - 1];
+
+  const lastLeading = leading.at(-1);
   if (
     firstLeading &&
     lastLeading &&
@@ -1114,6 +1120,7 @@ function hasMultiLineLeadingComment(
   }
 
   const first = comments[0];
-  const last = comments[comments.length - 1];
+
+  const last = comments.at(-1);
   return Boolean(first && last && last.loc.end.line > first.loc.start.line);
 }

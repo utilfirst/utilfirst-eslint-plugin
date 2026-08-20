@@ -160,7 +160,7 @@ pnpm install
 pnpm run setup-hooks # one-time: wire pre-commit via simple-git-hooks
 pnpm test            # unit, dual-runtime, and packed-artifact tests
 pnpm run build       # tsdown → dist/
-pnpm run lint        # eslint + prettier + publint + tsc
+pnpm run lint        # oxlint + prettier + publint
 ```
 
 ## License

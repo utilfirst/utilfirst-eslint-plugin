@@ -9,7 +9,7 @@ export function ruleContextOptionsSchema<Schema extends z.ZodType>(
     .nullable()
     .transform((options) => {
       if (options === null) {
-        return undefined;
+        return;
       }
       if (Array.isArray(options)) {
         return options[0];
