@@ -6,6 +6,7 @@
   "editor.formatOnSave": true,
   "editor.rulers": [80],
   "files.readonlyInclude": {
+    ".tmp/**": true,
     "dist/**": true,
     "node_modules/**": true,
     "pnpm-lock.yaml": true
