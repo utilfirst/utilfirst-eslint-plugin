@@ -28,6 +28,10 @@ ruleTester.run("no-unhandled-detached-promises", rule, {
       errors: [{ messageId: "unhandledDetachedPromise" }],
     },
     {
+      code: "void runSynchronously();",
+      errors: [{ messageId: "unhandledDetachedPromise" }],
+    },
+    {
       code: "void send().then(handleValue);",
       errors: [{ messageId: "unhandledDetachedPromise" }],
     },

@@ -70,17 +70,17 @@ function hasRejectionHandler(expression: ESTree.Expression): boolean {
   return false;
 }
 
-/** Require detached call chains to consume their rejection. */
+/** Treat `void` calls as detached work and require a rejection handler. */
 export const noUnhandledDetachedPromisesRule = defineRule({
   meta: {
     type: "problem",
     docs: {
       description:
-        "Disallow detached call chains that do not install a rejection handler.",
+        "Disallow void-marked detached call chains that do not install a rejection handler.",
     },
     messages: {
       unhandledDetachedPromise:
-        "This detached call does not handle rejection. Add `.catch(...)` or a second `.then(...)` callback at this boundary.",
+        "A `void` call marks detached work and must handle rejection. Add `.catch(...)` or a second `.then(...)` callback at this boundary.",
     },
   },
   createOnce(context) {

@@ -117,13 +117,13 @@ export default [
 | [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)    | Reject positional boolean flags on named functions                                    |
 | [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                    | Reject `Reflect.apply`                                                                |
 | [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                      | Reject `Reflect.get`                                                                  |
-| [`no-runtime-typeof`](./docs/rules.md#boundary-contracts)                            | Reject runtime `typeof` checks                                                        |
+| [`no-runtime-typeof`](./docs/rules.md#boundary-contracts)                            | Keep runtime `typeof` checks inside explicit decoding boundaries                      |
 | [`no-shape-in-symbol-names`](./docs/rules.md#ownership-and-tests)                    | Reject `shape` in symbols other than static properties                                |
-| [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                        | Reject explicit `unknown` parameters                                                  |
+| [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                        | Keep explicit `unknown` parameters at decoding boundaries                             |
 | [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                           | Reject `unknown` return contracts                                                     |
 | [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                      | Reject type aliases that resolve to `unknown`                                         |
 | [`no-unsafe-dictionary-type`](./docs/rules.md#boundary-contracts)                    | Reject dictionary contracts with broad value types                                    |
-| [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                     | Require rejection handling on detached call chains                                    |
+| [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                     | Require rejection handling on `void`-marked detached call chains                      |
 | [`no-widen-then-assert`](./docs/rules.md#type-evidence)                              | Reject const flows that widen a known value before narrowing it                       |
 | [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)            | Require an options object for named functions with three or more inputs               |
 | [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                     | Require a forcing reason on lint disable directives                                   |

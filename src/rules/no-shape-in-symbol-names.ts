@@ -43,7 +43,7 @@ export const noForbiddenTermInSymbolNamesRule = defineRule({
     type: "problem",
     docs: {
       description:
-        'Disallow "shape" in JavaScript, TypeScript, private, and JSX symbol names while preserving static property names.',
+        'Disallow "shape" in repository-owned symbols while preserving protocol-owned property and boundary names.',
     },
     messages: {
       forbiddenSymbolName:
