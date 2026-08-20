@@ -1,26 +1,36 @@
 # consistent-blank-lines
 
-Insert blank lines between statement-list and `JSXChild` items that start a new thought, and remove them between items that continue the same paragraph.
+Apply one explicit gap policy between adjacent statement-list and `JSXChild` items.
 - **Type**: `layout`
 - **Fixable**: yes (`--fix`)
 - **Configuration**: none (no options)
 
-## Spec
+## Gap policies
 
-### Statement lists
+Each adjacent pair receives one policy:
+- **Tight** requires zero blank lines.
+- **Separate** requires exactly one blank line.
+- **Preserve** leaves the existing gap unchanged.
 
-For `Statement[]` (Program body, BlockStatement body, SwitchCase consequent, StaticBlock body), insert one blank line between two adjacent items (the earlier and the later) when the later starts a new thought, which is the case when its leading comments span multiple lines, or when none of these holds:
-- Both are imports, or both are re-exports (`export ... from`, `export *`), with any user-inserted blank line preserved.
-- Both are expression statements, with any user-inserted blank line preserved.
-- Neither is a hook-call statement (`const x = useFoo()` or a bare `useFoo()` expression statement), and _name flow_: the earlier is single-line and introduces or assigns a name that the later references, neither is a `type` alias, and the later is not a multi-line declaration, a multi-line `return`, or a multi-line `throw` (references inside the body of a nested function declaration, class declaration, or class expression don't count).
-- Neither is a hook-call statement, and _matching declarations_: both are single-line `const`/`let` with one declarator each and matching export-ness (`export const` with `export const`, plain `const` with plain `const`), with right-hand sides either both non-calls, or both calls sharing the same callee.
-- Neither is a hook-call statement, and _matching type aliases_: both are single-line `type` aliases with matching export-ness (`export type` with `export type`, plain `type` with plain `type`).
-- Neither is a hook-call statement, and both are `if`s, except when the earlier is a guard `if` (then-branch always terminates via `return`/`throw`/`break`/`continue`, recursively through `block`, `if`, `try`) and the later is not.
-- Neither is a hook-call statement, and the earlier is an expression statement while the later is an expression statement, a non-guard `if`, a single-line `return`, a single-line `throw`, `break`, or `continue`.
-- Both are hook-call statements and form matching declarations.
+Tight and Preserve do not split items that share a source line. Separate splits same-line items and inserts one blank line. Fixes retain the file's line-ending sequence and the leading whitespace of the earlier item's source line. Blank-line policy applies outside attached comment groups; spacing inside a comment group is outside this rule's scope.
 
-### JSX children
+## Statement lists
 
-For `JSXChild[]` (JSXElement and JSXFragment children, after filtering pure-whitespace `JSXText`), comment-only `JSXExpressionContainer`s (those whose expression is `JSXEmptyExpression`) attach as leading documentation to the next non-comment-only sibling. Insert one blank line between two adjacent non-comment-only items (the earlier and the later) when the later starts a new thought, which is the case when its leading comment-only containers span multiple lines, or when none of these holds:
-- The sibling list contains a literal-text node (a `JSXText` with non-whitespace content, or a `JSXExpressionContainer` whose expression yields a string literal directly, via a logical or conditional operator, or as a template literal).
-- Both the earlier and the later are single-line.
+The rule checks adjacent items in Program, BlockStatement, SwitchCase consequent, and StaticBlock bodies. It chooses the first matching policy below.
+1. **Leading documentation**: A contiguous comment beginning on the current effective ending line attaches to the earlier statement and extends that ending line. Remaining comments before the later statement attach to the later statement. If the later statement's leading comment group spans multiple lines, Separate applies.
+2. **Hooks**: A hook call is a direct `use[A-Z]` call in a one-declarator variable declaration or bare expression statement. Export wrappers do not change the classification. If either statement is a hook call, Tight applies only when both are single-line hook variable declarations with matching export-ness. Separate applies to every other hook pair.
+3. **User-owned grouping**: Preserve applies when both statements are imports, both are re-exports (`export ... from` or `export *`), or both are non-hook expression statements.
+4. **Name flow**: Tight applies when the earlier statement is single-line, introduces or assigns a name, and the later statement references the same lexical binding. Export wrappers are transparent. Type aliases do not participate. A multi-line variable, function, class, interface, return, or throw statement cannot continue name flow. Bodies owned by nested function or class declarations are opaque. Bodies inside expression initializers, including arrow functions, function expressions, and class expressions, remain part of the initializer.
+5. **Matching variable declarations**: Tight applies to two single-line, one-declarator `const` or `let` statements with matching export-ness when both initializers are non-calls or both are calls with the same call identity. `const` and `let` can share a tight gap because mutability does not change declaration ownership. A call includes a direct call and a ChainExpression wrapping a call. Call identity consists of the optional-call marker and the exact source text of the callee, so private members, `super`, computed members, optional chains, and intermediate chained-call arguments remain distinguishable.
+6. **Matching type aliases**: Tight applies to two single-line type aliases with the same export-ness.
+7. **Consecutive conditionals**: Tight applies to two `if` statements unless the earlier statement is a guard and the later statement is not. A branch always terminates when it is `return`, `throw`, `break`, or `continue`; when a block's final statement always terminates; when both branches of an `if` always terminate; or when a `try` finalizer always terminates, or its body and present catch body both always terminate.
+8. **Expression continuation**: Tight applies when a non-hook expression statement is followed by a non-guard `if`, a single-line `return`, a single-line `throw`, `break`, or `continue`.
+9. **Default**: Separate applies.
+
+## JSX children
+
+The rule filters pure-whitespace `JSXText` children before comparing adjacent non-comment items. Comment-only `JSXExpressionContainer` children attach to the next non-comment child. A trailing comment-only container without a later child is outside this rule's scope. The first matching policy below applies.
+1. **Leading documentation**: Separate applies when the later child's attached comment-only group spans multiple lines.
+2. **Local text run**: Tight applies when either child is a literal-text child. A literal-text child is non-whitespace `JSXText` or a `JSXExpressionContainer` guaranteed to produce text or no rendered child: a string literal, a template literal, transparent TypeScript wrappers around either form, a logical `&&` expression whose right side qualifies, or a conditional expression whose two branches qualify.
+3. **Visual weight**: Tight applies when both children are single-line.
+4. **Default**: Separate applies.

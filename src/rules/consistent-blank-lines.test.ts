@@ -64,6 +64,18 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `class C {}\nnew C();\n`,
     },
     {
+      name: "name flow from a default-exported function declaration",
+      code: `export default function create() {}\ncreate();\n`,
+    },
+    {
+      name: "name flow from a declared function",
+      code: `declare function create(): void;\ncreate();\n`,
+    },
+    {
+      name: "name flow through a class-expression body",
+      code: `const dep = 1;\nconst C = class { method() { return dep; } };\n`,
+    },
+    {
       name: "name flow from an interface into a type annotation",
       code: `interface I {}\nconst x: I = y;\n`,
     },
@@ -180,6 +192,26 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const a = f()();\nconst b = f()();\n`,
     },
     {
+      name: "matching consts with private-member callees stay grouped",
+      code: `class C { #load() {} m() { const a = this.#load();\nconst b = this.#load(); } }`,
+    },
+    {
+      name: "matching consts with super-member callees stay grouped",
+      code: `class C extends B { m() { const a = super.load();\nconst b = super.load(); } }`,
+    },
+    {
+      name: "matching optional calls stay grouped",
+      code: `const a = load?.();\nconst b = load?.();\n`,
+    },
+    {
+      name: "different optional calls stay separated",
+      code: `const a = left?.load();\n\nconst b = right?.save();\n`,
+    },
+    {
+      name: "chained calls with different intermediate arguments stay separated",
+      code: `const a = factory("a")();\n\nconst b = factory("b")();\n`,
+    },
+    {
       name: "consts with computed-vs-dotted callees stay separated",
       code: `const a = obj.foo();\n\nconst b = obj[foo]();\n`,
     },
@@ -202,6 +234,10 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
     {
       name: "matching let pair stays grouped",
       code: `let a = 1;\nlet b = 2;\n`,
+    },
+    {
+      name: "matching const and let pair stays grouped",
+      code: `const a = 1;\nlet b = 2;\n`,
     },
     {
       name: "matching type aliases stay grouped",
@@ -252,6 +288,14 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const a = useFoo();\nconst b = useBar();\n`,
     },
     {
+      name: "exported hook-call declarations stay grouped",
+      code: `export const a = useFoo();\nexport const b = useBar();\n`,
+    },
+    {
+      name: "bare hook calls stay separated",
+      code: `useFoo();\n\nuseBar();\n`,
+    },
+    {
       name: "hook decl then bare hook needs a blank",
       code: `const ref = useRef();\n\nuseEffect(() => {});\n`,
     },
@@ -292,8 +336,20 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const n = (\n  <p>\n    {cond && "x"}\n    <b\n      x={1}\n    />\n  </p>\n);\n`,
     },
     {
-      name: "conditional alternate string container counts as literal text",
-      code: `const n = (\n  <p>\n    {cond ? x : "b"}\n    <b\n      x={1}\n    />\n  </p>\n);\n`,
+      name: "type-asserted string container counts as literal text",
+      code: `const n = (\n  <p>\n    {"x" as const}\n    <b\n      x={1}\n    />\n  </p>\n);\n`,
+    },
+    {
+      name: "literal text affects only its adjacent JSX pair",
+      code: `const n = (\n  <div>\n    intro\n    <a\n      x={1}\n    />\n\n    <b\n      x={1}\n    />\n  </div>\n);\n`,
+    },
+    {
+      name: "trailing JSX comment-only container is outside the rule",
+      code: `const n = (\n  <div>\n    <a />\n\n    {/* trailing */}\n  </div>\n);\n`,
+    },
+    {
+      name: "protocol and property identifiers do not create name flow",
+      code: `const remote = 1;\n\nimport { remote as local } from "x";\n\nconst marker = 1;\n\ninterface RecordLike { marker: string }\n\nconst outer = 1;\n\nouter: for (;;) { break outer; }\n`,
     },
   ],
   invalid: [
@@ -314,6 +370,36 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const a = 1;\nfunction other() {\n  return 2;\n}\n`,
       output: `const a = 1;\n\nfunction other() {\n  return 2;\n}\n`,
       errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "same-line unrelated statements are split and separated",
+      code: `const a = 1; function other() {}\n`,
+      output: `const a = 1;\n\nfunction other() {}\n`,
+      errors: [{ messageId: "missing", line: 1, column: 14 }],
+    },
+    {
+      name: "same-line nested statements use source-line indentation",
+      code: `function owner() { const a = 1; function other() {} }\n`,
+      output: `function owner() { const a = 1;\n\nfunction other() {} }\n`,
+      errors: [{ messageId: "missing" }],
+    },
+    {
+      name: "CRLF separation retains the source line ending",
+      code: `const a = 1;\r\nfunction other() {}\r\n`,
+      output: `const a = 1;\r\n\r\nfunction other() {}\r\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "trailing comment stays with the earlier statement",
+      code: `const a = 1; // trailing\nfunction other() {}\n`,
+      output: `const a = 1; // trailing\n\nfunction other() {}\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "extra blank after a trailing comment is removed for a tight gap",
+      code: `const a = 1; // trailing\n\nconst b = 2;\n`,
+      output: `const a = 1; // trailing\nconst b = 2;\n`,
+      errors: [{ messageId: "extra", line: 3, column: 1 }],
     },
     {
       name: "export const and plain const are not matching declarations",
@@ -436,6 +522,18 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       errors: [{ messageId: "missing", line: 2, column: 1 }],
     },
     {
+      name: "different optional-call callees need a blank",
+      code: `const a = left?.load();\nconst b = right?.save();\n`,
+      output: `const a = left?.load();\n\nconst b = right?.save();\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "blank between matching const and let declarations is removed",
+      code: `const a = 1;\n\nlet b = 2;\n`,
+      output: `const a = 1;\nlet b = 2;\n`,
+      errors: [{ messageId: "extra", line: 3, column: 1 }],
+    },
+    {
       name: "single-line multi-declarator const is not a matching pair",
       code: `const a = 1, b = 2;\nconst c = 3;\n`,
       output: `const a = 1, b = 2;\n\nconst c = 3;\n`,
@@ -451,6 +549,48 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       name: "non-hook decl then hook decl needs a blank",
       code: `const a = 1;\nconst b = useFoo();\n`,
       output: `const a = 1;\n\nconst b = useFoo();\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "blank between exported hook declarations is removed",
+      code: `export const a = useFoo();\n\nexport const b = useBar();\n`,
+      output: `export const a = useFoo();\nexport const b = useBar();\n`,
+      errors: [{ messageId: "extra", line: 3, column: 1 }],
+    },
+    {
+      name: "bare hook calls require separation",
+      code: `useFoo();\nuseBar();\n`,
+      output: `useFoo();\n\nuseBar();\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "default-exported declaration name flow removes a blank",
+      code: `export default function create() {}\n\ncreate();\n`,
+      output: `export default function create() {}\ncreate();\n`,
+      errors: [{ messageId: "extra", line: 3, column: 1 }],
+    },
+    {
+      name: "imported protocol names do not create name flow",
+      code: `const remote = 1;\nimport { remote as local } from "x";\n`,
+      output: `const remote = 1;\n\nimport { remote as local } from "x";\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "exported protocol names do not create name flow",
+      code: `function local() {}\n\nconst publicName = 1;\nexport { local as publicName };\n`,
+      output: `function local() {}\n\nconst publicName = 1;\n\nexport { local as publicName };\n`,
+      errors: [{ messageId: "missing", line: 4, column: 1 }],
+    },
+    {
+      name: "interface property names do not create name flow",
+      code: `const marker = 1;\ninterface RecordLike { marker: string }\n`,
+      output: `const marker = 1;\n\ninterface RecordLike { marker: string }\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "labels do not create name flow",
+      code: `const outer = 1;\nouter: for (;;) { break outer; }\n`,
+      output: `const outer = 1;\n\nouter: for (;;) { break outer; }\n`,
       errors: [{ messageId: "missing", line: 2, column: 1 }],
     },
     {
@@ -494,6 +634,18 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const n = (\n  <p>\n    text\n    <a />\n\n    <b />\n  </p>\n);\n`,
       output: `const n = (\n  <p>\n    text\n    <a />\n    <b />\n  </p>\n);\n`,
       errors: [{ messageId: "extra", line: 6, column: 5 }],
+    },
+    {
+      name: "one textual conditional branch does not form a text run",
+      code: `const n = (\n  <p>\n    {cond ? value : "fallback"}\n    <b\n      x={1}\n    />\n  </p>\n);\n`,
+      output: `const n = (\n  <p>\n    {cond ? value : "fallback"}\n\n    <b\n      x={1}\n    />\n  </p>\n);\n`,
+      errors: [{ messageId: "missing", line: 4, column: 5 }],
+    },
+    {
+      name: "distant literal text does not merge multi-line JSX siblings",
+      code: `const n = (\n  <div>\n    intro\n    <a\n      x={1}\n    />\n    <b\n      x={1}\n    />\n  </div>\n);\n`,
+      output: `const n = (\n  <div>\n    intro\n    <a\n      x={1}\n    />\n\n    <b\n      x={1}\n    />\n  </div>\n);\n`,
+      errors: [{ messageId: "missing", line: 7, column: 5 }],
     },
     {
       name: "multi-line comment-only container forces a blank",

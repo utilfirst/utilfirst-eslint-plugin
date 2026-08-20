@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -113,6 +113,45 @@ test(
     const output = await getOxlintOutput();
     for (const ruleName of ruleNames) {
       expect(output).toContain(`utilfirst(${ruleName})`);
+    }
+  },
+  DUAL_RUNTIME_TIMEOUT_MS,
+);
+
+test(
+  "fixes comment boundaries with CRLF through Oxlint",
+  async () => {
+    const testDirectory = await mkdtemp(
+      join(tmpdir(), "utilfirst-oxlint-fix-"),
+    );
+
+    const configPath = join(testDirectory, ".oxlintrc.json");
+    const sourcePath = join(testDirectory, "fixture.ts");
+
+    const pluginPath = new URL("./index.ts", import.meta.url).pathname;
+    const source = "const value = 1; // trailing\r\nfunction load() {}\r\n";
+
+    await writeFile(
+      configPath,
+      JSON.stringify({
+        jsPlugins: [{ name: "utilfirst", specifier: pluginPath }],
+        rules: { "utilfirst/consistent-blank-lines": "error" },
+      }),
+    );
+    await writeFile(sourcePath, source);
+
+    try {
+      await execFileAsync(
+        "node_modules/.bin/oxlint",
+        ["--config", configPath, "--fix", sourcePath],
+        { cwd: process.cwd() },
+      );
+
+      await expect(readFile(sourcePath, "utf8")).resolves.toBe(
+        "const value = 1; // trailing\r\n\r\nfunction load() {}\r\n",
+      );
+    } finally {
+      await rm(testDirectory, { force: true, recursive: true });
     }
   },
   DUAL_RUNTIME_TIMEOUT_MS,

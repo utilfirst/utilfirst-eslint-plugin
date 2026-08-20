@@ -1,50 +1,25 @@
-// Insert one blank line between two adjacent statements (the earlier and the
-// later) inside a `Statement[]` block (Program body, BlockStatement body,
-// SwitchCase consequent, StaticBlock body) when the later starts a new
-// thought, which is the case when its leading comments span multiple lines, or
-// when none of these holds:
+// Apply one explicit gap policy to each adjacent pair. Tight requires zero
+// blank lines, Separate requires exactly one, and Preserve leaves the existing
+// gap unchanged. Leading multi-line documentation always selects Separate.
 //
-//   - Both are imports, or both are re-exports (`export ... from`,
-//     `export *`), with any user-inserted blank line preserved.
-//   - Both are expression statements, with any user-inserted blank line
-//     preserved.
-//   - Neither is a hook-call statement (`const x = useFoo()` or a bare
-//     `useFoo()` expression statement), and _name flow_: the earlier is
-//     single-line and introduces or assigns a name that the later references,
-//     neither is a `type` alias, and the later is not a multi-line declaration,
-//     a multi-line `return`, or a multi-line `throw` (references inside the
-//     body of a nested function declaration, class declaration, or class
-//     expression don't count).
-//   - Neither is a hook-call statement, and _matching declarations_: both are
-//     single-line `const`/`let` with one declarator each and matching
-//     export-ness (`export const` with `export const`, plain `const` with plain
-//     `const`), with right-hand sides either both non-calls, or both calls
-//     sharing the same callee.
-//   - Neither is a hook-call statement, and _matching type aliases_: both are
-//     single-line `type` aliases with matching export-ness (`export type` with
-//     `export type`, plain `type` with plain `type`).
-//   - Neither is a hook-call statement, and both are `if`s, except when the
-//     earlier is a guard `if` (then-branch always terminates via
-//     `return`/`throw`/`break`/`continue`, recursively through `block`, `if`,
-//     `try`) and the later is not.
-//   - Neither is a hook-call statement, and the earlier is an expression
-//     statement while the later is an expression statement, a non-guard `if`,
-//     a single-line `return`, a single-line `throw`, `break`, or `continue`.
-//   - Both are hook-call statements and form matching declarations.
+// Statement-list precedence after leading documentation is: hook isolation;
+// Preserve for import pairs, re-export pairs, and non-hook expression pairs;
+// Tight for name flow, matching variable declarations, matching type aliases,
+// consecutive conditionals, and expression continuations; then Separate.
+// Export wrappers are transparent to hook and name-flow classification.
+// Matching variables have one single-line `const`/`let` declarator, matching
+// export-ness, and either two non-call initializers or calls with the same
+// optional marker and exact callee source. Function and class declaration
+// bodies are opaque to name flow; expression-initializer bodies are not.
 //
-// For `JSXChild[]` (JSXElement and JSXFragment children, after filtering
-// pure-whitespace `JSXText`), comment-only `JSXExpressionContainer`s (those
-// whose expression is `JSXEmptyExpression`) attach as leading documentation to
-// the next non-comment-only sibling. Insert one blank line between two
-// adjacent non-comment-only items (the earlier and the later) when the later
-// starts a new thought, which is the case when its leading comment-only
-// containers span multiple lines, or when none of these holds:
-//
-//   - The sibling list contains a literal-text node (a `JSXText` with
-//     non-whitespace content, or a `JSXExpressionContainer` whose expression
-//     yields a string literal directly, via a logical or conditional operator,
-//     or as a template literal).
-//   - Both the earlier and the later are single-line.
+// JSX precedence after leading documentation is: Tight when either adjacent
+// child belongs to a local literal-text run, Tight when both are single-line,
+// then Separate. Literal text is non-whitespace `JSXText` or an expression
+// guaranteed to render text or nothing through a string, template, transparent
+// TypeScript wrapper, qualifying `&&`, or fully qualifying conditional.
+// Comment-only containers attach forward; an unattached trailing container is
+// outside the rule. Gap fixes preserve line endings and do not normalize
+// spacing inside attached comment groups.
 
 import {
   AST_NODE_TYPES,
@@ -53,6 +28,12 @@ import {
 } from "@typescript-eslint/utils";
 
 type MessageIds = "extra" | "missing";
+type GapPolicy = "preserve" | "separate" | "tight";
+
+type StatementCommentPartition = {
+  effectiveEnd: TSESTree.Node | TSESTree.Comment;
+  leadingComments: TSESTree.Comment[];
+};
 
 const SKIP_KEYS = new Set(["parent", "loc", "range", "start", "end"]);
 
@@ -71,16 +52,9 @@ const IMPORT_SPECIFIER_TYPES = new Set<AST_NODE_TYPES>([
 const OPAQUE_BODY_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.FunctionDeclaration,
   AST_NODE_TYPES.ClassDeclaration,
-  AST_NODE_TYPES.ClassExpression,
 ]);
 
-const FLOW_PREV_TYPES = new Set<AST_NODE_TYPES>([
-  AST_NODE_TYPES.ExpressionStatement,
-  AST_NODE_TYPES.IfStatement,
-]);
-
-const FLOW_NEXT_TYPES = new Set<AST_NODE_TYPES>([
-  AST_NODE_TYPES.ExpressionStatement,
+const EXPRESSION_CONTINUATION_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.IfStatement,
   AST_NODE_TYPES.ReturnStatement,
   AST_NODE_TYPES.ThrowStatement,
@@ -88,13 +62,13 @@ const FLOW_NEXT_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.ContinueStatement,
 ]);
 
-// Statement kinds that, when multi-line, always deserve their own paragraph
-// regardless of other coupling.
+// Statement kinds whose multi-line form cannot continue name flow.
 const HEAVY_NEXT_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.VariableDeclaration,
   AST_NODE_TYPES.FunctionDeclaration,
   AST_NODE_TYPES.ClassDeclaration,
   AST_NODE_TYPES.TSInterfaceDeclaration,
+  AST_NODE_TYPES.TSDeclareFunction,
   AST_NODE_TYPES.ReturnStatement,
   AST_NODE_TYPES.ThrowStatement,
 ]);
@@ -120,38 +94,45 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
     type: "layout",
     docs: {
       description:
-        "Insert blank lines between statement-list and JSXChild items that start a new thought.",
+        "Apply explicit gap policies between adjacent statement-list and JSXChild items.",
       url: "https://github.com/utilfirst/utilfirst-eslint-plugin/blob/main/docs/rules/consistent-blank-lines.md",
     },
     fixable: "whitespace",
     defaultOptions: [],
     schema: [],
     messages: {
-      extra:
-        "Unexpected blank line between items that continue the same paragraph.",
-      missing:
-        "Expected a blank line between items that start a new paragraph.",
+      extra: "Unexpected blank line between items that require a tight gap.",
+      missing: "Expected one blank line between items that require separation.",
     },
   },
   create(context) {
     const sourceCode = context.sourceCode;
+    const lineBreak = sourceCode.text.includes("\r\n") ? "\r\n" : "\n";
 
     function checkBlock(statements: TSESTree.Statement[]) {
       for (let i = 0; i < statements.length - 1; i++) {
         const prev = statements[i];
         const next = statements[i + 1];
         if (prev && next) {
-          const leadingComments = sourceCode.getCommentsBefore(next);
+          const comments = sourceCode.getCommentsBefore(next);
+
+          const { effectiveEnd, leadingComments } = partitionStatementComments({
+            comments,
+            prev,
+          });
+
           const effectiveStart = leadingComments[0] ?? next;
           checkPair({
+            effectiveEnd,
             effectiveStart,
-            isSameParagraph: () => sameParagraph({ next, prev, sourceCode }),
             next,
+            policy: statementGapPolicy({
+              leadingComments,
+              next,
+              prev,
+              sourceCode,
+            }),
             prev,
-            shouldPreserveExtra: () =>
-              isImportPair(prev, next) ||
-              (isReExport(prev) && isReExport(next)) ||
-              isExpressionStatementPair(prev, next),
           });
         }
       }
@@ -188,45 +169,56 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
           const { leading, node: next } = nextSibling;
           const effectiveStart = leading[0] ?? next;
           checkPair({
+            effectiveEnd: prev,
             effectiveStart,
-            isSameParagraph: () => sameJsxParagraph({ leading, next, prev }),
             next,
+            policy: jsxGapPolicy({ leading, next, prev }),
             prev,
-            shouldPreserveExtra: () => false,
           });
         }
       }
     }
 
     function checkPair({
+      effectiveEnd,
       effectiveStart,
-      isSameParagraph,
       next,
+      policy,
       prev,
-      shouldPreserveExtra,
     }: {
+      effectiveEnd: TSESTree.Node | TSESTree.Comment;
       effectiveStart: TSESTree.Node | TSESTree.Comment;
-      isSameParagraph: () => boolean;
       next: TSESTree.Node;
+      policy: GapPolicy;
       prev: TSESTree.Node;
-      shouldPreserveExtra: () => boolean;
     }) {
-      const prevEndLine = prev.loc.end.line;
+      if (policy === "preserve") {
+        return;
+      }
+
+      const prevEndLine = effectiveEnd.loc.end.line;
       const nextStartLine = effectiveStart.loc.start.line;
-      if (nextStartLine - prevEndLine < 1) {
+      if (nextStartLine === prevEndLine) {
+        if (policy === "tight") {
+          return;
+        }
+
+        const indentation = indentationOf(prev, sourceCode);
+        context.report({
+          node: next,
+          messageId: "missing",
+          fix: (fixer) =>
+            fixer.replaceTextRange(
+              [effectiveEnd.range[1], effectiveStart.range[0]],
+              `${lineBreak}${lineBreak}${indentation}`,
+            ),
+        });
         return;
       }
 
-      const isPaddingRequired = !isSameParagraph();
       const paddingCount = nextStartLine - prevEndLine - 1;
-      const targetPadding = isPaddingRequired ? 1 : 0;
+      const targetPadding = policy === "separate" ? 1 : 0;
       if (paddingCount === targetPadding) {
-        return;
-      }
-
-      // Preserve user grouping (e.g., imports and re-exports): user-inserted
-      // blanks within the group are preserved rather than collapsed.
-      if (paddingCount > targetPadding && shouldPreserveExtra()) {
         return;
       }
 
@@ -246,7 +238,7 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
 
           return fixer.replaceTextRange(
             [start, end],
-            "\n".repeat(targetPadding),
+            lineBreak.repeat(targetPadding),
           );
         },
       });
@@ -275,55 +267,132 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
   },
 };
 
-function sameParagraph({
+function partitionStatementComments({
+  comments,
+  prev,
+}: {
+  comments: TSESTree.Comment[];
+  prev: TSESTree.Statement;
+}): StatementCommentPartition {
+  let effectiveEnd: TSESTree.Node | TSESTree.Comment = prev;
+  let leadingIndex = 0;
+  while (true) {
+    const comment = comments[leadingIndex];
+    if (!comment || comment.loc.start.line !== effectiveEnd.loc.end.line) {
+      break;
+    }
+
+    effectiveEnd = comment;
+    leadingIndex++;
+  }
+
+  return {
+    effectiveEnd,
+    leadingComments: comments.slice(leadingIndex),
+  };
+}
+
+function indentationOf(
+  node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
+): string {
+  const lineStart = sourceCode.getIndexFromLoc({
+    line: node.loc.start.line,
+    column: 0,
+  });
+
+  const linePrefix = sourceCode.text.slice(lineStart, node.range[0]);
+  return /^[\t ]*/u.exec(linePrefix)?.[0] ?? "";
+}
+
+function statementGapPolicy({
+  leadingComments,
   next,
   prev,
   sourceCode,
 }: {
+  leadingComments: TSESTree.Comment[];
   next: TSESTree.Statement;
   prev: TSESTree.Statement;
   sourceCode: TSESLint.SourceCode;
-}): boolean {
-  // Multi-line leading comments document `next` as its own thing: a new
-  // paragraph regardless of declaration shape.
-  if (hasMultiLineLeadingComment(next, sourceCode)) {
-    return false;
+}): GapPolicy {
+  if (itemsSpanMultipleLines(leadingComments)) {
+    return "separate";
   }
 
-  // Hook-call statements form their own paragraph: they pair only with another
-  // hook-call variable declaration that satisfies (B).
-  const prevHook = isHookStatement(prev);
-  const nextHook = isHookStatement(next);
+  const prevHook = hookStatementOf(prev);
+  const nextHook = hookStatementOf(next);
   if (prevHook || nextHook) {
-    return (
-      prevHook &&
-      nextHook &&
-      isMatchingVarDeclPair({
-        next,
-        prev,
-        shouldMatchInitializers: false,
-      })
-    );
+    return prevHook?.kind === "variable" &&
+      nextHook?.kind === "variable" &&
+      declarationsHaveSameShell({ next, prev })
+      ? "tight"
+      : "separate";
   }
+  if (
+    isImportPair(prev, next) ||
+    (isReExport(prev) && isReExport(next)) ||
+    isExpressionStatementPair(prev, next)
+  ) {
+    return "preserve";
+  }
+  if (
+    sharesNameFlow({ next, prev, sourceCode }) ||
+    statementsRequireTightGap({ next, prev, sourceCode })
+  ) {
+    return "tight";
+  }
+
+  return "separate";
+}
+
+function hookStatementOf(
+  stmt: TSESTree.Statement,
+): { kind: "expression" | "variable" } | null {
+  const declaration = unwrapExport(stmt);
+  if (
+    declaration.type === AST_NODE_TYPES.VariableDeclaration &&
+    declaration.declarations.length === 1 &&
+    isHookCall(declaration.declarations[0].init)
+  ) {
+    return { kind: "variable" };
+  }
+  if (
+    declaration.type === AST_NODE_TYPES.ExpressionStatement &&
+    isHookCall(declaration.expression)
+  ) {
+    return { kind: "expression" };
+  }
+
+  return null;
+}
+
+function declarationsHaveSameShell({
+  next,
+  prev,
+}: {
+  next: TSESTree.Statement;
+  prev: TSESTree.Statement;
+}): boolean {
+  const previousDeclaration = unwrapExport(prev);
+  const nextDeclaration = unwrapExport(next);
 
   return (
-    sharesNameFlow({ next, prev, sourceCode }) ||
-    statementsBelongTogether(prev, next)
+    previousDeclaration.type === AST_NODE_TYPES.VariableDeclaration &&
+    nextDeclaration.type === AST_NODE_TYPES.VariableDeclaration &&
+    isExported(prev) === isExported(next) &&
+    !isMultiLine(prev) &&
+    !isMultiLine(next) &&
+    previousDeclaration.declarations.length === 1 &&
+    nextDeclaration.declarations.length === 1
   );
 }
 
-function isHookStatement(stmt: TSESTree.Statement): boolean {
-  if (
-    stmt.type === AST_NODE_TYPES.VariableDeclaration &&
-    stmt.declarations.length === 1
-  ) {
-    return isHookCall(stmt.declarations[0].init);
-  }
-  if (stmt.type === AST_NODE_TYPES.ExpressionStatement) {
-    return isHookCall(stmt.expression);
-  }
-
-  return false;
+function isExported(stmt: TSESTree.Statement): boolean {
+  return (
+    stmt.type === AST_NODE_TYPES.ExportNamedDeclaration ||
+    stmt.type === AST_NODE_TYPES.ExportDefaultDeclaration
+  );
 }
 
 function sharesNameFlow({
@@ -371,39 +440,36 @@ function isHookCall(node: TSESTree.Node | null): boolean {
   );
 }
 
-function statementsBelongTogether(
-  prev: TSESTree.Statement,
-  next: TSESTree.Statement,
-): boolean {
-  if (isImportPair(prev, next)) {
-    return true;
-  }
-  if (isReExport(prev) && isReExport(next)) {
-    return true;
-  }
-  if (isMatchingVarDeclPair({ next, prev })) {
+function statementsRequireTightGap({
+  next,
+  prev,
+  sourceCode,
+}: {
+  next: TSESTree.Statement;
+  prev: TSESTree.Statement;
+  sourceCode: TSESLint.SourceCode;
+}): boolean {
+  if (isMatchingVarDeclPair({ next, prev, sourceCode })) {
     return true;
   }
   if (isMatchingTypeAliasPair(prev, next)) {
     return true;
   }
-  if (FLOW_PREV_TYPES.has(prev.type) && FLOW_NEXT_TYPES.has(next.type)) {
+  if (
+    prev.type === AST_NODE_TYPES.IfStatement &&
+    next.type === AST_NODE_TYPES.IfStatement
+  ) {
+    return !(isGuardIf(prev) && !isGuardIf(next));
+  }
+  if (
+    prev.type === AST_NODE_TYPES.ExpressionStatement &&
+    EXPRESSION_CONTINUATION_TYPES.has(next.type)
+  ) {
     if (HEAVY_NEXT_TYPES.has(next.type) && isMultiLine(next)) {
       return false;
     }
 
-    if (prev.type === AST_NODE_TYPES.IfStatement) {
-      if (next.type !== AST_NODE_TYPES.IfStatement) {
-        return false;
-      }
-      if (isGuardIf(prev) && !isGuardIf(next)) {
-        return false;
-      }
-    } else if (next.type === AST_NODE_TYPES.IfStatement && isGuardIf(next)) {
-      return false;
-    }
-
-    return true;
+    return !(next.type === AST_NODE_TYPES.IfStatement && isGuardIf(next));
   }
 
   return false;
@@ -440,11 +506,11 @@ function isReExport(stmt: TSESTree.Statement): boolean {
 function isMatchingVarDeclPair({
   next,
   prev,
-  shouldMatchInitializers = true,
+  sourceCode,
 }: {
   next: TSESTree.Statement;
   prev: TSESTree.Statement;
-  shouldMatchInitializers?: boolean;
+  sourceCode: TSESLint.SourceCode;
 }): boolean {
   const previousDeclaration = unwrapExport(prev);
   const nextDeclaration = unwrapExport(next);
@@ -467,21 +533,17 @@ function isMatchingVarDeclPair({
     return false;
   }
   if (
-    shouldMatchInitializers &&
-    !initializersBelongTogether(
-      previousDeclaration.declarations[0].init,
-      nextDeclaration.declarations[0].init,
-    )
+    !initializersBelongTogether({
+      nextInit: nextDeclaration.declarations[0].init,
+      prevInit: previousDeclaration.declarations[0].init,
+      sourceCode,
+    })
   ) {
     return false;
   }
 
-  // `export const` (public) and plain `const` (local helper) belong to
-  // different paragraphs.
-  return (
-    (prev.type === AST_NODE_TYPES.ExportNamedDeclaration) ===
-    (next.type === AST_NODE_TYPES.ExportNamedDeclaration)
-  );
+  // Public and local declarations require separate gaps.
+  return isExported(prev) === isExported(next);
 }
 
 function isMatchingTypeAliasPair(
@@ -500,16 +562,15 @@ function isMatchingTypeAliasPair(
     return false;
   }
 
-  // `export type` (public) and plain `type` (local helper) belong to different
-  // paragraphs.
-  return (
-    (prev.type === AST_NODE_TYPES.ExportNamedDeclaration) ===
-    (next.type === AST_NODE_TYPES.ExportNamedDeclaration)
-  );
+  // Public and local aliases require separate gaps.
+  return isExported(prev) === isExported(next);
 }
 
 function unwrapExport(stmt: TSESTree.Statement): TSESTree.Node {
   if (stmt.type === AST_NODE_TYPES.ExportNamedDeclaration && stmt.declaration) {
+    return stmt.declaration;
+  }
+  if (stmt.type === AST_NODE_TYPES.ExportDefaultDeclaration) {
     return stmt.declaration;
   }
 
@@ -520,95 +581,44 @@ function isConstOrLet(decl: TSESTree.VariableDeclaration): boolean {
   return decl.kind === "const" || decl.kind === "let";
 }
 
-function initializersBelongTogether(
-  prevInit: TSESTree.Node | null,
-  nextInit: TSESTree.Node | null,
-): boolean {
-  const prevCall = asCall(prevInit);
-  const nextCall = asCall(nextInit);
-  if (prevCall && nextCall) {
-    return calleesEqual(prevCall.callee, nextCall.callee);
+function initializersBelongTogether({
+  nextInit,
+  prevInit,
+  sourceCode,
+}: {
+  nextInit: TSESTree.Node | null;
+  prevInit: TSESTree.Node | null;
+  sourceCode: TSESLint.SourceCode;
+}): boolean {
+  const previousCallIdentity = callIdentityOf(prevInit, sourceCode);
+  const nextCallIdentity = callIdentityOf(nextInit, sourceCode);
+  if (previousCallIdentity !== null && nextCallIdentity !== null) {
+    return previousCallIdentity === nextCallIdentity;
   }
-  if (prevCall || nextCall) {
+  if (previousCallIdentity !== null || nextCallIdentity !== null) {
     return false;
   }
 
   return true;
 }
 
-function asCall(expr: TSESTree.Node | null): TSESTree.CallExpression | null {
+function callIdentityOf(
+  expr: TSESTree.Node | null,
+  sourceCode: TSESLint.SourceCode,
+): string | null {
   if (!expr) {
     return null;
   }
-  if (expr.type === AST_NODE_TYPES.CallExpression) {
-    return expr;
+
+  const call =
+    expr.type === AST_NODE_TYPES.ChainExpression ? expr.expression : expr;
+
+  if (call.type !== AST_NODE_TYPES.CallExpression) {
+    return null;
   }
 
-  return null;
-}
-
-function calleesEqual(
-  a: TSESTree.Node | null,
-  b: TSESTree.Node | null,
-): boolean {
-  if (!a || a.type !== b?.type) {
-    return false;
-  }
-  if (
-    a.type === AST_NODE_TYPES.Identifier &&
-    b.type === AST_NODE_TYPES.Identifier
-  ) {
-    return a.name === b.name;
-  }
-  if (a.type === AST_NODE_TYPES.ThisExpression) {
-    return true;
-  }
-  if (
-    a.type === AST_NODE_TYPES.MemberExpression &&
-    b.type === AST_NODE_TYPES.MemberExpression
-  ) {
-    if (a.computed !== b.computed) {
-      return false;
-    }
-    if (!calleesEqual(a.object, b.object)) {
-      return false;
-    }
-    if (
-      !a.computed &&
-      a.property.type === AST_NODE_TYPES.Identifier &&
-      b.property.type === AST_NODE_TYPES.Identifier
-    ) {
-      return a.property.name === b.property.name;
-    }
-    if (
-      a.computed &&
-      a.property.type === AST_NODE_TYPES.Identifier &&
-      b.property.type === AST_NODE_TYPES.Identifier
-    ) {
-      return a.property.name === b.property.name;
-    }
-    if (
-      a.computed &&
-      a.property.type === AST_NODE_TYPES.Literal &&
-      b.property.type === AST_NODE_TYPES.Literal
-    ) {
-      return a.property.value === b.property.value;
-    }
-
-    return false;
-  }
-
-  // Chained calls match when their underlying callees match. Intermediate
-  // arguments are ignored, and final-level arguments use
-  // `initializersBelongTogether`.
-  if (
-    a.type === AST_NODE_TYPES.CallExpression &&
-    b.type === AST_NODE_TYPES.CallExpression
-  ) {
-    return calleesEqual(a.callee, b.callee);
-  }
-
-  return false;
+  const optionalMarker = call.optional ? "optional" : "direct";
+  return `${optionalMarker}:${sourceCode.getText(call.callee)}`;
 }
 
 function isGuardIf(stmt: TSESTree.Node): boolean {
@@ -668,6 +678,8 @@ function collectIntroducedOrAssignedNames(
   } else if (s.type === AST_NODE_TYPES.ClassDeclaration && s.id) {
     set.add(s.id.name);
   } else if (s.type === AST_NODE_TYPES.TSInterfaceDeclaration) {
+    set.add(s.id.name);
+  } else if (s.type === AST_NODE_TYPES.TSDeclareFunction && s.id) {
     set.add(s.id.name);
   } else if (s.type === AST_NODE_TYPES.ExpressionStatement) {
     const expr = s.expression;
@@ -860,6 +872,15 @@ function isInSubtree(node: TSESTree.Node, root: TSESTree.Node): boolean {
 function isDeclarationOrPropertyKey(idNode: TSESTree.Identifier): boolean {
   const parent = idNode.parent;
   if (
+    (parent.type === AST_NODE_TYPES.LabeledStatement &&
+      parent.label === idNode) ||
+    ((parent.type === AST_NODE_TYPES.BreakStatement ||
+      parent.type === AST_NODE_TYPES.ContinueStatement) &&
+      parent.label === idNode)
+  ) {
+    return true;
+  }
+  if (
     parent.type === AST_NODE_TYPES.VariableDeclarator &&
     parent.id === idNode
   ) {
@@ -890,6 +911,36 @@ function isDeclarationOrPropertyKey(idNode: TSESTree.Identifier): boolean {
     IMPORT_SPECIFIER_TYPES.has(parent.type) &&
     "local" in parent &&
     parent.local === idNode
+  ) {
+    return true;
+  }
+  if (parent.type === AST_NODE_TYPES.ImportSpecifier) {
+    return true;
+  }
+  if (
+    parent.type === AST_NODE_TYPES.ExportSpecifier &&
+    parent.exported === idNode &&
+    parent.local !== idNode
+  ) {
+    return true;
+  }
+  if (parent.type === AST_NODE_TYPES.MetaProperty) {
+    return true;
+  }
+  if (
+    parent.type === AST_NODE_TYPES.TSQualifiedName &&
+    parent.right === idNode
+  ) {
+    return true;
+  }
+  if (
+    (parent.type === AST_NODE_TYPES.MethodDefinition ||
+      parent.type === AST_NODE_TYPES.PropertyDefinition ||
+      parent.type === AST_NODE_TYPES.AccessorProperty ||
+      parent.type === AST_NODE_TYPES.TSMethodSignature ||
+      parent.type === AST_NODE_TYPES.TSPropertySignature) &&
+    parent.key === idNode &&
+    !parent.computed
   ) {
     return true;
   }
@@ -969,7 +1020,7 @@ function isInBindingPosition(idNode: TSESTree.Identifier): boolean {
   return false;
 }
 
-function sameJsxParagraph({
+function jsxGapPolicy({
   leading,
   next,
   prev,
@@ -977,30 +1028,15 @@ function sameJsxParagraph({
   leading: TSESTree.JSXExpressionContainer[];
   next: TSESTree.JSXChild;
   prev: TSESTree.JSXChild;
-}): boolean {
-  // Multi-line leading comment-only containers document `next` as its own
-  // thing: a new paragraph regardless of sibling shape.
-  const firstLeading = leading[0];
-
-  const lastLeading = leading.at(-1);
-  if (
-    firstLeading &&
-    lastLeading &&
-    lastLeading.loc.end.line > firstLeading.loc.start.line
-  ) {
-    return false;
+}): GapPolicy {
+  if (itemsSpanMultipleLines(leading)) {
+    return "separate";
+  }
+  if (isLiteralTextChild(prev) || isLiteralTextChild(next)) {
+    return "tight";
   }
 
-  // Inline prose: a sibling list that mixes elements with literal-string
-  // spacers like {" "} or {", "} reads as one rendered text run.
-  if (siblingsIncludeLiteralText(next)) {
-    return true;
-  }
-
-  // A multi-line sibling next to anything else is a distinct visual chunk. The
-  // asymmetric weight reads as its own paragraph regardless of the lighter
-  // sibling's shape.
-  return !(isMultiLine(prev) || isMultiLine(next));
+  return isMultiLine(prev) || isMultiLine(next) ? "separate" : "tight";
 }
 
 function isCommentOnlyContainer(
@@ -1012,56 +1048,46 @@ function isCommentOnlyContainer(
   );
 }
 
-function siblingsIncludeLiteralText(node: TSESTree.JSXChild): boolean {
-  const parent = parentOf(node);
-  if (
-    !parent ||
-    (parent.type !== AST_NODE_TYPES.JSXElement &&
-      parent.type !== AST_NODE_TYPES.JSXFragment)
-  ) {
-    return false;
+function isLiteralTextChild(child: TSESTree.JSXChild): boolean {
+  if (child.type === AST_NODE_TYPES.JSXText) {
+    return child.value.trim() !== "";
   }
 
-  for (const sibling of parent.children) {
-    if (
-      sibling.type === AST_NODE_TYPES.JSXText &&
-      sibling.value.trim() !== ""
-    ) {
-      return true;
-    }
-    if (
-      sibling.type === AST_NODE_TYPES.JSXExpressionContainer &&
-      expressionYieldsStringLiteral(sibling.expression)
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+  return (
+    child.type === AST_NODE_TYPES.JSXExpressionContainer &&
+    expressionProducesTextOrNothing(child.expression)
+  );
 }
 
-function expressionYieldsStringLiteral(expr: TSESTree.Node): boolean {
+function expressionProducesTextOrNothing(expr: TSESTree.Node): boolean {
   if (expr.type === AST_NODE_TYPES.Literal) {
-    return isString(expr.value);
+    return typeof expr.value === "string";
   }
   if (expr.type === AST_NODE_TYPES.TemplateLiteral) {
     return true;
   }
-  if (expr.type === AST_NODE_TYPES.LogicalExpression) {
-    return expressionYieldsStringLiteral(expr.right);
+  if (
+    expr.type === AST_NODE_TYPES.TSAsExpression ||
+    expr.type === AST_NODE_TYPES.TSTypeAssertion ||
+    expr.type === AST_NODE_TYPES.TSNonNullExpression ||
+    expr.type === AST_NODE_TYPES.TSSatisfiesExpression
+  ) {
+    return expressionProducesTextOrNothing(expr.expression);
+  }
+  if (
+    expr.type === AST_NODE_TYPES.LogicalExpression &&
+    expr.operator === "&&"
+  ) {
+    return expressionProducesTextOrNothing(expr.right);
   }
   if (expr.type === AST_NODE_TYPES.ConditionalExpression) {
     return (
-      expressionYieldsStringLiteral(expr.consequent) ||
-      expressionYieldsStringLiteral(expr.alternate)
+      expressionProducesTextOrNothing(expr.consequent) &&
+      expressionProducesTextOrNothing(expr.alternate)
     );
   }
 
   return false;
-}
-
-function isString<Value>(value: Value): value is Value & string {
-  return typeof value === "string";
 }
 
 function isNode<Value>(value: Value): value is Value & TSESTree.Node {
@@ -1110,17 +1136,15 @@ function isMultiLine(node: TSESTree.Node): boolean {
   return node.loc.start.line !== node.loc.end.line;
 }
 
-function hasMultiLineLeadingComment(
-  node: TSESTree.Node,
-  sourceCode: TSESLint.SourceCode,
+function itemsSpanMultipleLines(
+  items: readonly (TSESTree.Node | TSESTree.Comment)[],
 ): boolean {
-  const comments = sourceCode.getCommentsBefore(node);
-  if (comments.length === 0) {
+  const first = items[0];
+
+  const last = items.at(-1);
+  if (!first || !last) {
     return false;
   }
 
-  const first = comments[0];
-
-  const last = comments.at(-1);
-  return Boolean(first && last && last.loc.end.line > first.loc.start.line);
+  return last.loc.end.line > first.loc.start.line;
 }

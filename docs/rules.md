@@ -53,4 +53,4 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 ## Layout
 
-- [`consistent-blank-lines`](./rules/consistent-blank-lines.md) is the project formatting policy for grouping statements and JSX children into paragraphs based on name flow, matching declarations, control flow, hooks, comments, and line span. Its detailed specification owns the formatting contract and fixer behavior.
+- [`consistent-blank-lines`](./rules/consistent-blank-lines.md) assigns tight, separate, or preserved gaps between statements and JSX children based on name flow, declaration families, control flow, hooks, comments, and line span. Its detailed specification owns the formatting contract and fixer behavior.
