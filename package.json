@@ -40,7 +40,9 @@
     "lint:typecheck": "tsc --pretty --noEmit",
     "prepack": "pnpm run build",
     "setup-hooks": "simple-git-hooks",
-    "test": "vitest run"
+    "test": "pnpm run test:unit && pnpm run test:package",
+    "test:package": "node scripts/test-package.mjs",
+    "test:unit": "vitest run"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged && pnpm run lint:typecheck"
@@ -52,7 +54,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^20.19.0",
+    "@types/node": "^24.13.3",
     "@typescript-eslint/rule-tester": "^8.59.3",
     "@utilfirst/prettier-plugin": "^0.1.0",
     "@vitest/coverage-v8": "^4.1.7",
@@ -76,7 +78,7 @@
   },
   "packageManager": "pnpm@11.0.9",
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=24.0.0"
   },
   "publishConfig": {
     "access": "public",

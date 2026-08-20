@@ -125,7 +125,7 @@ The rules other than `consistent-blank-lines`, `no-conditional-undefined-propert
 ```sh
 pnpm install
 pnpm run setup-hooks # one-time: wire pre-commit via simple-git-hooks
-pnpm test            # vitest, ESLint, and Oxlint
+pnpm test            # unit, dual-runtime, and packed-artifact tests
 pnpm run build       # tsdown → dist/
 pnpm run lint        # eslint + prettier + publint + tsc
 ```
