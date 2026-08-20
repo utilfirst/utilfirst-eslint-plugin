@@ -4,7 +4,7 @@ Shared rules for ESLint 10 and Oxlint.
 
 ## Policy
 
-Every exported rule must express universal project policy. The recommended config enables the complete registry at error severity, and the test suite rejects registry entries that are absent from that config. A rule that cannot justify universal error severity must be redesigned or removed rather than moved to an optional preset. Rule options adapt repository ownership or boundary conventions without disabling the rule.
+Every exported rule must express universal project policy. The recommended config enables the complete registry at error severity together with ESLint's `no-else-return` and `no-nested-ternary` rules, and the test suite rejects registry entries that are absent from that config. A rule that cannot justify universal error severity must be redesigned or removed rather than moved to an optional preset. Rule options adapt repository ownership or boundary conventions without disabling the rule.
 
 ## Install
 

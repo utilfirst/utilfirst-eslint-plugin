@@ -81,13 +81,16 @@ const rules = {
   ...antiSlopRules,
 };
 
-const recommendedRules: NonNullable<TSESLint.FlatConfig.Config["rules"]> =
-  Object.fromEntries(
+const recommendedRules: NonNullable<TSESLint.FlatConfig.Config["rules"]> = {
+  "no-else-return": "error",
+  "no-nested-ternary": "error",
+  ...Object.fromEntries(
     Object.keys(rules).map((ruleName) => [
       `utilfirst/${ruleName}`,
       "error" as const,
     ]),
-  );
+  ),
+};
 
 type UtilfirstPlugin = {
   meta: typeof meta;
