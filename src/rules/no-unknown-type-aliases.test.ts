@@ -27,7 +27,18 @@ ruleTester.run("no-unknown-type-aliases", rule, {
       errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
     },
     {
+      code: "type Payload = string | unknown;",
+      errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
+    },
+    {
       code: "type Raw = unknown; type Payload = Raw;",
+      errors: [
+        { messageId: "unknownAlias", data: { alias: "Raw" } },
+        { messageId: "unknownAlias", data: { alias: "Payload" } },
+      ],
+    },
+    {
+      code: "type Raw = string | unknown; type Payload = Raw;",
       errors: [
         { messageId: "unknownAlias", data: { alias: "Raw" } },
         { messageId: "unknownAlias", data: { alias: "Payload" } },
