@@ -22,6 +22,10 @@ jobs:
           node-version: 24
           cache: pnpm
 
+      - run: pnpm run release:check-tag
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
       - run: pnpm run build
@@ -76,7 +80,10 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
+          cache: pnpm
 
-      - run: pnpm dlx changelogithub
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - run: pnpm exec changelogithub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
