@@ -8,6 +8,9 @@ import plugin from "./index.ts";
 
 const execFileAsync = promisify(execFile);
 
+// Oxlint process startup approaches Vitest's default timeout under suite load.
+const DUAL_RUNTIME_TIMEOUT_MS = 15_000;
+
 const fixtureSource = `import { vi } from "vitest";
 
 const topLevelFunction = () => 1;
@@ -104,9 +107,13 @@ async function getOxlintOutput(): Promise<string> {
   }
 }
 
-test("reports every shared rule through Oxlint", async () => {
-  const output = await getOxlintOutput();
-  for (const ruleName of ruleNames) {
-    expect(output).toContain(`utilfirst(${ruleName})`);
-  }
-});
+test(
+  "reports every shared rule through Oxlint",
+  async () => {
+    const output = await getOxlintOutput();
+    for (const ruleName of ruleNames) {
+      expect(output).toContain(`utilfirst(${ruleName})`);
+    }
+  },
+  DUAL_RUNTIME_TIMEOUT_MS,
+);
