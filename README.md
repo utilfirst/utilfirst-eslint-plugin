@@ -37,6 +37,15 @@ export default [
 ];
 ```
 
+Rules with consumer-specific ownership accept options in either runtime. For example, declare workspace import prefixes for `no-module-mocking`:
+
+```js
+"utilfirst/no-module-mocking": [
+  "error",
+  { internalModulePrefixes: ["@workspace/"] },
+];
+```
+
 ```jsonc
 // .oxlintrc.json
 {

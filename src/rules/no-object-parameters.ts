@@ -3,6 +3,7 @@ import { defineRule } from "@oxlint/plugins";
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 
 import { lexicalTypeParameterNames } from "../shared/lexical-type-parameters.ts";
+import { resolveTypeAlias } from "../shared/type-alias.ts";
 
 type Parameter = ESTree.ParamPattern;
 
@@ -64,8 +65,6 @@ export const noObjectParametersRule = defineRule({
     },
   },
   createOnce(context) {
-    const aliases = new Map<string, ESTree.TSType>();
-
     const resolvesToObject = (
       type: ESTree.TSType,
       shadowedAliases: ReadonlySet<string>,
@@ -92,13 +91,18 @@ export const noObjectParametersRule = defineRule({
         return false;
       }
 
-      const alias = aliases.get(type.typeName.name);
-      if (alias === undefined) {
+      const alias = resolveTypeAlias(context.sourceCode, type);
+      if (alias === null || (alias.typeParameters?.params.length ?? 0) > 0) {
         return false;
       }
 
       const nextVisited = new Set([...visited, type.typeName.name]);
-      return resolvesToObject(alias, shadowedAliases, nextVisited);
+
+      return resolvesToObject(
+        alias.typeAnnotation,
+        shadowedAliases,
+        nextVisited,
+      );
     };
 
     const checkParameters = (node: ParameterOwner) => {
@@ -125,23 +129,6 @@ export const noObjectParametersRule = defineRule({
     };
 
     return {
-      Program(node) {
-        aliases.clear();
-
-        for (const statement of node.body) {
-          const declaration =
-            statement.type === "ExportNamedDeclaration"
-              ? statement.declaration
-              : statement;
-
-          if (
-            declaration?.type === "TSTypeAliasDeclaration" &&
-            (declaration.typeParameters?.params.length ?? 0) === 0
-          ) {
-            aliases.set(declaration.id.name, declaration.typeAnnotation);
-          }
-        }
-      },
       ArrowFunctionExpression: checkParameters,
       FunctionDeclaration: checkParameters,
       FunctionExpression: checkParameters,

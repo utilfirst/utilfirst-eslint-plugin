@@ -2,6 +2,8 @@ import { defineRule } from "@oxlint/plugins";
 
 import type { ESTree } from "@oxlint/plugins";
 
+import { resolveTypeAlias } from "../shared/type-alias.ts";
+
 function referencedAliasName(type: ESTree.TSType): string | null {
   if (type.type === "TSParenthesizedType") {
     return referencedAliasName(type.typeAnnotation);
@@ -29,8 +31,6 @@ export const noUnknownTypeAliasesRule = defineRule({
     },
   },
   createOnce(context) {
-    const aliases = new Map<string, ESTree.TSTypeAliasDeclaration>();
-
     const resolvesToUnknown = (
       type: ESTree.TSType,
       visited = new Set<string>(),
@@ -47,11 +47,12 @@ export const noUnknownTypeAliasesRule = defineRule({
         return false;
       }
 
-      const alias = aliases.get(name);
-      if (
-        alias === undefined ||
-        (alias.typeParameters?.params.length ?? 0) > 0
-      ) {
+      const alias =
+        type.type === "TSTypeReference"
+          ? resolveTypeAlias(context.sourceCode, type)
+          : null;
+
+      if (alias === null || (alias.typeParameters?.params.length ?? 0) > 0) {
         return false;
       }
 
@@ -60,33 +61,16 @@ export const noUnknownTypeAliasesRule = defineRule({
     };
 
     return {
-      Program(node) {
-        aliases.clear();
-
-        for (const statement of node.body) {
-          const declaration =
-            statement.type === "ExportNamedDeclaration"
-              ? statement.declaration
-              : statement;
-
-          if (declaration?.type === "TSTypeAliasDeclaration") {
-            aliases.set(declaration.id.name, declaration);
-          }
+      TSTypeAliasDeclaration(node) {
+        if (!resolvesToUnknown(node.typeAnnotation, new Set([node.id.name]))) {
+          return;
         }
 
-        for (const alias of aliases.values()) {
-          if (
-            !resolvesToUnknown(alias.typeAnnotation, new Set([alias.id.name]))
-          ) {
-            continue;
-          }
-
-          context.report({
-            node: alias.id,
-            messageId: "unknownAlias",
-            data: { alias: alias.id.name },
-          });
-        }
+        context.report({
+          node: node.id,
+          messageId: "unknownAlias",
+          data: { alias: node.id.name },
+        });
       },
     };
   },

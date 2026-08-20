@@ -19,6 +19,7 @@ ruleTester.run("no-object-parameters", rule, {
     "function consume<Value extends object>(value: Value) {}",
     "type Owner = { id: string }; function consume(value: Owner) {}",
     "function consume<Value>(value: Value) {}",
+    "function outer() { type Value = string; function consume(value: Value) {} }",
   ],
   invalid: [
     {
@@ -35,6 +36,10 @@ ruleTester.run("no-object-parameters", rule, {
     },
     {
       code: "function consume(...values: object[]) {}",
+      errors: [{ messageId: "objectParameter" }],
+    },
+    {
+      code: "function outer() { type Input = object; function consume(value: Input) {} }",
       errors: [{ messageId: "objectParameter" }],
     },
   ],

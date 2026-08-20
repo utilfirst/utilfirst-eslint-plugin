@@ -3,6 +3,7 @@ import { defineRule } from "@oxlint/plugins";
 import type { ESTree } from "@oxlint/plugins";
 
 import { lexicalTypeParameterNames } from "../shared/lexical-type-parameters.ts";
+import { resolveTypeAlias } from "../shared/type-alias.ts";
 
 type FunctionWithReturnType =
   | ESTree.ArrowFunctionExpression
@@ -40,8 +41,6 @@ export const noUnknownReturnsRule = defineRule({
     },
   },
   createOnce(context) {
-    const aliases = new Map<string, ESTree.TSTypeAliasDeclaration>();
-
     const resolvesToUnknown = (
       type: ESTree.TSType,
       shadowedAliases: ReadonlySet<string>,
@@ -77,11 +76,12 @@ export const noUnknownReturnsRule = defineRule({
         return false;
       }
 
-      const alias = aliases.get(name);
-      if (
-        alias === undefined ||
-        (alias.typeParameters?.params.length ?? 0) > 0
-      ) {
+      const alias =
+        type.type === "TSTypeReference"
+          ? resolveTypeAlias(context.sourceCode, type)
+          : null;
+
+      if (alias === null || (alias.typeParameters?.params.length ?? 0) > 0) {
         return false;
       }
 
@@ -115,20 +115,6 @@ export const noUnknownReturnsRule = defineRule({
     };
 
     return {
-      Program(node) {
-        aliases.clear();
-
-        for (const statement of node.body) {
-          const declaration =
-            statement.type === "ExportNamedDeclaration"
-              ? statement.declaration
-              : statement;
-
-          if (declaration?.type === "TSTypeAliasDeclaration") {
-            aliases.set(declaration.id.name, declaration);
-          }
-        }
-      },
       ArrowFunctionExpression: checkReturnType,
       FunctionDeclaration: checkReturnType,
       FunctionExpression: checkReturnType,

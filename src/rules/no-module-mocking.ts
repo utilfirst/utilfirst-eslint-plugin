@@ -1,8 +1,17 @@
 import { defineRule } from "@oxlint/plugins";
+import { z } from "zod";
 
 import type { ESTree, Scope, SourceCode, Variable } from "@oxlint/plugins";
 
 const moduleMockMethods = new Set(["doMock", "mock", "unstable_mockModule"]);
+
+const ModuleMockOptionsSchema = z.object({
+  internalModulePrefixes: z.array(z.string()).optional(),
+});
+
+const ModuleMockContextOptionsSchema = z
+  .union([ModuleMockOptionsSchema, z.array(ModuleMockOptionsSchema)])
+  .nullable();
 
 function resolveVariable(
   sourceCode: SourceCode,
@@ -108,11 +117,15 @@ function moduleMockCall(
   return method !== null && moduleMockMethods.has(method);
 }
 
-function isRepositoryOwnedSpecifier(specifier: string): boolean {
+function isRepositoryOwnedSpecifier(
+  specifier: string,
+  internalModulePrefixes: readonly string[],
+): boolean {
   return (
     specifier.startsWith(".") ||
     specifier.startsWith("/") ||
-    specifier.startsWith("#")
+    specifier.startsWith("#") ||
+    internalModulePrefixes.some((prefix) => specifier.startsWith(prefix))
   );
 }
 
@@ -132,6 +145,20 @@ export const noModuleMockingRule = defineRule({
       moduleMock:
         "Replace this local module mock through a production dependency seam and a faithful test implementation.",
     },
+    schema: [
+      {
+        type: "object",
+        properties: {
+          internalModulePrefixes: {
+            type: "array",
+            items: { type: "string", minLength: 1 },
+            uniqueItems: true,
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
+    defaultOptions: [{ internalModulePrefixes: [] }],
   },
   createOnce(context) {
     return {
@@ -146,11 +173,26 @@ export const noModuleMockingRule = defineRule({
           return;
         }
 
+        const rawOptions: unknown = context.options;
+
+        const parsedOptions =
+          ModuleMockContextOptionsSchema.safeParse(rawOptions);
+
+        let parsedOption: z.infer<typeof ModuleMockOptionsSchema> | undefined;
+        if (parsedOptions.success && parsedOptions.data !== null) {
+          parsedOption = Array.isArray(parsedOptions.data)
+            ? parsedOptions.data[0]
+            : parsedOptions.data;
+        }
+
+        const internalModulePrefixes =
+          parsedOption?.internalModulePrefixes ?? [];
+
         const [specifier] = node.arguments;
         if (
           specifier?.type !== "Literal" ||
           !isString(specifier.value) ||
-          !isRepositoryOwnedSpecifier(specifier.value)
+          !isRepositoryOwnedSpecifier(specifier.value, internalModulePrefixes)
         ) {
           return;
         }

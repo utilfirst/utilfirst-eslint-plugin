@@ -37,5 +37,13 @@ ruleTester.run("no-unknown-type-aliases", rule, {
       code: "export type Payload = (unknown);",
       errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
     },
+    {
+      code: "function outer() { type Payload = unknown; return input; }",
+      errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
+    },
+    {
+      code: "namespace Values { export type Payload = unknown; }",
+      errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
+    },
   ],
 });

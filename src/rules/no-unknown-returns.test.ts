@@ -19,6 +19,7 @@ ruleTester.run("no-unknown-returns", rule, {
     "function load(): User { return user; }",
     "function infer() { return input; }",
     "function cause(): { cause: unknown } { return { cause: input }; }",
+    "function outer<Raw>() { function load(): Raw { return input; } }",
   ],
   invalid: [
     {
@@ -31,6 +32,10 @@ ruleTester.run("no-unknown-returns", rule, {
     },
     {
       code: "type Raw = unknown; function load(): Raw { return input; }",
+      errors: [{ messageId: "unknownReturn" }],
+    },
+    {
+      code: "function outer() { type Raw = unknown; function load(): Raw { return input; } }",
       errors: [{ messageId: "unknownReturn" }],
     },
   ],
