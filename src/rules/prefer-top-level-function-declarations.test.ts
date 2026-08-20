@@ -1,11 +1,11 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message IDs this test asserts.
-const rule = plugin.rules[
-  "prefer-top-level-function-declarations"
-] as TSESLint.RuleModule<"anonymousDefaultExport" | "topLevelBinding">;
+const rule = getRuleForTest<"anonymousDefaultExport" | "topLevelBinding">(
+  "prefer-top-level-function-declarations",
+  "anonymousDefaultExport",
+  "topLevelBinding",
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("prefer-top-level-function-declarations", rule, {

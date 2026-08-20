@@ -1,12 +1,11 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
 import { expect, test } from "vitest";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
-const rule = plugin.rules[
-  "no-conditional-undefined-properties"
-] as TSESLint.RuleModule<"conditionalUndefined">;
+const rule = getRuleForTest<"conditionalUndefined">(
+  "no-conditional-undefined-properties",
+  "conditionalUndefined",
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-conditional-undefined-properties", rule, {

@@ -1,28 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-type PreferOptionsRule = TSESLint.RuleModule<
+const rule = getRuleForTest<
   "preferOptions",
   [{ allowFunctionNames?: string[] }]
->;
-
-function assertPreferOptionsRule(
-  candidateRule: TSESLint.RuleModule<string>,
-): asserts candidateRule is TSESLint.RuleModule<string> & PreferOptionsRule {
-  if (!("preferOptions" in candidateRule.meta.messages)) {
-    throw new Error(
-      "Options parameter rule has an unexpected message contract",
-    );
-  }
-}
-
-const rule = plugin.rules["prefer-options-parameter"];
-if (rule === undefined) {
-  throw new Error("Options parameter rule is missing from the registry");
-}
-
-assertPreferOptionsRule(rule);
+>("prefer-options-parameter", "preferOptions");
 
 const ruleTester = new RuleTester();
 ruleTester.run("prefer-options-parameter", rule, {

@@ -1,29 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-type PositionalBooleanRule = TSESLint.RuleModule<
+const rule = getRuleForTest<
   "positionalBoolean",
   [{ allowFunctionNames?: string[] }]
->;
-
-function assertPositionalBooleanRule(
-  candidateRule: TSESLint.RuleModule<string>,
-): asserts candidateRule is TSESLint.RuleModule<string> &
-  PositionalBooleanRule {
-  if (!("positionalBoolean" in candidateRule.meta.messages)) {
-    throw new Error(
-      "Positional boolean rule has an unexpected message contract",
-    );
-  }
-}
-
-const rule = plugin.rules["no-positional-boolean-parameters"];
-if (rule === undefined) {
-  throw new Error("Positional boolean rule is missing from the registry");
-}
-
-assertPositionalBooleanRule(rule);
+>("no-positional-boolean-parameters", "positionalBoolean");
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-positional-boolean-parameters", rule, {

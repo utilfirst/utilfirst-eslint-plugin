@@ -1,11 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
-const rule = plugin.rules[
-  "require-safety-comment-for-type-assertion"
-] as TSESLint.RuleModule<"missingSafetyComment">;
+const rule = getRuleForTest<"missingSafetyComment">(
+  "require-safety-comment-for-type-assertion",
+  "missingSafetyComment",
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("require-safety-comment-for-type-assertion", rule, {

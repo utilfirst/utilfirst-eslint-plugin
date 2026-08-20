@@ -1,11 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
-const rule = plugin.rules[
-  "no-unsafe-dictionary-type"
-] as TSESLint.RuleModule<"unsafeDictionary">;
+const rule = getRuleForTest<"unsafeDictionary">(
+  "no-unsafe-dictionary-type",
+  "unsafeDictionary",
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-unsafe-dictionary-type", rule, {

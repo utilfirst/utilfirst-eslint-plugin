@@ -1,16 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-type UnknownParametersRule = TSESLint.RuleModule<
+const rule = getRuleForTest<
   "unknownParameter",
   [{ allowParameterNames?: string[] }]
->;
-
-// SAFETY: The registry key selects the rule whose message and option contract this test asserts.
-const rule = plugin.rules[
-  "no-unknown-parameters"
-] as TSESLint.RuleModule<"unknownParameter"> & UnknownParametersRule;
+>("no-unknown-parameters", "unknownParameter");
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-unknown-parameters", rule, {

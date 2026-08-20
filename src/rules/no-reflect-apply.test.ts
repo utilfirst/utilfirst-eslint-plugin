@@ -1,11 +1,7 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
-const rule = plugin.rules[
-  "no-reflect-apply"
-] as TSESLint.RuleModule<"reflectApply">;
+const rule = getRuleForTest<"reflectApply">("no-reflect-apply", "reflectApply");
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-reflect-apply", rule, {

@@ -1,12 +1,11 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
 import { expect, test } from "vitest";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
-const rule = plugin.rules[
-  "no-conditional-empty-object-spread"
-] as TSESLint.RuleModule<"avoid">;
+const rule = getRuleForTest<"avoid">(
+  "no-conditional-empty-object-spread",
+  "avoid",
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-conditional-empty-object-spread", rule, {

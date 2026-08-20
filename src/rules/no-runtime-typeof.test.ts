@@ -1,26 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-type RuntimeTypeofRule = TSESLint.RuleModule<
+const rule = getRuleForTest<"runtimeTypeof", [{ allowInTypeGuards?: boolean }]>(
+  "no-runtime-typeof",
   "runtimeTypeof",
-  [{ allowInTypeGuards?: boolean }]
->;
-
-function assertRuntimeTypeofRule(
-  candidateRule: TSESLint.RuleModule<string>,
-): asserts candidateRule is TSESLint.RuleModule<string> & RuntimeTypeofRule {
-  if (!("runtimeTypeof" in candidateRule.meta.messages)) {
-    throw new Error("Runtime typeof rule has an unexpected message contract");
-  }
-}
-
-const rule = plugin.rules["no-runtime-typeof"];
-if (rule === undefined) {
-  throw new Error("Runtime typeof rule is missing from the registry");
-}
-
-assertRuntimeTypeofRule(rule);
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-runtime-typeof", rule, {

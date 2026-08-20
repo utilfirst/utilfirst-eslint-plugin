@@ -1,26 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-type ModuleMockRule = TSESLint.RuleModule<
+const rule = getRuleForTest<
   "moduleMock",
   [{ internalModulePrefixes?: string[] }]
->;
-
-function assertModuleMockRule(
-  candidateRule: TSESLint.RuleModule<string>,
-): asserts candidateRule is TSESLint.RuleModule<string> & ModuleMockRule {
-  if (!("moduleMock" in candidateRule.meta.messages)) {
-    throw new Error("Module mock rule has an unexpected message contract");
-  }
-}
-
-const rule = plugin.rules["no-module-mocking"];
-if (rule === undefined) {
-  throw new Error("Module mock rule is missing from the registry");
-}
-
-assertModuleMockRule(rule);
+>("no-module-mocking", "moduleMock");
 
 const ruleTester = new RuleTester({
   languageOptions: {

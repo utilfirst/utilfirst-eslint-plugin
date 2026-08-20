@@ -1,10 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-const rule = plugin.rules["require-lint-suppression-reason"];
-if (rule === undefined) {
-  throw new Error("Lint suppression reason rule is missing from the registry");
-}
+const rule = getRuleForTest<"missingReason">(
+  "require-lint-suppression-reason",
+  "missingReason",
+);
 
 const ruleTester = new RuleTester({
   linterOptions: { reportUnusedDisableDirectives: false },

@@ -1,10 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-const rule = plugin.rules["no-unhandled-detached-promises"];
-if (rule === undefined) {
-  throw new Error("Detached promise rule is missing from the registry");
-}
+const rule = getRuleForTest<"unhandledDetachedPromise">(
+  "no-unhandled-detached-promises",
+  "unhandledDetachedPromise",
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-unhandled-detached-promises", rule, {

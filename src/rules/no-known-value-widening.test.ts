@@ -1,11 +1,7 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
-const rule = plugin.rules[
-  "no-known-value-widening"
-] as TSESLint.RuleModule<"widening">;
+const rule = getRuleForTest<"widening">("no-known-value-widening", "widening");
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-known-value-widening", rule, {

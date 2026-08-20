@@ -1,11 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
-const rule = plugin.rules[
-  "no-unknown-type-aliases"
-] as TSESLint.RuleModule<"unknownAlias">;
+const rule = getRuleForTest<"unknownAlias">(
+  "no-unknown-type-aliases",
+  "unknownAlias",
+);
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-unknown-type-aliases", rule, {

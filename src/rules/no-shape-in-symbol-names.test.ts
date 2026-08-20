@@ -1,16 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
-import plugin from "../index.ts";
+import { getRuleForTest } from "../rule-test.ts";
 
-type DomainNamesRule = TSESLint.RuleModule<
+const rule = getRuleForTest<
   "forbiddenSymbolName",
   [{ allowSymbolNames?: string[] }]
->;
-
-// SAFETY: The registry key selects the rule whose message and option contract this test asserts.
-const rule = plugin.rules[
-  "no-shape-in-symbol-names"
-] as TSESLint.RuleModule<"forbiddenSymbolName"> & DomainNamesRule;
+>("no-shape-in-symbol-names", "forbiddenSymbolName");
 
 const ruleTester = new RuleTester({
   languageOptions: {
