@@ -41,6 +41,10 @@ export default [
         "error",
         { allowFunctionNames: ["protocolCallback"] },
       ],
+      "utilfirst/prefer-options-parameter": [
+        "error",
+        { allowFunctionNames: ["protocolCallback"] },
+      ],
       "utilfirst/no-runtime-typeof": ["error", { allowInTypeGuards: true }],
     },
   },
@@ -48,7 +52,7 @@ export default [
 ```
 
 - `internalModulePrefixes` marks package-style import prefixes as repository-owned for `no-module-mocking`.
-- `allowFunctionNames` preserves named functions whose positional boolean signature is fixed by an external protocol.
+- `allowFunctionNames` preserves named functions whose positional boolean or multi-input signature is fixed by an external protocol.
 - `allowInTypeGuards` permits `typeof` inside explicit type predicates while continuing to reject ad hoc runtime narrowing.
 
 ```jsonc
@@ -84,7 +88,13 @@ export default [
     "utilfirst/no-unknown-returns": "error",
     "utilfirst/no-unknown-type-aliases": "error",
     "utilfirst/no-unsafe-dictionary-type": "error",
+    "utilfirst/no-unhandled-detached-promises": "error",
     "utilfirst/no-widen-then-assert": "error",
+    "utilfirst/prefer-options-parameter": [
+      "error",
+      { "allowFunctionNames": ["protocolCallback"] },
+    ],
+    "utilfirst/require-lint-suppression-reason": "error",
     "utilfirst/require-safety-comment-for-type-assertion": "error",
   },
 }
@@ -113,12 +123,15 @@ export default [
 | [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                           | Reject `unknown` return contracts                                                     |
 | [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                      | Reject type aliases that resolve to `unknown`                                         |
 | [`no-unsafe-dictionary-type`](./docs/rules.md#boundary-contracts)                    | Reject dictionary contracts with broad value types                                    |
+| [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                     | Require rejection handling on detached call chains                                    |
 | [`no-widen-then-assert`](./docs/rules.md#type-evidence)                              | Reject const flows that widen a known value before narrowing it                       |
+| [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)            | Require an options object for named functions with three or more inputs               |
+| [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                     | Require a forcing reason on lint disable directives                                   |
 | [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)         | Require a `SAFETY:` comment for non-const type assertions                             |
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-conditional-undefined-properties`, `no-enum-declarations`, and `no-positional-boolean-parameters`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-positional-boolean-parameters`, `no-unhandled-detached-promises`, `prefer-options-parameter`, and `require-lint-suppression-reason`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 

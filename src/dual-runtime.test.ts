@@ -49,6 +49,15 @@ function load(): unknown {
 function configure(isEnabled: boolean): void {
   consume(conditionalOptions, isEnabled);
 }
+
+function combine(first: string, second: string, third: string): string {
+  return first + second + third;
+}
+
+void Promise.resolve();
+
+// eslint-disable-next-line no-console
+console.log(combine("a", "b", "c"));
 `;
 
 const ruleNames = Object.keys(plugin.rules);

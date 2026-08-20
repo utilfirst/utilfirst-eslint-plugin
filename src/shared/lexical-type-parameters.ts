@@ -7,11 +7,15 @@ const AstNodeSchema = z.custom<ESTree.Node>(
   (value) => z.object({ type: z.string() }).safeParse(value).success,
 );
 
-function collectInferTypeParameterNames(
-  node: ESTree.Node,
-  visitorKeys: VisitorKeys,
-  names: Set<string>,
-): void {
+function collectInferTypeParameterNames({
+  names,
+  node,
+  visitorKeys,
+}: {
+  names: Set<string>;
+  node: ESTree.Node;
+  visitorKeys: VisitorKeys;
+}): void {
   if (node.type === "TSInferType") {
     names.add(node.typeParameter.name.name);
   }
@@ -24,7 +28,11 @@ function collectInferTypeParameterNames(
 
     const parsedNode = AstNodeSchema.safeParse(value);
     if (parsedNode.success) {
-      collectInferTypeParameterNames(parsedNode.data, visitorKeys, names);
+      collectInferTypeParameterNames({
+        names,
+        node: parsedNode.data,
+        visitorKeys,
+      });
       continue;
     }
     if (!Array.isArray(value)) {
@@ -34,7 +42,11 @@ function collectInferTypeParameterNames(
     for (const child of value) {
       const parsedChild = AstNodeSchema.safeParse(child);
       if (parsedChild.success) {
-        collectInferTypeParameterNames(parsedChild.data, visitorKeys, names);
+        collectInferTypeParameterNames({
+          names,
+          node: parsedChild.data,
+          visitorKeys,
+        });
       }
     }
   }
@@ -64,7 +76,11 @@ export function lexicalTypeParameterNames(
       current.type === "TSConditionalType" &&
       descendant === current.trueType
     ) {
-      collectInferTypeParameterNames(current.extendsType, visitorKeys, names);
+      collectInferTypeParameterNames({
+        names,
+        node: current.extendsType,
+        visitorKeys,
+      });
     }
 
     descendant = current;

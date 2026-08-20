@@ -41,20 +41,28 @@ export const noUnknownReturnsRule = defineRule({
     },
   },
   createOnce(context) {
-    const resolvesToUnknown = (
-      type: ESTree.TSType,
-      shadowedAliases: ReadonlySet<string>,
+    const resolvesToUnknown = ({
+      shadowedAliases,
+      type,
       visited = new Set<string>(),
-    ): boolean => {
+    }: {
+      shadowedAliases: ReadonlySet<string>;
+      type: ESTree.TSType;
+      visited?: Set<string>;
+    }): boolean => {
       if (type.type === "TSUnknownKeyword") {
         return true;
       }
       if (type.type === "TSParenthesizedType") {
-        return resolvesToUnknown(type.typeAnnotation, shadowedAliases, visited);
+        return resolvesToUnknown({
+          shadowedAliases,
+          type: type.typeAnnotation,
+          visited,
+        });
       }
       if (type.type === "TSUnionType") {
         return type.types.some((member) =>
-          resolvesToUnknown(member, shadowedAliases, visited),
+          resolvesToUnknown({ shadowedAliases, type: member, visited }),
         );
       }
       if (
@@ -67,7 +75,7 @@ export const noUnknownReturnsRule = defineRule({
 
         return (
           value !== undefined &&
-          resolvesToUnknown(value, shadowedAliases, visited)
+          resolvesToUnknown({ shadowedAliases, type: value, visited })
         );
       }
 
@@ -87,11 +95,11 @@ export const noUnknownReturnsRule = defineRule({
 
       const nextVisited = new Set([...visited, name]);
 
-      return resolvesToUnknown(
-        alias.typeAnnotation,
+      return resolvesToUnknown({
         shadowedAliases,
-        nextVisited,
-      );
+        type: alias.typeAnnotation,
+        visited: nextVisited,
+      });
     };
 
     const checkReturnType = (node: FunctionWithReturnType) => {
@@ -100,10 +108,13 @@ export const noUnknownReturnsRule = defineRule({
         return;
       }
       if (
-        !resolvesToUnknown(
-          annotation.typeAnnotation,
-          lexicalTypeParameterNames(node, context.sourceCode.visitorKeys),
-        )
+        !resolvesToUnknown({
+          shadowedAliases: lexicalTypeParameterNames(
+            node,
+            context.sourceCode.visitorKeys,
+          ),
+          type: annotation.typeAnnotation,
+        })
       ) {
         return;
       }

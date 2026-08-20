@@ -143,16 +143,16 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
         if (prev && next) {
           const leadingComments = sourceCode.getCommentsBefore(next);
           const effectiveStart = leadingComments[0] ?? next;
-          checkPair(
-            prev,
-            next,
+          checkPair({
             effectiveStart,
-            () => sameParagraph(prev, next, sourceCode),
-            () =>
+            isSameParagraph: () => sameParagraph({ next, prev, sourceCode }),
+            next,
+            prev,
+            shouldPreserveExtra: () =>
               isImportPair(prev, next) ||
               (isReExport(prev) && isReExport(next)) ||
               isExpressionStatementPair(prev, next),
-          );
+          });
         }
       }
     }
@@ -187,24 +187,30 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
           const { node: prev } = prevSibling;
           const { leading, node: next } = nextSibling;
           const effectiveStart = leading[0] ?? next;
-          checkPair(
-            prev,
-            next,
+          checkPair({
             effectiveStart,
-            () => sameJsxParagraph(prev, next, leading),
-            () => false,
-          );
+            isSameParagraph: () => sameJsxParagraph({ leading, next, prev }),
+            next,
+            prev,
+            shouldPreserveExtra: () => false,
+          });
         }
       }
     }
 
-    function checkPair(
-      prev: TSESTree.Node,
-      next: TSESTree.Node,
-      effectiveStart: TSESTree.Node | TSESTree.Comment,
-      isSameParagraph: () => boolean,
-      shouldPreserveExtra: () => boolean,
-    ) {
+    function checkPair({
+      effectiveStart,
+      isSameParagraph,
+      next,
+      prev,
+      shouldPreserveExtra,
+    }: {
+      effectiveStart: TSESTree.Node | TSESTree.Comment;
+      isSameParagraph: () => boolean;
+      next: TSESTree.Node;
+      prev: TSESTree.Node;
+      shouldPreserveExtra: () => boolean;
+    }) {
       const prevEndLine = prev.loc.end.line;
       const nextStartLine = effectiveStart.loc.start.line;
       if (nextStartLine - prevEndLine < 1) {
@@ -269,11 +275,15 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
   },
 };
 
-function sameParagraph(
-  prev: TSESTree.Statement,
-  next: TSESTree.Statement,
-  sourceCode: TSESLint.SourceCode,
-): boolean {
+function sameParagraph({
+  next,
+  prev,
+  sourceCode,
+}: {
+  next: TSESTree.Statement;
+  prev: TSESTree.Statement;
+  sourceCode: TSESLint.SourceCode;
+}): boolean {
   // Multi-line leading comments document `next` as its own thing: a new
   // paragraph regardless of declaration shape.
   if (hasMultiLineLeadingComment(next, sourceCode)) {
@@ -289,7 +299,7 @@ function sameParagraph(
   }
 
   return (
-    sharesNameFlow(prev, next, sourceCode) ||
+    sharesNameFlow({ next, prev, sourceCode }) ||
     statementsBelongTogether(prev, next)
   );
 }
@@ -308,11 +318,15 @@ function isHookStatement(stmt: TSESTree.Statement): boolean {
   return false;
 }
 
-function sharesNameFlow(
-  prev: TSESTree.Statement,
-  next: TSESTree.Statement,
-  sourceCode: TSESLint.SourceCode,
-): boolean {
+function sharesNameFlow({
+  next,
+  prev,
+  sourceCode,
+}: {
+  next: TSESTree.Statement;
+  prev: TSESTree.Statement;
+  sourceCode: TSESLint.SourceCode;
+}): boolean {
   if (isMultiLine(prev)) {
     return false;
   }
@@ -710,7 +724,7 @@ function collectReferencedNames(
       node.type === AST_NODE_TYPES.Identifier &&
       !isDeclarationOrPropertyKey(node)
     ) {
-      if (resolvesOutsideRoot(node, root, sourceCode)) {
+      if (resolvesOutsideRoot({ idNode: node, root, sourceCode })) {
         set.add(node.name);
       }
     } else if (node.type === AST_NODE_TYPES.ThisExpression) {
@@ -721,7 +735,7 @@ function collectReferencedNames(
       node.type === AST_NODE_TYPES.JSXIdentifier &&
       isJsxComponentIdentifier(node)
     ) {
-      if (resolvesOutsideRoot(node, root, sourceCode)) {
+      if (resolvesOutsideRoot({ idNode: node, root, sourceCode })) {
         set.add(node.name);
       }
     }
@@ -729,11 +743,15 @@ function collectReferencedNames(
   return set;
 }
 
-function resolvesOutsideRoot(
-  idNode: TSESTree.Identifier | TSESTree.JSXIdentifier,
-  root: TSESTree.Node,
-  sourceCode: TSESLint.SourceCode,
-): boolean {
+function resolvesOutsideRoot({
+  idNode,
+  root,
+  sourceCode,
+}: {
+  idNode: TSESTree.Identifier | TSESTree.JSXIdentifier;
+  root: TSESTree.Node;
+  sourceCode: TSESLint.SourceCode;
+}): boolean {
   let scope: TSESLint.Scope.Scope | null = sourceCode.getScope(idNode);
   while (scope) {
     const variable = scope.variables.find((v) => v.name === idNode.name);
@@ -922,11 +940,15 @@ function isInBindingPosition(idNode: TSESTree.Identifier): boolean {
   return false;
 }
 
-function sameJsxParagraph(
-  prev: TSESTree.JSXChild,
-  next: TSESTree.JSXChild,
-  leading: TSESTree.JSXExpressionContainer[],
-): boolean {
+function sameJsxParagraph({
+  leading,
+  next,
+  prev,
+}: {
+  leading: TSESTree.JSXExpressionContainer[];
+  next: TSESTree.JSXChild;
+  prev: TSESTree.JSXChild;
+}): boolean {
   // Multi-line leading comment-only containers document `next` as its own
   // thing: a new paragraph regardless of sibling shape.
   const firstLeading = leading[0];

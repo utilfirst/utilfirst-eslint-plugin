@@ -30,11 +30,15 @@ function isGlobalReflect(
 }
 
 /** Reports whether a call target names one method on the global Reflect object. */
-export function isGlobalReflectMethodCall(
-  sourceCode: SourceCode,
-  callee: ESTree.Expression,
-  methodName: string,
-): boolean {
+export function isGlobalReflectMethodCall({
+  callee,
+  methodName,
+  sourceCode,
+}: {
+  callee: ESTree.Expression;
+  methodName: string;
+  sourceCode: SourceCode;
+}): boolean {
   if (
     !("property" in callee) ||
     !("object" in callee) ||

@@ -65,20 +65,28 @@ export const noObjectParametersRule = defineRule({
     },
   },
   createOnce(context) {
-    const resolvesToObject = (
-      type: ESTree.TSType,
-      shadowedAliases: ReadonlySet<string>,
+    const resolvesToObject = ({
+      shadowedAliases,
+      type,
       visited = new Set<string>(),
-    ): boolean => {
+    }: {
+      shadowedAliases: ReadonlySet<string>;
+      type: ESTree.TSType;
+      visited?: Set<string>;
+    }): boolean => {
       if (type.type === "TSObjectKeyword") {
         return true;
       }
       if (type.type === "TSParenthesizedType") {
-        return resolvesToObject(type.typeAnnotation, shadowedAliases, visited);
+        return resolvesToObject({
+          shadowedAliases,
+          type: type.typeAnnotation,
+          visited,
+        });
       }
       if (type.type === "TSUnionType") {
         return type.types.some((member) =>
-          resolvesToObject(member, shadowedAliases, visited),
+          resolvesToObject({ shadowedAliases, type: member, visited }),
         );
       }
       if (
@@ -98,11 +106,11 @@ export const noObjectParametersRule = defineRule({
 
       const nextVisited = new Set([...visited, type.typeName.name]);
 
-      return resolvesToObject(
-        alias.typeAnnotation,
+      return resolvesToObject({
         shadowedAliases,
-        nextVisited,
-      );
+        type: alias.typeAnnotation,
+        visited: nextVisited,
+      });
     };
 
     const checkParameters = (node: ParameterOwner) => {
@@ -116,7 +124,7 @@ export const noObjectParametersRule = defineRule({
         if (type === null) {
           continue;
         }
-        if (!resolvesToObject(type, shadowedAliases)) {
+        if (!resolvesToObject({ shadowedAliases, type })) {
           continue;
         }
 

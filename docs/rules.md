@@ -28,6 +28,15 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 - `no-positional-boolean-parameters` rejects boolean flags on repository-owned named function declarations and bindings. Use a named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
 - `no-reflect-apply` rejects dynamic invocation through `Reflect.apply`. Call a typed function directly or place dynamic dispatch behind a named interface.
 - `no-reflect-get` rejects dynamic reads through `Reflect.get`. Use typed property access or parse a dynamic value into a named contract before reading it.
+- `prefer-options-parameter` rejects repository-owned named function declarations and bindings with three or more inputs. Replace the positional inputs with one named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
+
+## Async errors
+
+- `no-unhandled-detached-promises` rejects `void` call chains without an observable rejection handler. Add `.catch(...)` or pass a rejection callback as the second argument to `.then(...)`. The shared ESLint and Oxlint implementation detects explicit call syntax rather than inferred promise types because Oxlint plugins do not expose TypeScript parser services.
+
+## Lint policy
+
+- `require-lint-suppression-reason` requires ESLint and Oxlint disable directives to include a non-empty reason after `--`. State the runtime, framework, or external boundary that forces the suppression.
 
 ## Ownership and tests
 

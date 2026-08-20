@@ -26,7 +26,11 @@ export const noReflectApplyRule = defineRule({
         }
 
         if (
-          isGlobalReflectMethodCall(context.sourceCode, node.callee, "apply")
+          isGlobalReflectMethodCall({
+            callee: node.callee,
+            methodName: "apply",
+            sourceCode: context.sourceCode,
+          })
         ) {
           context.report({ node, messageId: "reflectApply" });
         }

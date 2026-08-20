@@ -14,11 +14,14 @@ import { noReflectApplyRule } from "./rules/no-reflect-apply.ts";
 import { noReflectGetRule } from "./rules/no-reflect-get.ts";
 import { noRuntimeTypeofRule } from "./rules/no-runtime-typeof.ts";
 import { noForbiddenTermInSymbolNamesRule } from "./rules/no-shape-in-symbol-names.ts";
+import { noUnhandledDetachedPromisesRule } from "./rules/no-unhandled-detached-promises.ts";
 import { noUnknownParametersRule } from "./rules/no-unknown-parameters.ts";
 import { noUnknownReturnsRule } from "./rules/no-unknown-returns.ts";
 import { noUnknownTypeAliasesRule } from "./rules/no-unknown-type-aliases.ts";
 import { noUnsafeDictionaryTypeRule } from "./rules/no-unsafe-dictionary-type.ts";
 import { noWidenThenAssertRule } from "./rules/no-widen-then-assert.ts";
+import { preferOptionsParameterRule } from "./rules/prefer-options-parameter.ts";
+import { requireLintSuppressionReasonRule } from "./rules/require-lint-suppression-reason.ts";
 import { requireSafetyCommentForTypeAssertionRule } from "./rules/require-safety-comment-for-type-assertion.ts";
 
 const meta = {
@@ -45,7 +48,10 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-unknown-returns": noUnknownReturnsRule,
     "no-unknown-type-aliases": noUnknownTypeAliasesRule,
     "no-unsafe-dictionary-type": noUnsafeDictionaryTypeRule,
+    "no-unhandled-detached-promises": noUnhandledDetachedPromisesRule,
     "no-widen-then-assert": noWidenThenAssertRule,
+    "prefer-options-parameter": preferOptionsParameterRule,
+    "require-lint-suppression-reason": requireLintSuppressionReasonRule,
     "require-safety-comment-for-type-assertion":
       requireSafetyCommentForTypeAssertionRule,
   },

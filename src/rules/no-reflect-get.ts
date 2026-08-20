@@ -25,7 +25,13 @@ export const noReflectGetRule = defineRule({
           return;
         }
 
-        if (isGlobalReflectMethodCall(context.sourceCode, node.callee, "get")) {
+        if (
+          isGlobalReflectMethodCall({
+            callee: node.callee,
+            methodName: "get",
+            sourceCode: context.sourceCode,
+          })
+        ) {
           context.report({ node, messageId: "reflectGet" });
         }
       },

@@ -141,11 +141,15 @@ function normalizedTypeText(sourceText: string, type: ESTree.TSType): string {
   return sourceText.slice(type.range[0], type.range[1]).replaceAll(/\s+/gu, "");
 }
 
-function typesHaveSameSyntax(
-  sourceText: string,
-  left: ESTree.TSType | null,
-  right: ESTree.TSType,
-): boolean {
+function typesHaveSameSyntax({
+  left,
+  right,
+  sourceText,
+}: {
+  left: ESTree.TSType | null;
+  right: ESTree.TSType;
+  sourceText: string;
+}): boolean {
   return (
     left !== null &&
     normalizedTypeText(sourceText, unwrapTypeParentheses(left)) ===
@@ -260,12 +264,17 @@ function variableDeclarator(
   return null;
 }
 
-function knownValueEvidence(
-  expression: ESTree.Expression,
-  scopes: Parameters<typeof resolvedVariableForIdentifier>[0],
-  boundary: ESTree.Node | null,
-  visitedVariables: ReadonlySet<Variable>,
-): KnownValueEvidence | null {
+function knownValueEvidence({
+  boundary,
+  expression,
+  scopes,
+  visitedVariables,
+}: {
+  boundary: ESTree.Node | null;
+  expression: ESTree.Expression;
+  scopes: Parameters<typeof resolvedVariableForIdentifier>[0];
+  visitedVariables: ReadonlySet<Variable>;
+}): KnownValueEvidence | null {
   const unwrapped = unwrapExpressionParentheses(expression);
   if (
     unwrapped.type === "TSAsExpression" ||
@@ -330,12 +339,12 @@ function knownValueEvidence(
     return null;
   }
 
-  return knownValueEvidence(
-    declarator.init,
+  return knownValueEvidence({
     scopes,
     boundary,
-    new Set([...visitedVariables, variable]),
-  );
+    expression: declarator.init,
+    visitedVariables: new Set([...visitedVariables, variable]),
+  });
 }
 
 function widenedBinding(
@@ -384,31 +393,42 @@ function widenedBinding(
       ? assertedExpression(initializerAssertion)
       : declarator.init;
 
-  const evidence = knownValueEvidence(
-    originalExpression,
+  const evidence = knownValueEvidence({
+    expression: originalExpression,
     scopes,
     boundary,
-    new Set([variable]),
-  );
+    visitedVariables: new Set([variable]),
+  });
 
   return evidence === null
     ? null
     : { broadKind, evidence, declaredAt: declarator.range[1], boundary };
 }
 
-function assertionIsNarrower(
-  sourceText: string,
-  broadKind: BroadTypeKind,
-  evidence: KnownValueEvidence,
-  assertedType: ESTree.TSType,
-): boolean {
+function assertionIsNarrower({
+  assertedType,
+  broadKind,
+  evidence,
+  sourceText,
+}: {
+  assertedType: ESTree.TSType;
+  broadKind: BroadTypeKind;
+  evidence: KnownValueEvidence;
+  sourceText: string;
+}): boolean {
   if (broadTypeKind(assertedType) !== null) {
     return false;
   }
   if (broadKind === "top") {
     return true;
   }
-  if (typesHaveSameSyntax(sourceText, evidence.type, assertedType)) {
+  if (
+    typesHaveSameSyntax({
+      left: evidence.type,
+      right: assertedType,
+      sourceText,
+    })
+  ) {
     return true;
   }
   if (broadKind === "object") {
@@ -452,12 +472,12 @@ export const noWidenThenAssertRule = defineRule({
         widened === null ||
         node.range[0] <= widened.declaredAt ||
         functionBoundary(node) !== widened.boundary ||
-        !assertionIsNarrower(
-          context.sourceCode.text,
-          widened.broadKind,
-          widened.evidence,
-          node.typeAnnotation,
-        )
+        !assertionIsNarrower({
+          assertedType: node.typeAnnotation,
+          broadKind: widened.broadKind,
+          evidence: widened.evidence,
+          sourceText: context.sourceCode.text,
+        })
       ) {
         return;
       }
