@@ -110,6 +110,7 @@ export default [
       "error",
       { "allowFunctionNames": ["protocolCallback"] },
     ],
+    "utilfirst/prefer-switch-discriminator-chain": "error",
     "utilfirst/require-lint-suppression-reason": "error",
     "utilfirst/require-safety-comment-for-type-assertion": "error",
   },
@@ -142,6 +143,7 @@ export default [
 | [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                     | Require rejection handling on `void`-marked detached call chains                      |
 | [`no-widen-then-assert`](./docs/rules.md#type-evidence)                              | Reject const flows that widen a known value before narrowing it                       |
 | [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)            | Require options objects for named functions and methods with three or more inputs     |
+| [`prefer-switch-discriminator-chain`](./docs/rules.md#object-and-api-construction)   | Require a switch for four or more equality branches on one discriminator              |
 | [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                     | Require a forcing reason on lint disable directives                                   |
 | [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)         | Require one `SAFETY:` comment for each outermost non-const assertion                  |
 

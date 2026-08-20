@@ -38,6 +38,7 @@ Every exported rule is enabled at error severity by `configs.recommended`. The c
 - `no-reflect-apply` rejects dynamic invocation through `Reflect.apply`. Call a typed function directly or place dynamic dispatch behind a named interface.
 - `no-reflect-get` rejects dynamic reads through `Reflect.get`. Use typed property access or parse a dynamic value into a named contract before reading it.
 - `prefer-options-parameter` rejects repository-owned named functions and methods with three or more inputs. Replace the positional inputs with one named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
+- `prefer-switch-discriminator-chain` rejects four or more `if`/`else if` strict-equality branches on the same identifier. Replace the chain with a switch so the finite dispatch structure is explicit. Property access remains valid because repeated reads can differ from the switch's single read when a getter or proxy owns the property. Loose equality, mixed discriminators, non-literal comparisons, compound conditions, and range checks remain valid because a switch cannot preserve their contract mechanically.
 
 ## Async errors
 

@@ -46,6 +46,11 @@ function load(): unknown {
   return input;
 }
 
+if (input === "a") consume(input, input);
+else if (input === "b") consume(input, input);
+else if (input === "c") consume(input, input);
+else if (input === "d") consume(input, input);
+
 const owner = {
   configure(isEnabled: boolean): void {
     consume(conditionalOptions, isEnabled);
