@@ -2,7 +2,7 @@
 
 The rule implementations in [`src/rules/`](../src/rules/) own accepted syntax and diagnostics. Their colocated tests own executable examples. This reference explains why each rule is universal policy, which boundary it protects, and what replacement a violation should produce.
 
-Every exported rule is enabled at error severity by `configs.recommended`. The config also enables ESLint's `no-else-return` and `no-nested-ternary` rules together with `@typescript-eslint/no-shadow`. Options adapt repository ownership or externally fixed signatures while leaving the rule enabled.
+Every exported rule is enabled at error severity by `configs.recommended`. Options adapt repository ownership or externally fixed signatures while leaving the rule enabled.
 
 ## Principles
 

@@ -28,12 +28,16 @@ export default defineConfig([
         { prefer: "type-imports", fixStyle: "inline-type-imports" },
       ],
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-shadow": "error",
       "@typescript-eslint/no-unnecessary-condition": [
         "error",
         { allowConstantLoopConditions: "only-allowed-literals" },
       ],
       "arrow-body-style": ["error", "as-needed"],
       "curly": "error",
+      "no-else-return": "error",
+      "no-nested-ternary": "error",
+      "no-shadow": "off",
       "object-shorthand": "error",
       "quotes": [
         "error",

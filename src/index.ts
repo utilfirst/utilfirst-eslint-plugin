@@ -1,6 +1,5 @@
 import { eslintCompatPlugin } from "@oxlint/plugins";
 import type { TSESLint } from "@typescript-eslint/utils";
-import { plugin as typescriptEslintPlugin } from "typescript-eslint";
 import pkg from "../package.json" with { type: "json" };
 import { consistentBlankLines } from "./rules/consistent-blank-lines.ts";
 import { noChainedTypeAssertionsRule } from "./rules/no-chained-type-assertions.ts";
@@ -88,10 +87,6 @@ const rules = {
 };
 
 const recommendedRules: NonNullable<TSESLint.FlatConfig.Config["rules"]> = {
-  "no-else-return": "error",
-  "no-nested-ternary": "error",
-  "no-shadow": "off",
-  "@typescript-eslint/no-shadow": "error",
   ...Object.fromEntries(
     Object.keys(rules).map((ruleName) => [
       `utilfirst/${ruleName}`,
@@ -113,10 +108,7 @@ const plugin: UtilfirstPlugin = {
 };
 
 plugin.configs.recommended = {
-  plugins: {
-    "@typescript-eslint": typescriptEslintPlugin,
-    "utilfirst": plugin,
-  },
+  plugins: { utilfirst: plugin },
   rules: recommendedRules,
 };
 

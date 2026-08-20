@@ -51,7 +51,6 @@
   "dependencies": {
     "@oxlint/plugins": "1.78.0",
     "@typescript-eslint/utils": "^8.59.3",
-    "typescript-eslint": "^8.59.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -73,6 +72,7 @@
     "simple-git-hooks": "^2.13.1",
     "tsdown": "^0.18.4",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3",
     "vitest": "^4.0.7"
   },
   "peerDependencies": {

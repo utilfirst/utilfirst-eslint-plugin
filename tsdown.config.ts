@@ -6,10 +6,6 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  external: [
-    "@oxlint/plugins",
-    "@typescript-eslint/utils",
-    "typescript-eslint",
-  ],
+  external: ["@oxlint/plugins", "@typescript-eslint/utils"],
   outExtensions: () => ({ js: ".js" }),
 });
