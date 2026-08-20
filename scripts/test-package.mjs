@@ -101,7 +101,7 @@ try {
     await readFile(join(packageDirectory, "package.json"), "utf8"),
   );
 
-  if (packageManifest.engines?.node !== ">=24.0.0") {
+  if (packageManifest.engines?.node !== ">=24.11.0") {
     throw new Error("Packed package does not declare the Node 24 minimum");
   }
 } finally {
