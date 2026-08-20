@@ -27,6 +27,7 @@ ruleTester.run("no-shape-in-symbol-names", rule, {
     "const { shape: geometry } = payload;",
     "const { shape } = payload;",
     "import { shape as geometry } from './protocol';",
+    "export { geometry as shape };",
   ],
   invalid: [
     {
@@ -35,6 +36,10 @@ ruleTester.run("no-shape-in-symbol-names", rule, {
     },
     {
       code: "type UserShape = { id: string };",
+      errors: [{ messageId: "forbiddenSymbolName" }],
+    },
+    {
+      code: "const userShape = value; export { userShape as value };",
       errors: [{ messageId: "forbiddenSymbolName" }],
     },
   ],

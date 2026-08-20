@@ -34,7 +34,7 @@ function isProtocolOwnedName(node: ESTree.Node & { name: string }): boolean {
     return true;
   }
 
-  return parent.type === "ExportSpecifier" && parent.local === node;
+  return parent.type === "ExportSpecifier" && parent.exported === node;
 }
 
 /** Ban "shape" in repository-owned JavaScript and TypeScript symbol names. */
@@ -82,7 +82,7 @@ export const noForbiddenTermInSymbolNamesRule = defineRule({
         reportForbiddenSymbolName(node);
       },
       ExportSpecifier(node) {
-        protocolOwnedRanges.add(node.local.range[0]);
+        protocolOwnedRanges.add(node.exported.range[0]);
       },
       ImportSpecifier(node) {
         protocolOwnedRanges.add(node.imported.range[0]);

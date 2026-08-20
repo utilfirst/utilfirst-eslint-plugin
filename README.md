@@ -118,7 +118,7 @@ export default [
 | [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                    | Reject `Reflect.apply`                                                                |
 | [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                      | Reject `Reflect.get`                                                                  |
 | [`no-runtime-typeof`](./docs/rules.md#boundary-contracts)                            | Keep runtime `typeof` checks inside explicit decoding boundaries                      |
-| [`no-shape-in-symbol-names`](./docs/rules.md#ownership-and-tests)                    | Reject `shape` in symbols other than static properties                                |
+| [`no-shape-in-symbol-names`](./docs/rules.md#ownership-and-tests)                    | Reject `shape` in repository-owned symbols                                            |
 | [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                        | Keep explicit `unknown` parameters at decoding boundaries                             |
 | [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                           | Reject `unknown` return contracts                                                     |
 | [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                      | Reject type aliases that resolve to `unknown`                                         |
