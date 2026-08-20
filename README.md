@@ -68,9 +68,12 @@ Rules with consumer-specific ownership accept options in either runtime. For exa
 | [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md) | Insert blank lines between statement-list and JSXChild items that start a new thought |
 | `no-chained-type-assertions`                                       | Reject chained TypeScript assertions                                                  |
 | `no-conditional-empty-object-spread`                               | Reject conditional empty-object spreads                                               |
+| `no-conditional-undefined-properties`                              | Reject conditional undefined object properties                                        |
+| `no-enum-declarations`                                             | Reject runtime enums other than const and ambient enums                               |
 | `no-known-value-widening`                                          | Reject known values widened into broad target types                                   |
 | `no-module-mocking`                                                | Reject Vitest and Jest mocking of repository-owned modules                            |
 | `no-object-parameters`                                             | Reject `object` function parameters                                                   |
+| `no-positional-boolean-parameters`                                 | Reject positional boolean flags on named functions                                    |
 | `no-reflect-apply`                                                 | Reject `Reflect.apply`                                                                |
 | `no-reflect-get`                                                   | Reject `Reflect.get`                                                                  |
 | `no-runtime-typeof`                                                | Reject runtime `typeof` checks                                                        |

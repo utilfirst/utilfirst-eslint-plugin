@@ -4,9 +4,12 @@ import pkg from "../package.json" with { type: "json" };
 import { consistentBlankLines } from "./rules/consistent-blank-lines.ts";
 import { noChainedTypeAssertionsRule } from "./rules/no-chained-type-assertions.ts";
 import { noConditionalEmptyObjectSpreadRule } from "./rules/no-conditional-empty-object-spread.ts";
+import { noConditionalUndefinedPropertiesRule } from "./rules/no-conditional-undefined-properties.ts";
+import { noEnumDeclarationsRule } from "./rules/no-enum-declarations.ts";
 import { noKnownValueWideningRule } from "./rules/no-known-value-widening.ts";
 import { noModuleMockingRule } from "./rules/no-module-mocking.ts";
 import { noObjectParametersRule } from "./rules/no-object-parameters.ts";
+import { noPositionalBooleanParametersRule } from "./rules/no-positional-boolean-parameters.ts";
 import { noReflectApplyRule } from "./rules/no-reflect-apply.ts";
 import { noReflectGetRule } from "./rules/no-reflect-get.ts";
 import { noRuntimeTypeofRule } from "./rules/no-runtime-typeof.ts";
@@ -28,9 +31,12 @@ const antiSlopPlugin = eslintCompatPlugin({
   rules: {
     "no-chained-type-assertions": noChainedTypeAssertionsRule,
     "no-conditional-empty-object-spread": noConditionalEmptyObjectSpreadRule,
+    "no-conditional-undefined-properties": noConditionalUndefinedPropertiesRule,
+    "no-enum-declarations": noEnumDeclarationsRule,
     "no-known-value-widening": noKnownValueWideningRule,
     "no-module-mocking": noModuleMockingRule,
     "no-object-parameters": noObjectParametersRule,
+    "no-positional-boolean-parameters": noPositionalBooleanParametersRule,
     "no-reflect-apply": noReflectApplyRule,
     "no-reflect-get": noReflectGetRule,
     "no-runtime-typeof": noRuntimeTypeofRule,
