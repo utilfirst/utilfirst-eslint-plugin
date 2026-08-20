@@ -23,6 +23,7 @@ import { noUnsafeDictionaryTypeRule } from "./rules/no-unsafe-dictionary-type.ts
 import { noWidenThenAssertRule } from "./rules/no-widen-then-assert.ts";
 import { preferOptionsParameterRule } from "./rules/prefer-options-parameter.ts";
 import { preferSwitchDiscriminatorChainRule } from "./rules/prefer-switch-discriminator-chain.ts";
+import { preferTopLevelFunctionDeclarationsRule } from "./rules/prefer-top-level-function-declarations.ts";
 import { requireLintSuppressionReasonRule } from "./rules/require-lint-suppression-reason.ts";
 import { requireSafetyCommentForTypeAssertionRule } from "./rules/require-safety-comment-for-type-assertion.ts";
 
@@ -54,6 +55,8 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-widen-then-assert": noWidenThenAssertRule,
     "prefer-options-parameter": preferOptionsParameterRule,
     "prefer-switch-discriminator-chain": preferSwitchDiscriminatorChainRule,
+    "prefer-top-level-function-declarations":
+      preferTopLevelFunctionDeclarationsRule,
     "require-lint-suppression-reason": requireLintSuppressionReasonRule,
     "require-safety-comment-for-type-assertion":
       requireSafetyCommentForTypeAssertionRule,

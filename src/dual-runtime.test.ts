@@ -10,6 +10,7 @@ const execFileAsync = promisify(execFile);
 
 const fixtureSource = `import { vi } from "vitest";
 
+const topLevelFunction = () => 1;
 const paragraphStart = createValue();
 useValue(paragraphStart);
 function createNextValue() {}
@@ -63,7 +64,7 @@ const owner = {
 void Promise.resolve();
 
 // eslint-disable-next-line no-console
-console.log(owner.combine("a", "b", "c"));
+console.log(topLevelFunction(), owner.combine("a", "b", "c"));
 `;
 
 const ruleNames = Object.keys(plugin.rules);
