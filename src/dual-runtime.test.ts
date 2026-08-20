@@ -9,6 +9,10 @@ const execFileAsync = promisify(execFile);
 
 const fixtureSource = `import { vi } from "vitest";
 
+const paragraphStart = createValue();
+useValue(paragraphStart);
+function createNextValue() {}
+
 type RawValue = unknown;
 type Metadata = Record<string, unknown>;
 type UserShape = { name: string };
@@ -36,6 +40,7 @@ function load(): unknown {
 `;
 
 const ruleNames = [
+  "consistent-blank-lines",
   "no-chained-type-assertions",
   "no-conditional-empty-object-spread",
   "no-known-value-widening",

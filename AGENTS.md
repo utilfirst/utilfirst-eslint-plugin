@@ -1,6 +1,6 @@
 # @utilfirst/eslint-plugin
 
-Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v9/v10 peer.
+Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLint flat config only.
 
 ## Workflow
 
@@ -20,7 +20,7 @@ Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v
 
 ## Stack
 
-- ESM-only ESLint flat-config plugin bundled with tsdown and tested through Vitest plus the TypeScript ESLint rule tester.
+- ESM-only ESLint and Oxlint plugin bundled with tsdown and tested through Vitest, the TypeScript ESLint rule tester, and an Oxlint runtime fixture.
 
 ## Structure
 
@@ -32,7 +32,7 @@ Shared ESLint rules for utilfirst projects. ESM-only, flat config only, ESLint v
 .github/workflows/
 ├── ci.yml                          Lint + build + test on PR
 └── publish.yml                     Tag-triggered OIDC publish
-docs/rules/                         Per-rule spec docs, linked from each rule's meta.docs.url
+docs/rules/                         Source-owned specifications for rules that require detailed behavior contracts
 src/
 ├── index.ts                        Plugin entry: meta, rules map, configs.recommended
 └── rules/                          One file per rule, with colocated `*.test.ts` siblings
@@ -49,12 +49,12 @@ src/
 
 - `pnpm run build` runs tsdown. `prepack` chains it before `npm pack`/`publish`
 - Output is `dist/index.js` + `dist/index.d.ts`. The `outExtensions: () => ({ js: ".js" })` override is load-bearing. Tsdown defaults to `.mjs`, but the `exports` field references `.js` to match `"type": "module"` convention
-- `@typescript-eslint/utils` is shipped as a runtime `dependency` and marked `external` in `tsdown.config.ts`. Bundling it pushes the package from 18 kB to 495 kB and bloats every consumer
+- `@typescript-eslint/utils` is shipped as a runtime `dependency` and marked `external` in `tsdown.config.ts` so the package does not bundle another copy for each consumer
 
 ## Testing
 
 - Test runner is vitest. Rule tester is `@typescript-eslint/rule-tester` with vitest hooks bound in each test file (`RuleTester.afterAll = afterAll`, etc.)
-- `parserOptions: { ecmaFeatures: { jsx: true, globalReturn: true } }` is set on the `RuleTester` constructor so JSX fixtures and top-level `return` fixtures parse without per-case overrides
+- Set parser options on each `RuleTester` constructor only when its fixtures require JSX, module, or top-level return parsing
 
 ## Spec source
 
