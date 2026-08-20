@@ -9,7 +9,7 @@ export default defineConfig([
   tseslint.configs.stylisticTypeChecked,
   plugin.configs.recommended,
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: [".tmp/**", "dist/**", "node_modules/**"],
   },
   {
     languageOptions: {

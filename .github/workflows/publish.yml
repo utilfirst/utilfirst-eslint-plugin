@@ -22,7 +22,7 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - run: pnpm run release:check-tag
+      - run: pnpm run release-check-tag
         env:
           RELEASE_TAG: ${{ github.ref_name }}
 
