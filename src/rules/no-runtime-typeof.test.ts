@@ -11,6 +11,7 @@ ruleTester.run("no-runtime-typeof", rule, {
   valid: [
     "const value = input;",
     'function parse(value: unknown): string { if (typeof value !== "string") throw new Error(); return value; }',
+    'function parse(value: unknown): string { const hasStringType = () => typeof value === "string"; if (!hasStringType()) throw new Error(); return value; }',
     {
       code: 'function isString(value: unknown): value is string { return typeof value === "string"; }',
       options: [{ allowInTypeGuards: true }],
@@ -30,7 +31,7 @@ ruleTester.run("no-runtime-typeof", rule, {
       errors: [{ messageId: "runtimeTypeof" }],
     },
     {
-      code: 'function isString(value: unknown): value is string { const check = () => typeof value === "string"; return check(); }',
+      code: 'function inspect(value: string): string { const hasStringType = () => typeof value === "string"; return hasStringType() ? value : ""; }',
       options: [{ allowInTypeGuards: true }],
       errors: [{ messageId: "runtimeTypeof" }],
     },

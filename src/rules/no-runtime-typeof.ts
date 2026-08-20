@@ -25,12 +25,13 @@ function isInsideAllowedBoundary(
 ): boolean {
   let current: ESTree.Node | null = node.parent;
   while (current !== null && current.type !== "Program") {
-    if (isRuntimeFunction(current)) {
-      return (
-        isBoundaryDecoder(current) ||
+    if (
+      isRuntimeFunction(current) &&
+      (isBoundaryDecoder(current) ||
         (allowInTypeGuards &&
-          current.returnType?.typeAnnotation.type === "TSTypePredicate")
-      );
+          current.returnType?.typeAnnotation.type === "TSTypePredicate"))
+    ) {
+      return true;
     }
 
     current = current.parent;

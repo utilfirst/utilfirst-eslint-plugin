@@ -12,7 +12,14 @@ const OptionsSchema = z.object({
 const ContextOptionsSchema = ruleContextOptionsSchema(OptionsSchema);
 
 function containsForbiddenSymbolName(name: string): boolean {
-  return name.toLowerCase().includes(FORBIDDEN_SYMBOL_NAME);
+  const symbolWords = name
+    .replaceAll(/([a-z\d])([A-Z])/gu, "$1 $2")
+    .replaceAll(/([A-Z]+)([A-Z][a-z])/gu, "$1 $2")
+    .split(/[_$\s]+|(?<=\D)(?=\d)|(?<=\d)(?=\D)/u);
+
+  return symbolWords.some(
+    (symbolWord) => symbolWord.toLowerCase() === FORBIDDEN_SYMBOL_NAME,
+  );
 }
 
 function isProtocolOwnedName(node: ESTree.Node & { name: string }): boolean {

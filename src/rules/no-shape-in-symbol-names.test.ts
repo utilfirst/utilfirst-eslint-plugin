@@ -21,6 +21,9 @@ ruleTester.run("no-shape-in-symbol-names", rule, {
     "const { shape } = payload;",
     "import { shape as geometry } from './protocol';",
     "export { geometry as shape };",
+    "const shapefile = value;",
+    "const reshapedValue = value;",
+    "const shapelessValue = value;",
     {
       code: "type Shape = Circle | Rectangle;",
       options: [{ allowSymbolNames: ["Shape"] }],
@@ -33,6 +36,14 @@ ruleTester.run("no-shape-in-symbol-names", rule, {
     },
     {
       code: "type UserShape = { id: string };",
+      errors: [{ messageId: "forbiddenSymbolName" }],
+    },
+    {
+      code: "type USER_SHAPE_MAP = { id: string };",
+      errors: [{ messageId: "forbiddenSymbolName" }],
+    },
+    {
+      code: "const shape2D = value;",
       errors: [{ messageId: "forbiddenSymbolName" }],
     },
     {
