@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { expect, test } from "vitest";
+import plugin from "./index.ts";
 
 const execFileAsync = promisify(execFile);
 
@@ -21,6 +22,13 @@ const input: unknown = { name: "Ada" };
 const widened: unknown = { name: "Ada" };
 const broad: object = { name: "Ada" };
 const options = { ...(input === undefined ? {} : { input }) };
+const conditionalOptions = {
+  input: input === undefined ? undefined : input,
+};
+
+enum Status {
+  Ready,
+}
 
 vi.mock("./dependency", () => ({}));
 
@@ -37,26 +45,13 @@ function consume(value: object, other: unknown): void {
 function load(): unknown {
   return input;
 }
+
+function configure(isEnabled: boolean): void {
+  consume(conditionalOptions, isEnabled);
+}
 `;
 
-const ruleNames = [
-  "consistent-blank-lines",
-  "no-chained-type-assertions",
-  "no-conditional-empty-object-spread",
-  "no-known-value-widening",
-  "no-module-mocking",
-  "no-object-parameters",
-  "no-reflect-apply",
-  "no-reflect-get",
-  "no-runtime-typeof",
-  "no-shape-in-symbol-names",
-  "no-unknown-parameters",
-  "no-unknown-returns",
-  "no-unknown-type-aliases",
-  "no-unsafe-dictionary-type",
-  "no-widen-then-assert",
-  "require-safety-comment-for-type-assertion",
-] as const;
+const ruleNames = Object.keys(plugin.rules);
 
 async function getOxlintOutput(): Promise<string> {
   const testDirectory = await mkdtemp(join(tmpdir(), "utilfirst-oxlint-"));

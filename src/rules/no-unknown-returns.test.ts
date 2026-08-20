@@ -20,6 +20,8 @@ ruleTester.run("no-unknown-returns", rule, {
     "function infer() { return input; }",
     "function cause(): { cause: unknown } { return { cause: input }; }",
     "function outer<Raw>() { function load(): Raw { return input; } }",
+    "type Key = unknown; type Mapped<Input> = { [Key in keyof Input]: () => Key };",
+    "type Item = unknown; type Unpacked<Input> = Input extends Promise<infer Item> ? () => Item : never;",
   ],
   invalid: [
     {
@@ -36,6 +38,26 @@ ruleTester.run("no-unknown-returns", rule, {
     },
     {
       code: "function outer() { type Raw = unknown; function load(): Raw { return input; } }",
+      errors: [{ messageId: "unknownReturn" }],
+    },
+    {
+      code: "const load = (): unknown => input;",
+      errors: [{ messageId: "unknownReturn" }],
+    },
+    {
+      code: "type Loader = () => unknown;",
+      errors: [{ messageId: "unknownReturn" }],
+    },
+    {
+      code: "interface Loader { load(): unknown }",
+      errors: [{ messageId: "unknownReturn" }],
+    },
+    {
+      code: "declare function load(): unknown;",
+      errors: [{ messageId: "unknownReturn" }],
+    },
+    {
+      code: "function load(): string | unknown { return input; }",
       errors: [{ messageId: "unknownReturn" }],
     },
   ],

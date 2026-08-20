@@ -20,6 +20,9 @@ ruleTester.run("no-object-parameters", rule, {
     "type Owner = { id: string }; function consume(value: Owner) {}",
     "function consume<Value>(value: Value) {}",
     "function outer() { type Value = string; function consume(value: Value) {} }",
+    "type Input = object; function consume<Input>(value: Input) {}",
+    "type Input = object; type Consumer<Input> = (value: Input) => void;",
+    "type Key = object; type Mapped<Input> = { [Key in keyof Input]: (value: Key) => void };",
   ],
   invalid: [
     {
@@ -40,6 +43,10 @@ ruleTester.run("no-object-parameters", rule, {
     },
     {
       code: "function outer() { type Input = object; function consume(value: Input) {} }",
+      errors: [{ messageId: "objectParameter" }],
+    },
+    {
+      code: "type Item = object; type Fallback<Input> = Input extends infer Item ? string : (value: Item) => void;",
       errors: [{ messageId: "objectParameter" }],
     },
   ],
