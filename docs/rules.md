@@ -4,6 +4,15 @@ The rule implementations in [`src/rules/`](../src/rules/) own accepted syntax an
 
 Every exported rule is enabled at error severity by `configs.recommended`. Options adapt repository ownership or externally fixed signatures while leaving the rule enabled.
 
+## Principles
+
+- The plugin rejects recurring low-evidence patterns that erase type information, hide boundaries, fragment APIs, obscure ownership, or make failures unobservable.
+- Rules are shared project policy for repositories that adopt this package. Their value is measured against that anti-slop contract rather than unrestricted JavaScript and TypeScript usage.
+- Strong defaults keep the preferred form automatic. Narrow options preserve exact domain, framework, or external protocol contracts without weakening unrelated code.
+- A legitimate exceptional use does not invalidate a rule. Use a documented option when the exception is stable and identifiable, or a reasoned lint suppression when the case is isolated.
+- Tighten detection or add a bounded exception before considering removal. Remove a rule only when no enforceable universal contract can justify error severity.
+- Implementations and colocated tests own accepted syntax and diagnostics. This document owns the policy rationale and expected replacement, so a rule review must consider both surfaces.
+
 ## Type evidence
 
 - `no-chained-type-assertions` rejects nested assertions that discard one type and recreate another. Preserve the original precise type or validate untrusted input once before use. Chains containing only `as const` remain valid because they preserve literal evidence.

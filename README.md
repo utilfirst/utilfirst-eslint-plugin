@@ -143,7 +143,7 @@ export default [
 | [`no-widen-then-assert`](./docs/rules.md#type-evidence)                              | Reject const flows that widen a known value before narrowing it                       |
 | [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)            | Require an options object for named functions with three or more inputs               |
 | [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                     | Require a forcing reason on lint disable directives                                   |
-| [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)         | Require a `SAFETY:` comment for non-const type assertions                             |
+| [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)         | Require one `SAFETY:` comment for each outermost non-const assertion                  |
 
 ## Attribution
 

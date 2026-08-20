@@ -59,7 +59,11 @@ src/
 ## Rule policy
 
 - Every exported rule must express universal project policy and remain enabled at error severity in `configs.recommended`.
+- Assess a rule against the plugin's anti-slop purpose and shared consumer conventions before recommending removal.
+- Prefer tightening detection or adding a narrow exact option when a rule has legitimate boundary cases.
+- Do not treat one legitimate niche use as sufficient evidence for removal. Check whether a documented option or reasoned lint suppression preserves the strong default.
 - Redesign or remove a rule when its enforced contract does not justify universal error severity. Do not retain optional exported rules or a second preset.
+- Recommend removal only after proving that no enforceable universal contract can justify the rule at error severity.
 - Treat the registry-completeness test in `src/index.test.ts` as the enforcement owner for the all-recommended invariant.
 
 ## Spec source
