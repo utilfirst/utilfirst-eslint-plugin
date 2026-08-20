@@ -8,10 +8,15 @@ RuleTester.describe = describe;
 RuleTester.it = it;
 RuleTester.itOnly = it.only;
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
+type DomainNamesRule = TSESLint.RuleModule<
+  "forbiddenSymbolName",
+  [{ allowSymbolNames?: string[] }]
+>;
+
+// SAFETY: The registry key selects the rule whose message and option contract this test asserts.
 const rule = plugin.rules[
   "no-shape-in-symbol-names"
-] as TSESLint.RuleModule<"forbiddenSymbolName">;
+] as TSESLint.RuleModule<"forbiddenSymbolName"> & DomainNamesRule;
 
 const ruleTester = new RuleTester({
   languageOptions: {
@@ -28,6 +33,10 @@ ruleTester.run("no-shape-in-symbol-names", rule, {
     "const { shape } = payload;",
     "import { shape as geometry } from './protocol';",
     "export { geometry as shape };",
+    {
+      code: "type Shape = Circle | Rectangle;",
+      options: [{ allowSymbolNames: ["Shape"] }],
+    },
   ],
   invalid: [
     {
@@ -36,6 +45,15 @@ ruleTester.run("no-shape-in-symbol-names", rule, {
     },
     {
       code: "type UserShape = { id: string };",
+      errors: [{ messageId: "forbiddenSymbolName" }],
+    },
+    {
+      code: "type ShapeResult = { area: number };",
+      options: [{ allowSymbolNames: ["Shape"] }],
+      errors: [{ messageId: "forbiddenSymbolName" }],
+    },
+    {
+      code: 'import { value as userShape } from "./protocol";',
       errors: [{ messageId: "forbiddenSymbolName" }],
     },
     {

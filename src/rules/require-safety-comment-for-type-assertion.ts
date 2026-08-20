@@ -20,6 +20,23 @@ function isConstAssertion(node: TypeAssertion): boolean {
   );
 }
 
+function isNestedAssertion(node: TypeAssertion): boolean {
+  let current: ESTree.Expression = node;
+  let parent = node.parent;
+  while (
+    parent.type === "ParenthesizedExpression" &&
+    parent.expression === current
+  ) {
+    current = parent;
+    parent = parent.parent;
+  }
+
+  return (
+    (parent.type === "TSAsExpression" || parent.type === "TSTypeAssertion") &&
+    parent.expression === current
+  );
+}
+
 function hasSafetyComment(
   sourceCode: SourceCode,
   node: TypeAssertion,
@@ -65,6 +82,7 @@ export const requireSafetyCommentForTypeAssertionRule = defineRule({
     const checkAssertion = (node: TypeAssertion) => {
       if (
         isConstAssertion(node) ||
+        isNestedAssertion(node) ||
         hasSafetyComment(context.sourceCode, node)
       ) {
         return;

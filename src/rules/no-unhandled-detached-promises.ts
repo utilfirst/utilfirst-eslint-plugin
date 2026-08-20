@@ -38,11 +38,24 @@ function staticMemberName(expression: ESTree.MemberExpression): string | null {
 function isRejectionHandler(
   argument: ESTree.Argument | ESTree.SpreadElement | undefined,
 ): boolean {
-  return (
-    argument !== undefined &&
-    !(argument.type === "Identifier" && argument.name === "undefined") &&
-    !(argument.type === "Literal" && argument.value === null)
-  );
+  if (argument === undefined || argument.type === "SpreadElement") {
+    return false;
+  }
+
+  const unwrapped = unwrapExpression(argument);
+  if (unwrapped.type === "Identifier") {
+    return unwrapped.name !== "undefined";
+  }
+
+  return ![
+    "ArrayExpression",
+    "BinaryExpression",
+    "JSXElement",
+    "JSXFragment",
+    "Literal",
+    "ObjectExpression",
+    "TemplateLiteral",
+  ].includes(unwrapped.type);
 }
 
 function hasRejectionHandler(expression: ESTree.Expression): boolean {

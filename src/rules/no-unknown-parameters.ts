@@ -1,5 +1,6 @@
 import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import { z } from "zod";
 
 import { isBoundaryDecoder } from "../shared/boundary-decoder.ts";
 
@@ -13,6 +14,14 @@ type ParameterOwner =
   | ESTree.TSConstructorType
   | ESTree.TSFunctionType
   | ESTree.TSMethodSignature;
+
+const OptionsSchema = z.object({
+  allowParameterNames: z.array(z.string()).optional(),
+});
+
+const ContextOptionsSchema = z
+  .union([OptionsSchema, z.array(OptionsSchema)])
+  .nullable();
 
 function parameterAnnotation(
   parameter: Parameter,
@@ -71,12 +80,34 @@ export const noUnknownParametersRule = defineRule({
       unknownParameter:
         "Parameter `{{parameter}}` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
     },
+    schema: [
+      {
+        type: "object",
+        properties: {
+          allowParameterNames: {
+            type: "array",
+            items: { type: "string", minLength: 1 },
+            uniqueItems: true,
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
+    defaultOptions: [{ allowParameterNames: [] }],
   },
   createOnce(context) {
     const checkParameters = (node: ParameterOwner) => {
       if (isBoundaryDecoder(node)) {
         return;
       }
+
+      const parsedOptions = ContextOptionsSchema.safeParse(context.options);
+
+      const options = parsedOptions.success
+        ? Array.isArray(parsedOptions.data)
+          ? parsedOptions.data[0]
+          : parsedOptions.data
+        : undefined;
 
       for (const parameter of node.params) {
         const type = parameterType(parameter);
@@ -89,7 +120,10 @@ export const noUnknownParametersRule = defineRule({
           context.sourceCode.getText(parameter),
         );
 
-        if (name === "cause") {
+        if (
+          name === "cause" ||
+          options?.allowParameterNames?.includes(name) === true
+        ) {
           continue;
         }
 

@@ -158,8 +158,8 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const a = 1;\nconst b = 2;\n`,
     },
     {
-      name: "matching zero-arg consts with different callees stay grouped",
-      code: `const a = foo();\nconst b = bar();\n`,
+      name: "zero-argument consts with different callees stay separated",
+      code: `const a = foo();\n\nconst b = bar();\n`,
     },
     {
       name: "matching consts with equal member callees stay grouped",
@@ -170,8 +170,8 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const a = this();\nconst b = this();\n`,
     },
     {
-      name: "consts with mismatched callee node types fall back to zero-arg",
-      code: `const a = foo();\nconst b = obj.bar();\n`,
+      name: "consts with mismatched callee node types stay separated",
+      code: `const a = foo();\n\nconst b = obj.bar();\n`,
     },
     {
       name: "uninitialized matching let pair stays grouped",
@@ -186,20 +186,20 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const a = f()();\nconst b = f()();\n`,
     },
     {
-      name: "consts with computed-vs-dotted callees fall back to zero-arg",
-      code: `const a = obj.foo();\nconst b = obj[foo]();\n`,
+      name: "consts with computed-vs-dotted callees stay separated",
+      code: `const a = obj.foo();\n\nconst b = obj[foo]();\n`,
     },
     {
-      name: "consts with different member objects fall back to zero-arg",
-      code: `const a = x.foo();\nconst b = y.foo();\n`,
+      name: "consts with different member objects stay separated",
+      code: `const a = x.foo();\n\nconst b = y.foo();\n`,
     },
     {
-      name: "consts with different member properties fall back to zero-arg",
-      code: `const a = obj.foo();\nconst b = obj.bar();\n`,
+      name: "consts with different member properties stay separated",
+      code: `const a = obj.foo();\n\nconst b = obj.bar();\n`,
     },
     {
-      name: "consts with arrow-IIFE callees fall back to zero-arg",
-      code: `const a = (() => 1)();\nconst b = (() => 2)();\n`,
+      name: "consts with arrow-IIFE callees stay separated",
+      code: `const a = (() => 1)();\n\nconst b = (() => 2)();\n`,
     },
     {
       name: "matching export const pair stays grouped",
@@ -303,6 +303,12 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
     },
   ],
   invalid: [
+    {
+      name: "unrelated zero-argument calls start separate paragraphs",
+      code: `const a = foo();\nconst b = bar();\n`,
+      output: `const a = foo();\n\nconst b = bar();\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
     {
       name: "blank between adjacent same-shape consts is removed",
       code: `const a = 1;\n\nconst b = 2;\n`,

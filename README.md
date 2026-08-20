@@ -41,11 +41,19 @@ export default [
         "error",
         { allowFunctionNames: ["protocolCallback"] },
       ],
+      "utilfirst/no-unknown-parameters": [
+        "error",
+        { allowParameterNames: ["externalPayload"] },
+      ],
+      "utilfirst/no-runtime-typeof": ["error", { allowInTypeGuards: true }],
+      "utilfirst/no-shape-in-symbol-names": [
+        "error",
+        { allowSymbolNames: ["Shape"] },
+      ],
       "utilfirst/prefer-options-parameter": [
         "error",
         { allowFunctionNames: ["protocolCallback"] },
       ],
-      "utilfirst/no-runtime-typeof": ["error", { allowInTypeGuards: true }],
     },
   },
 ];
@@ -53,7 +61,9 @@ export default [
 
 - `internalModulePrefixes` marks package-style import prefixes as repository-owned for `no-module-mocking`.
 - `allowFunctionNames` preserves named functions whose positional boolean or multi-input signature is fixed by an external protocol.
+- `allowParameterNames` preserves `unknown` parameters whose names identify an externally fixed callback or interface signature.
 - `allowInTypeGuards` permits `typeof` inside explicit type predicates while continuing to reject ad hoc runtime narrowing.
+- `allowSymbolNames` preserves exact repository-owned names whose domain meaning requires `shape`.
 
 ```jsonc
 // .oxlintrc.json
@@ -83,8 +93,14 @@ export default [
     "utilfirst/no-reflect-apply": "error",
     "utilfirst/no-reflect-get": "error",
     "utilfirst/no-runtime-typeof": ["error", { "allowInTypeGuards": true }],
-    "utilfirst/no-shape-in-symbol-names": "error",
-    "utilfirst/no-unknown-parameters": "error",
+    "utilfirst/no-shape-in-symbol-names": [
+      "error",
+      { "allowSymbolNames": ["Shape"] },
+    ],
+    "utilfirst/no-unknown-parameters": [
+      "error",
+      { "allowParameterNames": ["externalPayload"] },
+    ],
     "utilfirst/no-unknown-returns": "error",
     "utilfirst/no-unknown-type-aliases": "error",
     "utilfirst/no-unsafe-dictionary-type": "error",
@@ -110,7 +126,7 @@ export default [
 | [`no-chained-type-assertions`](./docs/rules.md#type-evidence)                        | Reject chained TypeScript assertions                                                  |
 | [`no-conditional-empty-object-spread`](./docs/rules.md#object-and-api-construction)  | Reject conditional empty-object spreads                                               |
 | [`no-conditional-undefined-properties`](./docs/rules.md#object-and-api-construction) | Reject conditional undefined object properties                                        |
-| [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                | Reject runtime enums other than const and ambient enums                               |
+| [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                | Reject repository-owned enums other than ambient declarations                         |
 | [`no-known-value-widening`](./docs/rules.md#type-evidence)                           | Reject known values widened into broad target types                                   |
 | [`no-module-mocking`](./docs/rules.md#ownership-and-tests)                           | Reject Vitest and Jest mocking of repository-owned modules                            |
 | [`no-object-parameters`](./docs/rules.md#boundary-contracts)                         | Reject `object` function parameters                                                   |

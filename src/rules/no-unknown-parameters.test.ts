@@ -8,10 +8,15 @@ RuleTester.describe = describe;
 RuleTester.it = it;
 RuleTester.itOnly = it.only;
 
-// SAFETY: The registry key selects the rule whose message ID this test asserts.
+type UnknownParametersRule = TSESLint.RuleModule<
+  "unknownParameter",
+  [{ allowParameterNames?: string[] }]
+>;
+
+// SAFETY: The registry key selects the rule whose message and option contract this test asserts.
 const rule = plugin.rules[
   "no-unknown-parameters"
-] as TSESLint.RuleModule<"unknownParameter">;
+] as TSESLint.RuleModule<"unknownParameter"> & UnknownParametersRule;
 
 const ruleTester = new RuleTester();
 ruleTester.run("no-unknown-parameters", rule, {
@@ -22,6 +27,10 @@ ruleTester.run("no-unknown-parameters", rule, {
     "function parse(value: unknown): string { return String(value); }",
     "function isString(value: unknown): value is string { return true; }",
     "type Parser = (value: unknown) => string;",
+    {
+      code: "type ExternalCallback = (payload: unknown) => void;",
+      options: [{ allowParameterNames: ["payload"] }],
+    },
   ],
   invalid: [
     {

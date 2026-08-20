@@ -15,26 +15,25 @@ function isInsideAmbientModule(node: ESTree.TSEnumDeclaration): boolean {
   return false;
 }
 
-/** Prefer literal unions or constant objects over runtime TypeScript enums. */
+/** Prefer literal unions or constant objects over repository-owned TypeScript enums. */
 export const noEnumDeclarationsRule = defineRule({
   meta: {
     type: "suggestion",
     docs: {
       description:
-        "Disallow runtime enum declarations while preserving const and ambient enums.",
+        "Disallow repository-owned enum declarations while preserving ambient enums.",
     },
     messages: {
       enumDeclaration:
-        "Replace this runtime enum with a literal union or an inferred constant object. Keep const or ambient enums only when their boundary requires them.",
+        "Replace this enum with a literal union or an inferred constant object. Keep ambient enums only when their boundary requires them.",
     },
   },
   create(context) {
-    const isDeclarationFile = context.filename.endsWith(".d.ts");
+    const isDeclarationFile = /\.d\.[cm]?ts$/u.test(context.filename);
 
     return {
       TSEnumDeclaration(node) {
         if (
-          !node.const &&
           !node.declare &&
           !isDeclarationFile &&
           !isInsideAmbientModule(node)

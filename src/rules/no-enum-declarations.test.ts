@@ -16,13 +16,20 @@ const rule = plugin.rules[
 const ruleTester = new RuleTester();
 ruleTester.run("no-enum-declarations", rule, {
   valid: [
-    "const enum Status { Ready, Done }",
     "declare enum Status { Ready, Done }",
     "declare namespace Protocol { enum Status { Ready, Done } }",
     'declare module "protocol" { enum Status { Ready, Done } }',
     {
       code: "enum Status { Ready, Done }",
       filename: "types.d.ts",
+    },
+    {
+      code: "enum Status { Ready, Done }",
+      filename: "types.d.mts",
+    },
+    {
+      code: "enum Status { Ready, Done }",
+      filename: "types.d.cts",
     },
     'const Status = { ready: "ready", done: "done" } as const;',
     'type Status = "ready" | "done";',
@@ -34,6 +41,10 @@ ruleTester.run("no-enum-declarations", rule, {
     },
     {
       code: "export enum Status { Ready, Done }",
+      errors: [{ messageId: "enumDeclaration" }],
+    },
+    {
+      code: "const enum Status { Ready, Done }",
       errors: [{ messageId: "enumDeclaration" }],
     },
   ],

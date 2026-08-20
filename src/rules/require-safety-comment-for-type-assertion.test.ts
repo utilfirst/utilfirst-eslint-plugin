@@ -30,6 +30,10 @@ ruleTester.run("require-safety-comment-for-type-assertion", rule, {
       errors: [{ messageId: "missingSafetyComment" }],
     },
     {
+      code: "const value = input as unknown as string;",
+      errors: [{ messageId: "missingSafetyComment" }],
+    },
+    {
       code: "// The schema validated this value.\nconst value = input as string;",
       errors: [{ messageId: "missingSafetyComment" }],
     },

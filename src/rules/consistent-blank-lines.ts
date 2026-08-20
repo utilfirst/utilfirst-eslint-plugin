@@ -19,7 +19,7 @@
 //     single-line `const`/`let` with one declarator each and matching
 //     export-ness (`export const` with `export const`, plain `const` with plain
 //     `const`), with right-hand sides either both non-calls, or both calls
-//     (sharing a callee, or both zero-argument).
+//     sharing the same callee.
 //   - Neither is a hook-call statement, and _matching type aliases_: both are
 //     single-line `type` aliases with matching export-ness (`export type` with
 //     `export type`, plain `type` with plain `type`).
@@ -295,7 +295,15 @@ function sameParagraph({
   const prevHook = isHookStatement(prev);
   const nextHook = isHookStatement(next);
   if (prevHook || nextHook) {
-    return prevHook && nextHook && isMatchingVarDeclPair(prev, next);
+    return (
+      prevHook &&
+      nextHook &&
+      isMatchingVarDeclPair({
+        next,
+        prev,
+        shouldMatchInitializers: false,
+      })
+    );
   }
 
   return (
@@ -373,7 +381,7 @@ function statementsBelongTogether(
   if (isReExport(prev) && isReExport(next)) {
     return true;
   }
-  if (isMatchingVarDeclPair(prev, next)) {
+  if (isMatchingVarDeclPair({ next, prev })) {
     return true;
   }
   if (isMatchingTypeAliasPair(prev, next)) {
@@ -429,10 +437,15 @@ function isReExport(stmt: TSESTree.Statement): boolean {
   );
 }
 
-function isMatchingVarDeclPair(
-  prev: TSESTree.Statement,
-  next: TSESTree.Statement,
-): boolean {
+function isMatchingVarDeclPair({
+  next,
+  prev,
+  shouldMatchInitializers = true,
+}: {
+  next: TSESTree.Statement;
+  prev: TSESTree.Statement;
+  shouldMatchInitializers?: boolean;
+}): boolean {
   const previousDeclaration = unwrapExport(prev);
   const nextDeclaration = unwrapExport(next);
   if (
@@ -454,6 +467,7 @@ function isMatchingVarDeclPair(
     return false;
   }
   if (
+    shouldMatchInitializers &&
     !initializersBelongTogether(
       previousDeclaration.declarations[0].init,
       nextDeclaration.declarations[0].init,
@@ -513,11 +527,7 @@ function initializersBelongTogether(
   const prevCall = asCall(prevInit);
   const nextCall = asCall(nextInit);
   if (prevCall && nextCall) {
-    if (calleesEqual(prevCall.callee, nextCall.callee)) {
-      return true;
-    }
-
-    return prevCall.arguments.length === 0 && nextCall.arguments.length === 0;
+    return calleesEqual(prevCall.callee, nextCall.callee);
   }
   if (prevCall || nextCall) {
     return false;
@@ -569,6 +579,20 @@ function calleesEqual(
       b.property.type === AST_NODE_TYPES.Identifier
     ) {
       return a.property.name === b.property.name;
+    }
+    if (
+      a.computed &&
+      a.property.type === AST_NODE_TYPES.Identifier &&
+      b.property.type === AST_NODE_TYPES.Identifier
+    ) {
+      return a.property.name === b.property.name;
+    }
+    if (
+      a.computed &&
+      a.property.type === AST_NODE_TYPES.Literal &&
+      b.property.type === AST_NODE_TYPES.Literal
+    ) {
+      return a.property.value === b.property.value;
     }
 
     return false;
