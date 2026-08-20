@@ -56,6 +56,12 @@ src/
 - Test runner is vitest. Rule tester is `@typescript-eslint/rule-tester` with vitest hooks bound in each test file (`RuleTester.afterAll = afterAll`, etc.)
 - Set parser options on each `RuleTester` constructor only when its fixtures require JSX, module, or top-level return parsing
 
+## Rule policy
+
+- Every exported rule must express universal project policy and remain enabled at error severity in `configs.recommended`.
+- Redesign or remove a rule when its enforced contract does not justify universal error severity. Do not retain optional exported rules or a second preset.
+- Treat the registry-completeness test in `src/index.test.ts` as the enforcement owner for the all-recommended invariant.
+
 ## Spec source
 
 - The blank-lines rule's spec lives in two places: as a comment at the top of `src/rules/consistent-blank-lines.ts` and in `docs/rules/consistent-blank-lines.md`. The rule's behavior governs users; the spec doc is the canonical text. Update both on any spec change.
