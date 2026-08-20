@@ -28,6 +28,10 @@ export default defineConfig([
         { prefer: "type-imports", fixStyle: "inline-type-imports" },
       ],
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-unnecessary-condition": [
+        "error",
+        { allowConstantLoopConditions: "only-allowed-literals" },
+      ],
       "arrow-body-style": ["error", "as-needed"],
       "curly": "error",
       "object-shorthand": "error",

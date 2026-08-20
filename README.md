@@ -1,6 +1,6 @@
 # @utilfirst/eslint-plugin
 
-Shared ESLint rules for utilfirst projects. Flat config only, ESLint v9 / v10.
+Shared rules for ESLint 10 and Oxlint.
 
 ## Install
 
@@ -29,28 +29,62 @@ export default [
   {
     plugins: { utilfirst },
     rules: {
-      "utilfirst/consistent-blank-lines": "error",
+      "utilfirst/no-module-mocking": "error",
     },
   },
 ];
 ```
 
+```jsonc
+// .oxlintrc.json
+{
+  "jsPlugins": [
+    {
+      "name": "utilfirst",
+      "specifier": "@utilfirst/eslint-plugin",
+    },
+  ],
+  "rules": {
+    "utilfirst/no-module-mocking": "error",
+  },
+}
+```
+
 ## Rules
 
-| Rule                                                               | Description                                                                           | Fixable |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | ------- |
-| [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md) | Insert blank lines between statement-list and JSXChild items that start a new thought | yes     |
+| Rule                                                               | Description                                                                           |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md) | Insert blank lines between statement-list and JSXChild items that start a new thought |
+| `no-chained-type-assertions`                                       | Reject chained TypeScript assertions                                                  |
+| `no-conditional-empty-object-spread`                               | Reject conditional empty-object spreads                                               |
+| `no-known-value-widening`                                          | Reject known values widened into broad target types                                   |
+| `no-module-mocking`                                                | Reject Vitest and Jest module mocking                                                 |
+| `no-object-parameters`                                             | Reject `object` function parameters                                                   |
+| `no-reflect-apply`                                                 | Reject `Reflect.apply`                                                                |
+| `no-reflect-get`                                                   | Reject `Reflect.get`                                                                  |
+| `no-runtime-typeof`                                                | Reject runtime `typeof` checks                                                        |
+| `no-shape-in-symbol-names`                                         | Reject `shape` in symbols other than static properties                                |
+| `no-unknown-parameters`                                            | Reject explicit `unknown` parameters                                                  |
+| `no-unknown-returns`                                               | Reject `unknown` return contracts                                                     |
+| `no-unknown-type-aliases`                                          | Reject type aliases that resolve to `unknown`                                         |
+| `no-unsafe-dictionary-type`                                        | Reject dictionary contracts with broad value types                                    |
+| `no-widen-then-assert`                                             | Reject const flows that widen a known value before narrowing it                       |
+| `require-safety-comment-for-type-assertion`                        | Require a `SAFETY:` comment for non-const type assertions                             |
+
+## Attribution
+
+The rules other than `consistent-blank-lines` and their helpers are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 
 ```sh
 pnpm install
 pnpm run setup-hooks # one-time: wire pre-commit via simple-git-hooks
-pnpm test            # vitest + @typescript-eslint/rule-tester
+pnpm test            # vitest, ESLint, and Oxlint
 pnpm run build       # tsdown → dist/
 pnpm run lint        # eslint + prettier + publint + tsc
 ```
 
 ## License
 
-MIT
+MIT. The package includes third-party code under the same license.

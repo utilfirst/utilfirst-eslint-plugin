@@ -11,9 +11,6 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        eslint: ["9", "10"]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -28,12 +25,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - if: matrix.eslint == '9'
-        run: pnpm add -D eslint@9 --ignore-scripts
-
       - run: pnpm run build
 
       - run: pnpm test
 
-      - if: matrix.eslint == '10'
-        run: pnpm run lint
+      - run: pnpm run lint
