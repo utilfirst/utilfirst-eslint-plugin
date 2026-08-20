@@ -1,6 +1,7 @@
 import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 import { z } from "zod";
+import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
 
 const FORBIDDEN_SYMBOL_NAME = "shape";
 
@@ -8,9 +9,7 @@ const OptionsSchema = z.object({
   allowSymbolNames: z.array(z.string()).optional(),
 });
 
-const ContextOptionsSchema = z
-  .union([OptionsSchema, z.array(OptionsSchema)])
-  .nullable();
+const ContextOptionsSchema = ruleContextOptionsSchema(OptionsSchema);
 
 function containsForbiddenSymbolName(name: string): boolean {
   return name.toLowerCase().includes(FORBIDDEN_SYMBOL_NAME);
@@ -76,13 +75,7 @@ export const noForbiddenTermInSymbolNamesRule = defineRule({
       node: ESTree.Node & { name: string },
     ) => {
       const parsedOptions = ContextOptionsSchema.safeParse(context.options);
-
-      const options = parsedOptions.success
-        ? Array.isArray(parsedOptions.data)
-          ? parsedOptions.data[0]
-          : parsedOptions.data
-        : undefined;
-
+      const options = parsedOptions.success ? parsedOptions.data : undefined;
       if (
         protocolOwnedRanges.has(node.range[0]) ||
         reportedRanges.has(node.range[0]) ||

@@ -6,14 +6,13 @@ import {
   getOwnedFunctionName,
   type OwnedFunction,
 } from "../shared/owned-function.ts";
+import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
 
 const OptionsSchema = z.object({
   allowFunctionNames: z.array(z.string()).optional(),
 });
 
-const ContextOptionsSchema = z
-  .union([OptionsSchema, z.array(OptionsSchema)])
-  .nullable();
+const ContextOptionsSchema = ruleContextOptionsSchema(OptionsSchema);
 
 function annotationOf(
   parameter: ESTree.ParamPattern,
@@ -82,13 +81,7 @@ export const noPositionalBooleanParametersRule = defineRule({
 
       const rawOptions: unknown = context.options;
       const parsedOptions = ContextOptionsSchema.safeParse(rawOptions);
-
-      const options = parsedOptions.success
-        ? Array.isArray(parsedOptions.data)
-          ? parsedOptions.data[0]
-          : parsedOptions.data
-        : undefined;
-
+      const options = parsedOptions.success ? parsedOptions.data : undefined;
       if (options?.allowFunctionNames?.includes(functionName) === true) {
         return;
       }

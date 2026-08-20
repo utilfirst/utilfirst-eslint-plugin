@@ -560,13 +560,13 @@ export function classifyWideningTarget(
     return { kind: "object" };
   }
   if (unwrapped.type === "TSTypeLiteral") {
-    return unwrapped.members.some(
-      (member) => member.type === "TSIndexSignature",
-    )
-      ? { kind: "open dictionary" }
-      : unwrapped.members.length > 0
-        ? { kind: "anonymous object" }
-        : null;
+    if (
+      unwrapped.members.some((member) => member.type === "TSIndexSignature")
+    ) {
+      return { kind: "open dictionary" };
+    }
+
+    return unwrapped.members.length > 0 ? { kind: "anonymous object" } : null;
   }
   if (unwrapped.type === "TSMappedType") {
     return { kind: "open dictionary" };

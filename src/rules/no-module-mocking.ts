@@ -2,6 +2,7 @@ import { defineRule } from "@oxlint/plugins";
 import { z } from "zod";
 
 import type { ESTree, Scope, SourceCode, Variable } from "@oxlint/plugins";
+import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
 
 const moduleMockMethods = new Set(["doMock", "mock", "unstable_mockModule"]);
 
@@ -9,9 +10,9 @@ const ModuleMockOptionsSchema = z.object({
   internalModulePrefixes: z.array(z.string()).optional(),
 });
 
-const ModuleMockContextOptionsSchema = z
-  .union([ModuleMockOptionsSchema, z.array(ModuleMockOptionsSchema)])
-  .nullable();
+const ModuleMockContextOptionsSchema = ruleContextOptionsSchema(
+  ModuleMockOptionsSchema,
+);
 
 function resolveVariable(
   sourceCode: SourceCode,
@@ -102,17 +103,18 @@ function moduleMockCall(
   }
 
   const property = callee.property;
-
-  const method = callee.computed
-    ? property.type === "Literal" &&
-      (property.value === "doMock" ||
-        property.value === "mock" ||
-        property.value === "unstable_mockModule")
-      ? property.value
-      : null
-    : property.type === "Identifier"
-      ? property.name
-      : null;
+  let method: string | null = null;
+  if (
+    callee.computed &&
+    property.type === "Literal" &&
+    (property.value === "doMock" ||
+      property.value === "mock" ||
+      property.value === "unstable_mockModule")
+  ) {
+    method = property.value;
+  } else if (!callee.computed && property.type === "Identifier") {
+    method = property.name;
+  }
 
   return method !== null && moduleMockMethods.has(method);
 }
@@ -178,12 +180,9 @@ export const noModuleMockingRule = defineRule({
         const parsedOptions =
           ModuleMockContextOptionsSchema.safeParse(rawOptions);
 
-        let parsedOption: z.infer<typeof ModuleMockOptionsSchema> | undefined;
-        if (parsedOptions.success && parsedOptions.data !== null) {
-          parsedOption = Array.isArray(parsedOptions.data)
-            ? parsedOptions.data[0]
-            : parsedOptions.data;
-        }
+        const parsedOption = parsedOptions.success
+          ? parsedOptions.data
+          : undefined;
 
         const internalModulePrefixes =
           parsedOption?.internalModulePrefixes ?? [];

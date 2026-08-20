@@ -3,6 +3,7 @@ import { defineRule } from "@oxlint/plugins";
 import { z } from "zod";
 
 import { isBoundaryDecoder } from "../shared/boundary-decoder.ts";
+import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
 
 type Parameter = ESTree.ParamPattern;
 
@@ -19,9 +20,7 @@ const OptionsSchema = z.object({
   allowParameterNames: z.array(z.string()).optional(),
 });
 
-const ContextOptionsSchema = z
-  .union([OptionsSchema, z.array(OptionsSchema)])
-  .nullable();
+const ContextOptionsSchema = ruleContextOptionsSchema(OptionsSchema);
 
 function parameterAnnotation(
   parameter: Parameter,
@@ -102,13 +101,7 @@ export const noUnknownParametersRule = defineRule({
       }
 
       const parsedOptions = ContextOptionsSchema.safeParse(context.options);
-
-      const options = parsedOptions.success
-        ? Array.isArray(parsedOptions.data)
-          ? parsedOptions.data[0]
-          : parsedOptions.data
-        : undefined;
-
+      const options = parsedOptions.success ? parsedOptions.data : undefined;
       for (const parameter of node.params) {
         const type = parameterType(parameter);
         if (type?.type !== "TSUnknownKeyword") {
