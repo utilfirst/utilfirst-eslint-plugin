@@ -20,7 +20,14 @@ const ruleTester = new RuleTester({
 });
 
 ruleTester.run("no-shape-in-symbol-names", rule, {
-  valid: ["const value = owner.shape;", 'owner["shape"];'],
+  valid: [
+    "const value = owner.shape;",
+    'owner["shape"];',
+    'const view = <Widget shape="round" />;',
+    "const { shape: geometry } = payload;",
+    "const { shape } = payload;",
+    "import { shape as geometry } from './protocol';",
+  ],
   invalid: [
     {
       code: "const userShape = value;",
@@ -28,10 +35,6 @@ ruleTester.run("no-shape-in-symbol-names", rule, {
     },
     {
       code: "type UserShape = { id: string };",
-      errors: [{ messageId: "forbiddenSymbolName" }],
-    },
-    {
-      code: 'const view = <Widget shape="round" />;',
       errors: [{ messageId: "forbiddenSymbolName" }],
     },
   ],

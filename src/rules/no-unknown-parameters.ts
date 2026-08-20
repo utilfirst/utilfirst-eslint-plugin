@@ -1,6 +1,8 @@
 import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 
+import { isBoundaryDecoder } from "../shared/boundary-decoder.ts";
+
 type Parameter = ESTree.ParamPattern;
 
 type ParameterOwner =
@@ -57,13 +59,13 @@ function parameterName(parameter: Parameter, sourceText: string): string {
     : sourceText.replace(/\s*:\s*unknown\s*$/u, "");
 }
 
-/** Disallow unknown inputs except explicitly named error-cause enrichment. */
+/** Keep unknown inputs at explicit decoding and error-enrichment boundaries. */
 export const noUnknownParametersRule = defineRule({
   meta: {
     type: "problem",
     docs: {
       description:
-        "Disallow explicitly unknown function parameters except `cause`; decode unknown input at its I/O boundary instead.",
+        "Disallow explicitly unknown parameters outside decoders and error-cause enrichment boundaries.",
     },
     messages: {
       unknownParameter:
@@ -72,6 +74,10 @@ export const noUnknownParametersRule = defineRule({
   },
   createOnce(context) {
     const checkParameters = (node: ParameterOwner) => {
+      if (isBoundaryDecoder(node)) {
+        return;
+      }
+
       for (const parameter of node.params) {
         const type = parameterType(parameter);
         if (type?.type !== "TSUnknownKeyword") {

@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import type { ESTree } from "@oxlint/plugins";
 
+import { isBoundaryDecoder } from "../shared/boundary-decoder.ts";
+
 type RuntimeFunction = ESTree.ArrowFunctionExpression | ESTree.Function;
 
 const RuntimeTypeofOptionsSchema = z.object({
@@ -17,11 +19,18 @@ function isRuntimeFunction(node: ESTree.Node): node is RuntimeFunction {
   );
 }
 
-function isInsideTypeGuard(node: ESTree.Node): boolean {
+function isInsideAllowedBoundary(
+  node: ESTree.Node,
+  { allowInTypeGuards }: { allowInTypeGuards: boolean },
+): boolean {
   let current: ESTree.Node | null = node.parent;
   while (current !== null && current.type !== "Program") {
     if (isRuntimeFunction(current)) {
-      return current.returnType?.typeAnnotation.type === "TSTypePredicate";
+      return (
+        isBoundaryDecoder(current) ||
+        (allowInTypeGuards &&
+          current.returnType?.typeAnnotation.type === "TSTypePredicate")
+      );
     }
 
     current = current.parent;
@@ -30,13 +39,13 @@ function isInsideTypeGuard(node: ESTree.Node): boolean {
   return false;
 }
 
-/** Disallow runtime typeof checks that narrow unparsed values instead of decoding them. */
+/** Keep runtime representation checks inside explicit decoding boundaries. */
 export const noRuntimeTypeofRule = defineRule({
   meta: {
     type: "problem",
     docs: {
       description:
-        "Disallow runtime typeof checks; external values must be decoded into meaningful types at their I/O boundary.",
+        "Disallow runtime typeof checks outside explicit boundary decoders and configured type guards.",
     },
     messages: {
       runtimeTypeof:
@@ -64,7 +73,7 @@ export const noRuntimeTypeofRule = defineRule({
 
         if (
           node.operator === "typeof" &&
-          (!allowInTypeGuards || !isInsideTypeGuard(node))
+          !isInsideAllowedBoundary(node, { allowInTypeGuards })
         ) {
           context.report({ node, messageId: "runtimeTypeof" });
         }

@@ -19,6 +19,9 @@ ruleTester.run("no-unknown-parameters", rule, {
     "function enrich(cause: unknown) {}",
     "function consume<Value>(value: Value) {}",
     "function consume(value: { id: string }) {}",
+    "function parse(value: unknown): string { return String(value); }",
+    "function isString(value: unknown): value is string { return true; }",
+    "type Parser = (value: unknown) => string;",
   ],
   invalid: [
     {

@@ -32,6 +32,7 @@ const ruleTester = new RuleTester();
 ruleTester.run("no-runtime-typeof", rule, {
   valid: [
     "const value = input;",
+    'function parse(value: unknown): string { if (typeof value !== "string") throw new Error(); return value; }',
     {
       code: 'function isString(value: unknown): value is string { return typeof value === "string"; }',
       options: [{ allowInTypeGuards: true }],
@@ -48,11 +49,6 @@ ruleTester.run("no-runtime-typeof", rule, {
   invalid: [
     {
       code: 'if (typeof input === "string") use(input);',
-      errors: [{ messageId: "runtimeTypeof" }],
-    },
-    {
-      code: 'function parse(value: unknown): string { if (typeof value !== "string") throw new Error(); return value; }',
-      options: [{ allowInTypeGuards: true }],
       errors: [{ messageId: "runtimeTypeof" }],
     },
     {
