@@ -18,6 +18,7 @@ ruleTester.run("no-known-value-widening", rule, {
   valid: [
     "const value: unknown = read();",
     "const handlers: Record<string, Handler> = {};",
+    "const handlers: Record<string, Handler> = { start };",
     "const handlers = { start } satisfies Record<string, Handler>;",
     "type Handlers = { start: Handler }; const handlers: Handlers = { start };",
   ],
@@ -28,10 +29,6 @@ ruleTester.run("no-known-value-widening", rule, {
     },
     {
       code: "const value: object = { id: 1 };",
-      errors: [{ messageId: "widening" }],
-    },
-    {
-      code: "const handlers: Record<string, Handler> = { start };",
       errors: [{ messageId: "widening" }],
     },
     {

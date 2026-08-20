@@ -177,19 +177,15 @@ function functionName(
   return "anonymous function";
 }
 
-function isEmptyObjectExpression(expression: ESTree.Expression): boolean {
-  const unwrapped = unwrapExpression(expression);
-
-  return (
-    unwrapped.type === "ObjectExpression" && unwrapped.properties.length === 0
-  );
-}
-
 function isDictionaryAccumulatorTarget(destination: WideningTarget): boolean {
   return (
     destination.kind === "open dictionary" ||
     destination.kind === "generic container"
   );
+}
+
+function isObjectExpression(expression: ESTree.Expression): boolean {
+  return unwrapExpression(expression).type === "ObjectExpression";
 }
 
 function hasParentAssertion(node: ESTree.Node): boolean {
@@ -229,7 +225,7 @@ export const noKnownValueWideningRule = defineRule({
       }
       if (
         isDictionaryAccumulatorTarget(destination) &&
-        isEmptyObjectExpression(expression)
+        isObjectExpression(expression)
       ) {
         return;
       }
