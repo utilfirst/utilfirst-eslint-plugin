@@ -40,6 +40,7 @@ export default defineConfig([
         "double",
         { allowTemplateLiterals: true, avoidEscape: true },
       ],
+      "utilfirst/no-runtime-typeof": ["error", { allowInTypeGuards: true }],
     },
   },
   {

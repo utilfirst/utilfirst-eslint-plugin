@@ -31,7 +31,8 @@ function hasSafetyComment(
         .getCommentsBefore(current)
         .some(
           (comment) =>
-            comment.end <= node.start && /\bSAFETY\s*:/u.test(comment.value),
+            comment.range[1] <= node.range[0] &&
+            /\bSAFETY\s*:/u.test(comment.value),
         )
     ) {
       return true;

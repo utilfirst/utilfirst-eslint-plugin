@@ -1,28 +1,57 @@
-import { RuleTester } from "@typescript-eslint/rule-tester";
-import type { TSESLint } from "@typescript-eslint/utils";
 import { execFile } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
-import { afterAll, describe, expect, it, test } from "vitest";
-import plugin from "./index.ts";
+import { expect, test } from "vitest";
 
 const execFileAsync = promisify(execFile);
 
-const noModuleMockingRule = plugin.rules[
-  "no-module-mocking"
-] as TSESLint.RuleModule<"moduleMock">;
-
-RuleTester.afterAll = afterAll;
-RuleTester.describe = describe;
-RuleTester.it = it;
-RuleTester.itOnly = it.only;
-
 const fixtureSource = `import { vi } from "vitest";
 
+type RawValue = unknown;
+type Metadata = Record<string, unknown>;
+type UserShape = { name: string };
+
+const input: unknown = { name: "Ada" };
+const widened: unknown = { name: "Ada" };
+const broad: object = { name: "Ada" };
+const options = { ...(input === undefined ? {} : { input }) };
+
 vi.mock("./dependency", () => ({}));
+
+const chained = input as unknown as string;
+const narrowed = widened as { name: string };
+
+function consume(value: object, other: unknown): void {
+  if (typeof other === "string") {
+    Reflect.get(value, "name");
+    Reflect.apply(consume, undefined, [value, other]);
+  }
+}
+
+function load(): unknown {
+  return input;
+}
 `;
+
+const ruleNames = [
+  "no-chained-type-assertions",
+  "no-conditional-empty-object-spread",
+  "no-known-value-widening",
+  "no-module-mocking",
+  "no-object-parameters",
+  "no-reflect-apply",
+  "no-reflect-get",
+  "no-runtime-typeof",
+  "no-shape-in-symbol-names",
+  "no-unknown-parameters",
+  "no-unknown-returns",
+  "no-unknown-type-aliases",
+  "no-unsafe-dictionary-type",
+  "no-widen-then-assert",
+  "require-safety-comment-for-type-assertion",
+] as const;
 
 async function getOxlintOutput(): Promise<string> {
   const testDirectory = await mkdtemp(join(tmpdir(), "utilfirst-oxlint-"));
@@ -34,7 +63,9 @@ async function getOxlintOutput(): Promise<string> {
     configPath,
     JSON.stringify({
       jsPlugins: [{ name: "utilfirst", specifier: pluginPath }],
-      rules: { "utilfirst/no-module-mocking": "error" },
+      rules: Object.fromEntries(
+        ruleNames.map((ruleName) => [`utilfirst/${ruleName}`, "error"]),
+      ),
     }),
   );
   await writeFile(sourcePath, fixtureSource);
@@ -57,24 +88,9 @@ async function getOxlintOutput(): Promise<string> {
   }
 }
 
-const ruleTester = new RuleTester({
-  languageOptions: {
-    parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-  },
-});
-
-ruleTester.run("no-module-mocking", noModuleMockingRule, {
-  valid: ["const value = 1;"],
-  invalid: [
-    {
-      code: fixtureSource,
-      errors: [{ messageId: "moduleMock" }],
-    },
-  ],
-});
-
-test("reports module mocking through Oxlint", async () => {
+test("reports every shared rule through Oxlint", async () => {
   const output = await getOxlintOutput();
-  expect(output).toContain("utilfirst(no-module-mocking)");
-  expect(output).toContain("Replace module mocking");
+  for (const ruleName of ruleNames) {
+    expect(output).toContain(`utilfirst(${ruleName})`);
+  }
 });

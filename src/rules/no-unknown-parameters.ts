@@ -19,13 +19,26 @@ function parameterAnnotation(
     return parameterAnnotation(parameter.parameter);
   }
   if (parameter.type === "RestElement") {
-    return parameterAnnotation(parameter.argument);
+    return parameter.typeAnnotation ?? parameterAnnotation(parameter.argument);
   }
   if (parameter.type === "AssignmentPattern") {
     return parameter.left.typeAnnotation;
   }
 
   return parameter.typeAnnotation;
+}
+
+function parameterType(parameter: Parameter): ESTree.TSType | null {
+  const annotation = parameterAnnotation(parameter);
+  if (annotation === null || annotation === undefined) {
+    return null;
+  }
+
+  const type = annotation.typeAnnotation;
+
+  return parameter.type === "RestElement" && type.type === "TSArrayType"
+    ? type.elementType
+    : type;
 }
 
 function parameterName(parameter: Parameter, sourceText: string): string {
@@ -60,8 +73,8 @@ export const noUnknownParametersRule = defineRule({
   createOnce(context) {
     const checkParameters = (node: ParameterOwner) => {
       for (const parameter of node.params) {
-        const annotation = parameterAnnotation(parameter);
-        if (annotation?.typeAnnotation.type !== "TSUnknownKeyword") {
+        const type = parameterType(parameter);
+        if (type?.type !== "TSUnknownKeyword") {
           continue;
         }
 
@@ -75,7 +88,7 @@ export const noUnknownParametersRule = defineRule({
         }
 
         context.report({
-          node: annotation.typeAnnotation,
+          node: type,
           messageId: "unknownParameter",
           data: { parameter: name },
         });

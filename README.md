@@ -20,6 +20,8 @@ export default [
 ];
 ```
 
+The recommended config enables every rule at error severity.
+
 Or wire rules individually:
 
 ```js
@@ -58,7 +60,7 @@ export default [
 | `no-chained-type-assertions`                                       | Reject chained TypeScript assertions                                                  |
 | `no-conditional-empty-object-spread`                               | Reject conditional empty-object spreads                                               |
 | `no-known-value-widening`                                          | Reject known values widened into broad target types                                   |
-| `no-module-mocking`                                                | Reject Vitest and Jest module mocking                                                 |
+| `no-module-mocking`                                                | Reject Vitest and Jest mocking of repository-owned modules                            |
 | `no-object-parameters`                                             | Reject `object` function parameters                                                   |
 | `no-reflect-apply`                                                 | Reject `Reflect.apply`                                                                |
 | `no-reflect-get`                                                   | Reject `Reflect.get`                                                                  |

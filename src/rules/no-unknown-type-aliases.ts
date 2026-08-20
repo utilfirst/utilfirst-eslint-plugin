@@ -10,7 +10,7 @@ function referencedAliasName(type: ESTree.TSType): string | null {
     return null;
   }
 
-  return type.typeArguments === null || type.typeArguments.params.length === 0
+  return (type.typeArguments?.params.length ?? 0) === 0
     ? type.typeName.name
     : null;
 }
@@ -48,7 +48,10 @@ export const noUnknownTypeAliasesRule = defineRule({
       }
 
       const alias = aliases.get(name);
-      if (alias?.typeParameters !== null) {
+      if (
+        alias === undefined ||
+        (alias.typeParameters?.params.length ?? 0) > 0
+      ) {
         return false;
       }
 

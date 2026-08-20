@@ -76,7 +76,7 @@ function isPlainAliasConsumerUse(
 ): boolean {
   if (
     node.type !== "TSTypeReference" ||
-    (node.typeArguments !== null && node.typeArguments.params.length > 0)
+    (node.typeArguments?.params.length ?? 0) > 0
   ) {
     return false;
   }

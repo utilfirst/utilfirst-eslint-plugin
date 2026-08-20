@@ -138,7 +138,7 @@ function assertionFromExpression(
 }
 
 function normalizedTypeText(sourceText: string, type: ESTree.TSType): string {
-  return sourceText.slice(type.start, type.end).replaceAll(/\s+/gu, "");
+  return sourceText.slice(type.range[0], type.range[1]).replaceAll(/\s+/gu, "");
 }
 
 function typesHaveSameSyntax(
@@ -233,8 +233,8 @@ function resolvedVariableForIdentifier(
   for (const scope of scopes) {
     const reference = scope.references.find(
       (candidate) =>
-        candidate.identifier.start === identifier.start &&
-        candidate.identifier.end === identifier.end,
+        candidate.identifier.range[0] === identifier.range[0] &&
+        candidate.identifier.range[1] === identifier.range[1],
     );
 
     if (reference !== undefined) {
@@ -393,7 +393,7 @@ function widenedBinding(
 
   return evidence === null
     ? null
-    : { broadKind, evidence, declaredAt: declarator.end, boundary };
+    : { broadKind, evidence, declaredAt: declarator.range[1], boundary };
 }
 
 function assertionIsNarrower(
@@ -450,7 +450,7 @@ export const noWidenThenAssertRule = defineRule({
       const widened = widenedBinding(variable, scopes);
       if (
         widened === null ||
-        node.start <= widened.declaredAt ||
+        node.range[0] <= widened.declaredAt ||
         functionBoundary(node) !== widened.boundary ||
         !assertionIsNarrower(
           context.sourceCode.text,

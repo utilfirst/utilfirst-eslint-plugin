@@ -22,13 +22,26 @@ function parameterAnnotation(
     return parameterAnnotation(parameter.parameter);
   }
   if (parameter.type === "RestElement") {
-    return parameterAnnotation(parameter.argument);
+    return parameter.typeAnnotation ?? parameterAnnotation(parameter.argument);
   }
   if (parameter.type === "AssignmentPattern") {
     return parameter.left.typeAnnotation;
   }
 
   return parameter.typeAnnotation;
+}
+
+function parameterType(parameter: Parameter): ESTree.TSType | null {
+  const annotation = parameterAnnotation(parameter);
+  if (annotation === null || annotation === undefined) {
+    return null;
+  }
+
+  const type = annotation.typeAnnotation;
+
+  return parameter.type === "RestElement" && type.type === "TSArrayType"
+    ? type.elementType
+    : type;
 }
 
 function parameterName(parameter: Parameter, sourceCode: SourceCode): string {
@@ -72,7 +85,7 @@ export const noObjectParametersRule = defineRule({
       if (
         type.type !== "TSTypeReference" ||
         type.typeName.type !== "Identifier" ||
-        (type.typeArguments !== null && type.typeArguments.params.length > 0) ||
+        (type.typeArguments?.params.length ?? 0) > 0 ||
         visited.has(type.typeName.name) ||
         shadowedAliases.has(type.typeName.name)
       ) {
@@ -95,16 +108,16 @@ export const noObjectParametersRule = defineRule({
       );
 
       for (const parameter of node.params) {
-        const annotation = parameterAnnotation(parameter);
-        if (annotation === null || annotation === undefined) {
+        const type = parameterType(parameter);
+        if (type === null) {
           continue;
         }
-        if (!resolvesToObject(annotation.typeAnnotation, shadowedAliases)) {
+        if (!resolvesToObject(type, shadowedAliases)) {
           continue;
         }
 
         context.report({
-          node: annotation.typeAnnotation,
+          node: type,
           messageId: "objectParameter",
           data: { parameter: parameterName(parameter, context.sourceCode) },
         });
@@ -123,7 +136,7 @@ export const noObjectParametersRule = defineRule({
 
           if (
             declaration?.type === "TSTypeAliasDeclaration" &&
-            declaration.typeParameters === null
+            (declaration.typeParameters?.params.length ?? 0) === 0
           ) {
             aliases.set(declaration.id.name, declaration.typeAnnotation);
           }

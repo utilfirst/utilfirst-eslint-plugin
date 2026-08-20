@@ -45,31 +45,53 @@ const antiSlopPlugin = eslintCompatPlugin({
   },
 });
 
-// NOTE: `eslintCompatPlugin` adds `create` to every `createOnce` rule at
-// runtime, but its declared result retains the original Oxlint rule union.
-const antiSlopRules = antiSlopPlugin.rules as unknown as Record<
-  string,
-  TSESLint.RuleModule<string>
->;
+function assertEslintCompatibleRules(
+  candidateRules: typeof antiSlopPlugin.rules,
+): asserts candidateRules is typeof antiSlopPlugin.rules &
+  Record<string, TSESLint.RuleModule<string>> {
+  for (const candidateRule of Object.values(candidateRules)) {
+    if (candidateRule.create === undefined) {
+      throw new Error("ESLint compatibility adapter did not install `create`");
+    }
+  }
+}
 
-const rules: Record<string, TSESLint.RuleModule<string>> = {
+// `eslintCompatPlugin` mutates each `createOnce` rule before this public
+// registry crosses the ESLint boundary, but its return type omits that fact.
+assertEslintCompatibleRules(antiSlopPlugin.rules);
+
+const antiSlopRules = antiSlopPlugin.rules;
+
+type RuleRegistry = Record<string, TSESLint.RuleModule<string>>;
+
+const rules = {
   "consistent-blank-lines": consistentBlankLines,
   ...antiSlopRules,
 };
 
-const plugin = {
+const recommendedRules: NonNullable<TSESLint.FlatConfig.Config["rules"]> =
+  Object.fromEntries(
+    Object.keys(rules).map((ruleName) => [
+      `utilfirst/${ruleName}`,
+      "error" as const,
+    ]),
+  );
+
+type UtilfirstPlugin = {
+  meta: typeof meta;
+  rules: RuleRegistry;
+  configs: { recommended: TSESLint.FlatConfig.Config };
+};
+
+const plugin: UtilfirstPlugin = {
   meta,
   rules,
-  configs: {} as {
-    recommended: TSESLint.FlatConfig.Config;
-  },
+  configs: { recommended: {} },
 };
 
 plugin.configs.recommended = {
   plugins: { utilfirst: plugin },
-  rules: {
-    "utilfirst/consistent-blank-lines": "error",
-  },
+  rules: recommendedRules,
 };
 
 export default plugin;

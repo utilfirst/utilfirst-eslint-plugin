@@ -132,8 +132,7 @@ function isUnappliedReferenceTo(type: ESTree.TSType, name: string): boolean {
   return (
     unwrapped.type === "TSTypeReference" &&
     typeReferenceName(unwrapped) === name &&
-    (unwrapped.typeArguments === null ||
-      unwrapped.typeArguments.params.length === 0)
+    (unwrapped.typeArguments?.params.length ?? 0) === 0
   );
 }
 
@@ -153,12 +152,31 @@ function isNeverType(type: ESTree.TSType): boolean {
   return unwrapTransparentType(type).type === "TSNeverKeyword";
 }
 
+// ESLint uses `undefined` for absent optional annotations while Oxlint's
+// declarations use `null` on these nodes.
+function optionalPropertyTypeAnnotation(
+  member: ESTree.TSPropertySignature,
+): ESTree.TSTypeAnnotation | null | undefined {
+  return member.typeAnnotation;
+}
+
+function optionalMappedTypeAnnotation(
+  type: ESTree.TSMappedType,
+): ESTree.TSType | null | undefined {
+  return type.typeAnnotation;
+}
+
 function isEffectivelyEmptyMember(member: ESTree.TSSignature): boolean {
+  if (member.type !== "TSPropertySignature" || !member.optional) {
+    return false;
+  }
+
+  const typeAnnotation = optionalPropertyTypeAnnotation(member);
+
   return (
-    member.type === "TSPropertySignature" &&
-    member.optional &&
-    member.typeAnnotation !== null &&
-    isNeverType(member.typeAnnotation.typeAnnotation)
+    typeAnnotation !== null &&
+    typeAnnotation !== undefined &&
+    isNeverType(typeAnnotation.typeAnnotation)
   );
 }
 
@@ -352,9 +370,11 @@ function dictionaryValueTypes(
     );
   }
   if (unwrapped.type === "TSMappedType") {
-    return unwrapped.typeAnnotation === null
+    const typeAnnotation = optionalMappedTypeAnnotation(unwrapped);
+
+    return typeAnnotation === null || typeAnnotation === undefined
       ? []
-      : [{ type: unwrapped.typeAnnotation, substitutions }];
+      : [{ type: typeAnnotation, substitutions }];
   }
   if (unwrapped.type !== "TSTypeReference") {
     return [];

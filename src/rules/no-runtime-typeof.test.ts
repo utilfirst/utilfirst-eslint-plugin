@@ -1,0 +1,51 @@
+import { RuleTester } from "@typescript-eslint/rule-tester";
+import type { TSESLint } from "@typescript-eslint/utils";
+import { afterAll, describe, it } from "vitest";
+import plugin from "../index.ts";
+
+RuleTester.afterAll = afterAll;
+RuleTester.describe = describe;
+RuleTester.it = it;
+RuleTester.itOnly = it.only;
+
+type RuntimeTypeofRule = TSESLint.RuleModule<
+  "runtimeTypeof",
+  [{ allowInTypeGuards?: boolean }]
+>;
+
+function assertRuntimeTypeofRule(
+  candidateRule: TSESLint.RuleModule<string>,
+): asserts candidateRule is TSESLint.RuleModule<string> & RuntimeTypeofRule {
+  if (!("runtimeTypeof" in candidateRule.meta.messages)) {
+    throw new Error("Runtime typeof rule has an unexpected message contract");
+  }
+}
+
+const rule = plugin.rules["no-runtime-typeof"];
+if (rule === undefined) {
+  throw new Error("Runtime typeof rule is missing from the registry");
+}
+
+assertRuntimeTypeofRule(rule);
+
+const ruleTester = new RuleTester();
+ruleTester.run("no-runtime-typeof", rule, {
+  valid: [
+    "const value = input;",
+    {
+      code: 'function isString(value: unknown): value is string { return typeof value === "string"; }',
+      options: [{ allowInTypeGuards: true }],
+    },
+  ],
+  invalid: [
+    {
+      code: 'if (typeof input === "string") use(input);',
+      errors: [{ messageId: "runtimeTypeof" }],
+    },
+    {
+      code: 'function parse(value: unknown): string { if (typeof value !== "string") throw new Error(); return value; }',
+      options: [{ allowInTypeGuards: true }],
+      errors: [{ messageId: "runtimeTypeof" }],
+    },
+  ],
+});

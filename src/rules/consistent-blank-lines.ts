@@ -110,6 +110,8 @@ const TERMINATING_STATEMENT_TYPES = new Set<AST_NODE_TYPES>([
 // no parent at runtime. This keeps `undefined` reachable so guarded ascents
 // terminate.
 function parentOf(node: TSESTree.Node): TSESTree.Node | undefined {
+  // SAFETY: Parser roots omit `parent` although the declaration marks it as
+  // required, so this boundary restores the runtime optionality.
   return (node as { parent?: TSESTree.Node }).parent;
 }
 
@@ -286,7 +288,10 @@ function sameParagraph(
     return prevHook && nextHook && isMatchingVarDeclPair(prev, next);
   }
 
-  return sharesNameFlow(prev, next, sourceCode) || sameShape(prev, next);
+  return (
+    sharesNameFlow(prev, next, sourceCode) ||
+    statementsBelongTogether(prev, next)
+  );
 }
 
 function isHookStatement(stmt: TSESTree.Statement): boolean {
@@ -344,7 +349,7 @@ function isHookCall(node: TSESTree.Node | null): boolean {
   );
 }
 
-function sameShape(
+function statementsBelongTogether(
   prev: TSESTree.Statement,
   next: TSESTree.Statement,
 ): boolean {
@@ -435,7 +440,7 @@ function isMatchingVarDeclPair(
     return false;
   }
   if (
-    !initsMatchByShape(
+    !initializersBelongTogether(
       previousDeclaration.declarations[0].init,
       nextDeclaration.declarations[0].init,
     )
@@ -487,7 +492,7 @@ function isConstOrLet(decl: TSESTree.VariableDeclaration): boolean {
   return decl.kind === "const" || decl.kind === "let";
 }
 
-function initsMatchByShape(
+function initializersBelongTogether(
   prevInit: TSESTree.Node | null,
   nextInit: TSESTree.Node | null,
 ): boolean {
@@ -556,7 +561,8 @@ function calleesEqual(
   }
 
   // Chained calls match when their underlying callees match. Intermediate
-  // arguments are ignored, and final-level arguments use `initsMatchByShape`.
+  // arguments are ignored, and final-level arguments use
+  // `initializersBelongTogether`.
   if (
     a.type === AST_NODE_TYPES.CallExpression &&
     b.type === AST_NODE_TYPES.CallExpression
@@ -874,7 +880,7 @@ function isInBindingPosition(idNode: TSESTree.Identifier): boolean {
       FN_DECL_TYPES.has(parent.type) &&
       "params" in parent &&
       Array.isArray(parent.params) &&
-      (parent.params as TSESTree.Node[]).includes(cur)
+      parent.params.some((parameter) => parameter === cur)
     ) {
       return true;
     }
@@ -984,7 +990,7 @@ function siblingsIncludeLiteralText(node: TSESTree.JSXChild): boolean {
 
 function expressionYieldsStringLiteral(expr: TSESTree.Node): boolean {
   if (expr.type === AST_NODE_TYPES.Literal) {
-    return typeof expr.value === "string";
+    return isString(expr.value);
   }
   if (expr.type === AST_NODE_TYPES.TemplateLiteral) {
     return true;
@@ -1002,18 +1008,30 @@ function expressionYieldsStringLiteral(expr: TSESTree.Node): boolean {
   return false;
 }
 
-function walk(
-  node: TSESTree.Node | null | undefined,
-  fn: (node: TSESTree.Node) => void,
-) {
-  if (!node || typeof node !== "object" || typeof node.type !== "string") {
-    return;
-  }
+function isString<Value>(value: Value): value is Value & string {
+  return typeof value === "string";
+}
 
+function isNode<Value>(value: Value): value is Value & TSESTree.Node {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "type" in value &&
+    typeof value.type === "string"
+  );
+}
+
+function isArray<Value>(value: Value): value is Value & readonly unknown[] {
+  return Array.isArray(value);
+}
+
+function walk(node: TSESTree.Node, fn: (node: TSESTree.Node) => void) {
   fn(node);
 
-  const nodeFields = node as unknown as Record<string, unknown>;
-  for (const key of Object.keys(nodeFields)) {
+  // SAFETY: ESTree fields are inspected as data and validated with `isNode`
+  // before recursive traversal.
+  const nodeEntries = Object.entries(node) as [string, unknown][];
+  for (const [key, child] of nodeEntries) {
     if (SKIP_KEYS.has(key)) {
       continue;
     }
@@ -1024,13 +1042,14 @@ function walk(
       continue;
     }
 
-    const child = nodeFields[key];
-    if (Array.isArray(child)) {
-      for (const c of child) {
-        walk(c as TSESTree.Node | null, fn);
+    if (isArray(child)) {
+      for (const childNode of child) {
+        if (isNode(childNode)) {
+          walk(childNode, fn);
+        }
       }
-    } else {
-      walk(child as TSESTree.Node | null, fn);
+    } else if (isNode(child)) {
+      walk(child, fn);
     }
   }
 }

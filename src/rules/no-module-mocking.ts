@@ -108,17 +108,29 @@ function moduleMockCall(
   return method !== null && moduleMockMethods.has(method);
 }
 
-/** Ban test framework module mocking in favor of real dependency seams. */
+function isRepositoryOwnedSpecifier(specifier: string): boolean {
+  return (
+    specifier.startsWith(".") ||
+    specifier.startsWith("/") ||
+    specifier.startsWith("#")
+  );
+}
+
+function isString<Value>(value: Value): value is Value & string {
+  return typeof value === "string";
+}
+
+/** Ban test framework mocking of repository-owned modules. */
 export const noModuleMockingRule = defineRule({
   meta: {
     type: "problem",
     docs: {
       description:
-        "Disallow Vitest and Jest module mocking; tests must replace dependencies through real interfaces.",
+        "Disallow Vitest and Jest mocking of repository-owned modules; tests must replace local dependencies through production seams.",
     },
     messages: {
       moduleMock:
-        "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
+        "Replace this local module mock through a production dependency seam and a faithful test implementation.",
     },
   },
   createOnce(context) {
@@ -130,10 +142,20 @@ export const noModuleMockingRule = defineRule({
         ) {
           return;
         }
-
-        if (moduleMockCall(context.sourceCode, node.callee)) {
-          context.report({ node, messageId: "moduleMock" });
+        if (!moduleMockCall(context.sourceCode, node.callee)) {
+          return;
         }
+
+        const [specifier] = node.arguments;
+        if (
+          specifier?.type !== "Literal" ||
+          !isString(specifier.value) ||
+          !isRepositoryOwnedSpecifier(specifier.value)
+        ) {
+          return;
+        }
+
+        context.report({ node, messageId: "moduleMock" });
       },
     };
   },
