@@ -18,11 +18,11 @@ const ContextOptionsSchema = z
 function annotationOf(
   parameter: ESTree.ParamPattern,
 ): ESTree.TSTypeAnnotation | null | undefined {
+  if (parameter.type === "TSParameterProperty") {
+    return annotationOf(parameter.parameter);
+  }
   if (parameter.type === "AssignmentPattern") {
     return parameter.left.typeAnnotation;
-  }
-  if (parameter.type === "TSParameterProperty") {
-    return null;
   }
 
   return parameter.typeAnnotation;
@@ -32,6 +32,9 @@ function parameterName(
   parameter: ESTree.ParamPattern,
   sourceCode: SourceCode,
 ): string {
+  if (parameter.type === "TSParameterProperty") {
+    return parameterName(parameter.parameter, sourceCode);
+  }
   if (parameter.type === "AssignmentPattern") {
     return parameter.left.type === "Identifier"
       ? parameter.left.name

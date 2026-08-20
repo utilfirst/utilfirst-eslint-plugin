@@ -51,11 +51,14 @@ function hasConditionalUndefinedValue(
   value: ESTree.Expression,
 ): boolean {
   const unwrapped = unwrapParentheses(value);
+  if (unwrapped.type !== "ConditionalExpression") {
+    return false;
+  }
 
-  return (
-    unwrapped.type === "ConditionalExpression" &&
-    (isUndefinedExpression(sourceCode, unwrapped.consequent) ||
-      isUndefinedExpression(sourceCode, unwrapped.alternate))
+  return [unwrapped.consequent, unwrapped.alternate].some(
+    (branch) =>
+      isUndefinedExpression(sourceCode, branch) ||
+      hasConditionalUndefinedValue(sourceCode, branch),
   );
 }
 

@@ -78,6 +78,15 @@ ruleTester.run("no-positional-boolean-parameters", rule, {
       errors: [{ messageId: "positionalBoolean" }],
     },
     {
+      code: "class Owner { constructor(private isEnabled: boolean) {} }",
+      errors: [
+        {
+          messageId: "positionalBoolean",
+          data: { functionName: "constructor", parameter: "isEnabled" },
+        },
+      ],
+    },
+    {
       code: "class Owner { #load = (isFresh: boolean) => {}; }",
       errors: [
         {
