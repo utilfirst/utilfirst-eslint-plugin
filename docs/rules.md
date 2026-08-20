@@ -23,7 +23,6 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 ## Boundary contracts
 
 - `no-object-parameters` rejects the broad `object` type on function inputs, including local aliases that resolve to `object`. Accept a named owner type or a constrained generic.
-- `no-runtime-typeof` rejects ad hoc runtime representation checks outside functions that accept `unknown` and return a decoded type. Lexical helpers inside those functions share the decoding boundary. Set `allowInTypeGuards` when explicit type predicates or assertion functions also own validation.
 - `no-unknown-parameters` keeps explicit `unknown` inputs at functions that return a decoded type and at the `cause` convention for error enrichment. Run an expected parser at the I/O boundary and pass its named output into other repository functions. `allowParameterNames` preserves externally fixed callback and interface signatures.
 - `no-unknown-returns` rejects explicit `unknown` and `Promise<unknown>` return contracts, including local aliases. Parse before returning so callers receive a named domain type.
 - `no-unknown-type-aliases` rejects aliases that only conceal `unknown`. Keep an intentionally open nested field visible in its owner type instead of naming the top type.
@@ -31,7 +30,6 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 ## Object and API construction
 
-- `no-conditional-empty-object-spread` rejects conditional spreads that use `{}` to encode property omission. Create a typed object and add the property only in the branch where it is present so the mutation owns the presence transition.
 - `no-conditional-undefined-properties` rejects object properties whose conditional value is `undefined`. Omit the property through a branched call or a typed local object so presence has one meaning.
 - `no-enum-declarations` rejects repository-owned TypeScript enums, including const enums. Use literal unions or inferred constant objects. Ambient and declaration-file enums remain valid when a boundary requires them.
 - `no-positional-boolean-parameters` rejects boolean flags on repository-owned named functions and methods. Use a named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
@@ -52,7 +50,6 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 ## Ownership and tests
 
 - `no-module-mocking` rejects Vitest and Jest mocks of repository-owned modules. Inject an unowned dependency through a production boundary and test with a real implementation or stateful fake. `internalModulePrefixes` marks package-style workspace imports as repository-owned.
-- `no-shape-in-symbol-names` rejects `shape` as a distinct word in repository-owned JavaScript, TypeScript, private, and JSX symbol names. Name the symbol for its domain responsibility. Property keys, member access, imported and exported boundary names, and JSX attributes remain unchanged because those names can belong to an external protocol. `allowSymbolNames` preserves exact names whose domain meaning requires `shape`.
 
 ## Layout
 

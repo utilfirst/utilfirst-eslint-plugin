@@ -45,11 +45,6 @@ export default [
         "error",
         { allowParameterNames: ["externalPayload"] },
       ],
-      "utilfirst/no-runtime-typeof": ["error", { allowInTypeGuards: true }],
-      "utilfirst/no-shape-in-symbol-names": [
-        "error",
-        { allowSymbolNames: ["Shape"] },
-      ],
       "utilfirst/prefer-options-parameter": [
         "error",
         { allowFunctionNames: ["protocolCallback"] },
@@ -62,8 +57,6 @@ export default [
 - `internalModulePrefixes` marks package-style import prefixes as repository-owned for `no-module-mocking`.
 - `allowFunctionNames` preserves named functions whose positional boolean or multi-input signature is fixed by an external protocol.
 - `allowParameterNames` preserves `unknown` parameters whose names identify an externally fixed callback or interface signature.
-- `allowInTypeGuards` permits `typeof` inside explicit type predicates while continuing to reject ad hoc runtime narrowing.
-- `allowSymbolNames` preserves exact repository-owned names whose domain meaning requires `shape`.
 
 ```jsonc
 // .oxlintrc.json
@@ -77,7 +70,6 @@ export default [
   "rules": {
     "utilfirst/consistent-blank-lines": "error",
     "utilfirst/no-chained-type-assertions": "error",
-    "utilfirst/no-conditional-empty-object-spread": "error",
     "utilfirst/no-conditional-undefined-properties": "error",
     "utilfirst/no-enum-declarations": "error",
     "utilfirst/no-known-value-widening": "error",
@@ -92,11 +84,6 @@ export default [
     ],
     "utilfirst/no-reflect-apply": "error",
     "utilfirst/no-reflect-get": "error",
-    "utilfirst/no-runtime-typeof": ["error", { "allowInTypeGuards": true }],
-    "utilfirst/no-shape-in-symbol-names": [
-      "error",
-      { "allowSymbolNames": ["Shape"] },
-    ],
     "utilfirst/no-unknown-parameters": [
       "error",
       { "allowParameterNames": ["externalPayload"] },
@@ -126,7 +113,6 @@ export default [
 | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md)                      | Insert blank lines between statement-list and JSXChild items that start a new thought |
 | [`no-chained-type-assertions`](./docs/rules.md#type-evidence)                           | Reject chained TypeScript assertions                                                  |
-| [`no-conditional-empty-object-spread`](./docs/rules.md#object-and-api-construction)     | Reject conditional empty-object spreads                                               |
 | [`no-conditional-undefined-properties`](./docs/rules.md#object-and-api-construction)    | Reject conditional undefined object properties                                        |
 | [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                   | Reject repository-owned enums other than ambient declarations                         |
 | [`no-known-value-widening`](./docs/rules.md#type-evidence)                              | Reject known values widened into broad target types                                   |
@@ -135,8 +121,6 @@ export default [
 | [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)       | Reject positional boolean flags on named functions and methods                        |
 | [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                       | Reject `Reflect.apply`                                                                |
 | [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                         | Reject `Reflect.get`                                                                  |
-| [`no-runtime-typeof`](./docs/rules.md#boundary-contracts)                               | Keep runtime `typeof` checks inside explicit decoding boundaries                      |
-| [`no-shape-in-symbol-names`](./docs/rules.md#ownership-and-tests)                       | Reject `shape` in repository-owned symbols                                            |
 | [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                           | Keep explicit `unknown` parameters at decoding boundaries                             |
 | [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                              | Reject `unknown` return contracts                                                     |
 | [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                         | Reject type aliases that resolve to `unknown`                                         |

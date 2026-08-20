@@ -161,7 +161,6 @@
     "unicorn/no-negated-condition": "off",
     "utilfirst/consistent-blank-lines": "error",
     "utilfirst/no-chained-type-assertions": "error",
-    "utilfirst/no-conditional-empty-object-spread": "error",
     "utilfirst/no-conditional-undefined-properties": "error",
     "utilfirst/no-enum-declarations": "error",
     "utilfirst/no-known-value-widening": "error",
@@ -170,13 +169,6 @@
     "utilfirst/no-positional-boolean-parameters": "error",
     "utilfirst/no-reflect-apply": "error",
     "utilfirst/no-reflect-get": "error",
-    "utilfirst/no-runtime-typeof": [
-      "error",
-      {
-        "allowInTypeGuards": true
-      }
-    ],
-    "utilfirst/no-shape-in-symbol-names": "error",
     "utilfirst/no-unknown-parameters": "error",
     "utilfirst/no-unknown-returns": "error",
     "utilfirst/no-unknown-type-aliases": "error",
