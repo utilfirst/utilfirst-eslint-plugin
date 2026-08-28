@@ -39,13 +39,9 @@
     "lint:publint": "publint",
     "prepack": "pnpm run build",
     "release-check-tag": "node scripts/check-release-tag.mjs",
-    "setup-hooks": "simple-git-hooks",
     "test": "pnpm run test-unit && pnpm run test-package",
     "test-package": "node scripts/test-package.mjs",
     "test-unit": "vitest run"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged --concurrent false"
   },
   "dependencies": {
     "@oxlint/plugins": "1.78.0",
@@ -59,7 +55,6 @@
     "@vitest/coverage-v8": "^4.1.7",
     "changelogithub": "15.0.4",
     "eslint": "^10.8.1",
-    "lint-staged": "^17.0.4",
     "oxlint": "1.78.0",
     "oxlint-tsgolint": "7.0.2001",
     "prettier": "^3.8.3",
@@ -68,7 +63,6 @@
     "prettier-plugin-sh": "^0.18.1",
     "prettier-plugin-sort-json": "^4.2.0",
     "publint": "^0.3.16",
-    "simple-git-hooks": "^2.13.1",
     "tsdown": "^0.18.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3",

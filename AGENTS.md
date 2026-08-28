@@ -27,12 +27,10 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 - Read `package.json` and `mise.toml` for the peer contract, dependencies, scripts, and toolchain versions.
 - Let `.oxlintrc.json` own repository lint and type-check policy.
 - Read `tsdown.config.ts` and the `package.json` exports before changing bundle output.
-- Read `.github/workflows/{ci,publish}.yml` before changing compatibility checks or release delivery.
+- Read `.github/workflows/publish.yml` before changing release delivery.
 
 ```
-.github/workflows/
-├── ci.yml                          Lint + build + test on PR
-└── publish.yml                     Tag-triggered OIDC publish
+.github/workflows/publish.yml       Tag-triggered OIDC publish
 docs/rules/                         Source-owned specifications for rules that require detailed behavior contracts
 src/
 ├── index.ts                        Plugin entry: meta, rules map, configs.recommended
@@ -42,7 +40,6 @@ src/
 ## Commands
 
 - `pnpm install`: install dependencies
-- `pnpm run setup-hooks`: wire the `simple-git-hooks` pre-commit (run once after clone)
 - `pnpm run build`: bundle via tsdown to `dist/index.js` + `dist/index.d.ts`
 - `pnpm test`: run vitest
 - `pnpm run lint`: run Oxlint with type checking, Prettier, and publint
@@ -74,7 +71,6 @@ src/
 
 ## Lifecycle scripts
 
-- Wire `simple-git-hooks` through `pnpm run setup-hooks` instead of `prepare` or `postinstall`. The hook-script form tripped pnpm's `[ERR_PNPM_IGNORED_BUILDS]` gate on every consumer install, and the `false` opt-out in `pnpm-workspace.yaml` did not survive pnpm's auto-rewrite.
 - `prepack` runs the build before pack/publish so the tarball always contains a fresh `dist/`
 
 ## Release
