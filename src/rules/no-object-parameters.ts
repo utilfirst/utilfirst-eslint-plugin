@@ -3,7 +3,7 @@ import { defineRule } from "@oxlint/plugins";
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 
 import { lexicalTypeParameterNames } from "../shared/lexical-type-parameters.ts";
-import { resolveTypeAlias } from "../shared/type-alias.ts";
+import { resolvedTypeIncludesMatch } from "../shared/type-alias.ts";
 
 type Parameter = ESTree.ParamPattern;
 
@@ -65,54 +65,6 @@ export const noObjectParametersRule = defineRule({
     },
   },
   createOnce(context) {
-    const resolvesToObject = ({
-      shadowedAliases,
-      type,
-      visited = new Set<string>(),
-    }: {
-      shadowedAliases: ReadonlySet<string>;
-      type: ESTree.TSType;
-      visited?: Set<string>;
-    }): boolean => {
-      if (type.type === "TSObjectKeyword") {
-        return true;
-      }
-      if (type.type === "TSParenthesizedType") {
-        return resolvesToObject({
-          shadowedAliases,
-          type: type.typeAnnotation,
-          visited,
-        });
-      }
-      if (type.type === "TSUnionType") {
-        return type.types.some((member) =>
-          resolvesToObject({ shadowedAliases, type: member, visited }),
-        );
-      }
-      if (
-        type.type !== "TSTypeReference" ||
-        type.typeName.type !== "Identifier" ||
-        (type.typeArguments?.params.length ?? 0) > 0 ||
-        visited.has(type.typeName.name) ||
-        shadowedAliases.has(type.typeName.name)
-      ) {
-        return false;
-      }
-
-      const alias = resolveTypeAlias(context.sourceCode, type);
-      if (alias === null || (alias.typeParameters?.params.length ?? 0) > 0) {
-        return false;
-      }
-
-      const nextVisited = new Set([...visited, type.typeName.name]);
-
-      return resolvesToObject({
-        shadowedAliases,
-        type: alias.typeAnnotation,
-        visited: nextVisited,
-      });
-    };
-
     const checkParameters = (node: ParameterOwner) => {
       const shadowedAliases = lexicalTypeParameterNames(
         node,
@@ -124,7 +76,14 @@ export const noObjectParametersRule = defineRule({
         if (type === null) {
           continue;
         }
-        if (!resolvesToObject({ shadowedAliases, type })) {
+        if (
+          !resolvedTypeIncludesMatch({
+            isMatch: (candidate) => candidate.type === "TSObjectKeyword",
+            shadowedTypeNames: shadowedAliases,
+            sourceCode: context.sourceCode,
+            type,
+          })
+        ) {
           continue;
         }
 

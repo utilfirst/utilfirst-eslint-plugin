@@ -11,7 +11,7 @@ ruleTester.run("no-unknown-type-aliases", rule, {
   valid: [
     "type Payload = unknown[];",
     "type Payload = { value: unknown };",
-    "type Identity<T> = T; type Payload = Identity<unknown>;",
+    "type Identity<T> = T;",
     "type Left = Right; type Right = Left;",
   ],
   invalid: [
@@ -48,6 +48,18 @@ ruleTester.run("no-unknown-type-aliases", rule, {
     {
       code: "namespace Values { export type Payload = unknown; }",
       errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
+    },
+    {
+      code: "type Identity<T> = T; type Payload = Identity<unknown>;",
+      errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
+    },
+    {
+      code: "type Identity<T> = T; type Wrapper<T> = Identity<T>; type Payload = Wrapper<unknown>;",
+      errors: [{ messageId: "unknownAlias", data: { alias: "Payload" } }],
+    },
+    {
+      code: "type T = unknown; type Identity<T> = T;",
+      errors: [{ messageId: "unknownAlias", data: { alias: "T" } }],
     },
   ],
 });

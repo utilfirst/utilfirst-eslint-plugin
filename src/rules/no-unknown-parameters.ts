@@ -96,10 +96,6 @@ export const noUnknownParametersRule = defineRule({
   },
   createOnce(context) {
     const checkParameters = (node: ParameterOwner) => {
-      if (isBoundaryDecoder(node)) {
-        return;
-      }
-
       const parsedOptions = ContextOptionsSchema.safeParse(context.options);
       const options = parsedOptions.success ? parsedOptions.data : undefined;
       for (const parameter of node.params) {
@@ -115,7 +111,12 @@ export const noUnknownParametersRule = defineRule({
 
         if (
           name === "cause" ||
-          options?.allowParameterNames?.includes(name) === true
+          options?.allowParameterNames?.includes(name) === true ||
+          isBoundaryDecoder({
+            owner: node,
+            parameter,
+            sourceCode: context.sourceCode,
+          })
         ) {
           continue;
         }

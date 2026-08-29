@@ -42,5 +42,13 @@ ruleTester.run("no-object-parameters", rule, {
       code: "type Item = object; type Fallback<Input> = Input extends infer Item ? string : (value: Item) => void;",
       errors: [{ messageId: "objectParameter" }],
     },
+    {
+      code: "type Identity<T> = T; function consume(value: Identity<object>) {}",
+      errors: [{ messageId: "objectParameter" }],
+    },
+    {
+      code: "type Identity<T> = T; type Wrapper<T> = Identity<T>; function consume(value: Wrapper<object>) {}",
+      errors: [{ messageId: "objectParameter" }],
+    },
   ],
 });

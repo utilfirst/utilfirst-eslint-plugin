@@ -6,6 +6,7 @@ import {
   createTypeEnvironment,
   type TypeEnvironment,
 } from "../shared/dictionary-types.ts";
+import { resolveTypeAlias } from "../shared/type-alias.ts";
 
 import type { ESTree } from "@oxlint/plugins";
 
@@ -85,7 +86,8 @@ function isPlainAliasConsumerUse(
 
   return (
     name !== null &&
-    environment.aliases.has(name) &&
+    (environment.aliases.has(name) ||
+      resolveTypeAlias(environment.sourceCode, node) !== null) &&
     !isInsideTypeAliasDeclaration(node)
   );
 }
@@ -116,13 +118,13 @@ function shouldReportType(
   return true;
 }
 
-/** Disallow object-dictionary contracts whose direct value type is an unsafe escape hatch. */
+/** Disallow dictionary contracts whose direct value type is an unsafe escape hatch. */
 export const noUnsafeDictionaryTypeRule = defineRule({
   meta: {
     type: "problem",
     docs: {
       description:
-        "Disallow object-dictionary contracts whose direct value type is unknown, any, object, {}, or a union/alias containing one of those escape hatches.",
+        "Disallow dictionary contracts whose direct value type is unknown, any, object, {}, or a union/alias containing one of those escape hatches.",
     },
     messages: {
       unsafeDictionary:
@@ -151,7 +153,7 @@ export const noUnsafeDictionaryTypeRule = defineRule({
 
     return {
       Program(node) {
-        environment = createTypeEnvironment(node);
+        environment = createTypeEnvironment(node, context.sourceCode);
       },
       TSTypeReference: reportIfUnsafe,
       TSTypeLiteral: reportIfUnsafe,

@@ -231,7 +231,7 @@ export const noKnownValueWideningRule = defineRule({
 
     return {
       Program(node) {
-        environment = createTypeEnvironment(node);
+        environment = createTypeEnvironment(node, context.sourceCode);
       },
       VariableDeclarator(node) {
         if (node.init === null || node.id.type !== "Identifier") {

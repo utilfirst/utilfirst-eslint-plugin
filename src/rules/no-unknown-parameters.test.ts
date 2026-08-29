@@ -13,7 +13,7 @@ ruleTester.run("no-unknown-parameters", rule, {
     "function consume<Value>(value: Value) {}",
     "function consume(value: { id: string }) {}",
     "function parse(value: unknown): string { return String(value); }",
-    "function isString(value: unknown): value is string { return true; }",
+    'function isString(value: unknown): value is string { return typeof value === "string"; }',
     "type Parser = (value: unknown) => string;",
     {
       code: "type ExternalCallback = (payload: unknown) => void;",
@@ -31,6 +31,14 @@ ruleTester.run("no-unknown-parameters", rule, {
     },
     {
       code: "function consume(...values: unknown[]) {}",
+      errors: [{ messageId: "unknownParameter" }],
+    },
+    {
+      code: 'function pretend(value: unknown): string { return "fixed"; }',
+      errors: [{ messageId: "unknownParameter" }],
+    },
+    {
+      code: "function pretend(value: unknown): value is string { return true; }",
       errors: [{ messageId: "unknownParameter" }],
     },
   ],

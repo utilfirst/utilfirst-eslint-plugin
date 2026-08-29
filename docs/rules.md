@@ -22,11 +22,11 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 ## Boundary contracts
 
-- `no-object-parameters` rejects the broad `object` type on function inputs, including local aliases that resolve to `object`. Accept a named owner type or a constrained generic.
-- `no-unknown-parameters` keeps explicit `unknown` inputs at functions that return a decoded type and at the `cause` convention for error enrichment. Run an expected parser at the I/O boundary and pass its named output into other repository functions. `allowParameterNames` preserves externally fixed callback and interface signatures.
-- `no-unknown-returns` rejects explicit `unknown` and `Promise<unknown>` return contracts, including local aliases. Parse before returning so callers receive a named domain type.
-- `no-unknown-type-aliases` rejects aliases that only conceal `unknown`. Keep an intentionally open nested field visible in its owner type instead of naming the top type.
-- `no-unsafe-dictionary-type` rejects dictionaries whose direct value contract is `unknown`, `any`, `object`, `{}`, or an equivalent union or alias. Use an owner-defined value type and parse external payloads before insertion.
+- `no-object-parameters` rejects the broad `object` type on function inputs, including local and generic aliases that resolve to `object`. Accept a named owner type or a constrained generic.
+- `no-unknown-parameters` keeps explicit `unknown` inputs at declaration-only decoder contracts, functions and type guards that return a decoded type after reading the input, and the `cause` convention for error enrichment. Run an expected parser at the I/O boundary and pass its named output into other repository functions. `allowParameterNames` preserves externally fixed callback and interface signatures.
+- `no-unknown-returns` rejects explicit `unknown` and `Promise<unknown>` return contracts, including local and generic aliases. Parse before returning so callers receive a named domain type.
+- `no-unknown-type-aliases` rejects aliases, including instantiated generic aliases, that only conceal `unknown`. Keep an intentionally open nested field visible in its owner type instead of naming the top type.
+- `no-unsafe-dictionary-type` rejects `Record`, `Map`, `ReadonlyMap`, `WeakMap`, mapped types, index signatures, and aliases whose direct value contract is `unknown`, `any`, `object`, `{}`, or an equivalent union or alias. Use an owner-defined value type and parse external payloads before insertion.
 
 ## Object and API construction
 
