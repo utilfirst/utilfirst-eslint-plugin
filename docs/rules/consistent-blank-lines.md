@@ -31,6 +31,6 @@ The rule checks adjacent items in Program, BlockStatement, SwitchCase consequent
 
 The rule filters pure-whitespace `JSXText` children before comparing adjacent non-comment items. Comment-only `JSXExpressionContainer` children attach to the next non-comment child. A trailing comment-only container without a later child is outside this rule's scope. The first matching policy below applies.
 1. **Leading documentation**: Separate applies when the later child's attached comment-only group spans multiple lines.
-2. **Local text run**: Tight applies when either child is a literal-text child. A literal-text child is non-whitespace `JSXText` or a `JSXExpressionContainer` guaranteed to produce text or no rendered child: a string literal, a template literal, transparent TypeScript wrappers around either form, a logical `&&` expression whose right side qualifies, or a conditional expression whose two branches qualify.
+2. **Local text run**: Tight applies when either child is or directly neighbors a literal-text child. A literal-text child is non-whitespace `JSXText` or a `JSXExpressionContainer` guaranteed to produce text or no rendered child: a string literal, a template literal, transparent TypeScript wrappers around either form, a logical `&&` expression whose right side qualifies, or a conditional expression whose two branches qualify.
 3. **Visual weight**: Tight applies when both children are single-line.
 4. **Default**: Separate applies.

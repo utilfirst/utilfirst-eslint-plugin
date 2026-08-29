@@ -40,6 +40,10 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const node = (\n  <p>\n    before\n    <span />\n    <span />\n  </p>\n);\n`,
     },
     {
+      name: "separates later JSX after a completed text run",
+      code: `const node = (\n  <p>\n    {mark}\n\n    {condition ? (\n      <span />\n    ) : (\n      <strong />\n    )}\n\n    {later && (\n      <em />\n    )}\n  </p>\n);\n`,
+    },
+    {
       name: "preserves user grouping between re-exports",
       code: `export { a } from "a";\n\nexport * from "b";\n`,
     },
@@ -153,6 +157,25 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
         { messageId: "extra", line: 7, column: 5 },
         { messageId: "extra", line: 9, column: 5 },
       ],
+    },
+    {
+      name: "keeps interpolated JSX text runs tight",
+      code: `const node = (
+  <div>
+    Label: {value}
+
+    {condition && <span />}
+  </div>
+);
+`,
+      output: `const node = (
+  <div>
+    Label: {value}
+    {condition && <span />}
+  </div>
+);
+`,
+      errors: [{ messageId: "extra", line: 5, column: 5 }],
     },
   ],
 });

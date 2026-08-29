@@ -14,9 +14,11 @@
 //
 // JSX precedence after leading documentation is: Tight when either adjacent
 // child belongs to a local literal-text run, Tight when both are single-line,
-// then Separate. Literal text is non-whitespace `JSXText` or an expression
-// guaranteed to render text or nothing through a string, template, transparent
-// TypeScript wrapper, qualifying `&&`, or fully qualifying conditional.
+// then Separate. A child belongs to a local text run when it is or directly
+// neighbors literal text. Literal text is non-whitespace `JSXText` or an
+// expression guaranteed to render text or nothing through a string, template,
+// transparent TypeScript wrapper, qualifying `&&`, or fully qualifying
+// conditional.
 // Comment-only containers attach forward; an unattached trailing container is
 // outside the rule. Gap fixes preserve line endings and do not normalize
 // spacing inside attached comment groups.
@@ -168,11 +170,19 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
           const { node: prev } = prevSibling;
           const { leading, node: next } = nextSibling;
           const effectiveStart = leading[0] ?? next;
+          const beforePrev = siblings[i - 1]?.node;
+          const afterNext = siblings[i + 2]?.node;
           checkPair({
             effectiveEnd: prev,
             effectiveStart,
             next,
-            policy: jsxGapPolicy({ leading, next, prev }),
+            policy: jsxGapPolicy({
+              afterNext,
+              beforePrev,
+              leading,
+              next,
+              prev,
+            }),
             prev,
           });
         }
@@ -1021,10 +1031,14 @@ function isInBindingPosition(idNode: TSESTree.Identifier): boolean {
 }
 
 function jsxGapPolicy({
+  afterNext,
+  beforePrev,
   leading,
   next,
   prev,
 }: {
+  afterNext: TSESTree.JSXChild | undefined;
+  beforePrev: TSESTree.JSXChild | undefined;
   leading: TSESTree.JSXExpressionContainer[];
   next: TSESTree.JSXChild;
   prev: TSESTree.JSXChild;
@@ -1032,7 +1046,16 @@ function jsxGapPolicy({
   if (itemsSpanMultipleLines(leading)) {
     return "separate";
   }
-  if (isLiteralTextChild(prev) || isLiteralTextChild(next)) {
+  if (
+    isLiteralTextChild(prev) ||
+    isLiteralTextChild(next) ||
+    (beforePrev !== undefined &&
+      isLiteralTextChild(beforePrev) &&
+      beforePrev.loc.end.line === prev.loc.start.line) ||
+    (afterNext !== undefined &&
+      isLiteralTextChild(afterNext) &&
+      next.loc.end.line === afterNext.loc.start.line)
+  ) {
     return "tight";
   }
 
