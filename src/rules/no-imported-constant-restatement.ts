@@ -1,5 +1,6 @@
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import { nodeAssertCall } from "../shared/node-assert.ts";
 import { resolveVariable } from "../shared/scope.ts";
 import {
   isExpectationMatcher,
@@ -15,7 +16,6 @@ const nodeAssertEqualityMethods = new Set([
   "strictEqual",
 ]);
 
-const nodeAssertSources = new Set(["node:assert", "node:assert/strict"]);
 const importedConstantName = /^[A-Z][A-Z0-9_]*$/u;
 
 function expectationSubject(
@@ -56,114 +56,19 @@ function importedConstantRoot(
   return currentExpression.type === "Identifier" ? currentExpression : null;
 }
 
-function importedName(node: ESTree.Node): string | null {
-  if (node.type !== "ImportSpecifier") {
-    return null;
-  }
-
-  return node.imported.type === "Identifier"
-    ? node.imported.name
-    : node.imported.value;
-}
-
-function isNodeAssertModule(
-  sourceCode: SourceCode,
-  identifier: ESTree.IdentifierReference,
-): boolean {
-  const variable = resolveVariable(sourceCode, identifier);
-  if (variable === null) {
-    return false;
-  }
-
-  return variable.defs.some(
-    (definition) =>
-      definition.type === "ImportBinding" &&
-      (definition.node.type === "ImportDefaultSpecifier" ||
-        definition.node.type === "ImportNamespaceSpecifier") &&
-      definition.parent?.type === "ImportDeclaration" &&
-      nodeAssertSources.has(definition.parent.source.value),
-  );
-}
-
-function isNodeAssertObject(
-  sourceCode: SourceCode,
-  identifier: ESTree.IdentifierReference,
-): boolean {
-  if (isNodeAssertModule(sourceCode, identifier)) {
-    return true;
-  }
-
-  const variable = resolveVariable(sourceCode, identifier);
-  if (variable === null) {
-    return false;
-  }
-
-  return variable.defs.some(
-    (definition) =>
-      definition.type === "ImportBinding" &&
-      definition.parent?.type === "ImportDeclaration" &&
-      definition.parent.source.value === "node:assert" &&
-      importedName(definition.node) === "strict",
-  );
-}
-
-function isNodeAssertMemberObject(
-  sourceCode: SourceCode,
-  expression: ESTree.Expression | ESTree.Super,
-): boolean {
-  if (expression.type === "Identifier") {
-    return isNodeAssertObject(sourceCode, expression);
-  }
-
-  return (
-    expression.type === "MemberExpression" &&
-    staticMemberName(expression) === "strict" &&
-    expression.object.type === "Identifier" &&
-    isNodeAssertModule(sourceCode, expression.object)
-  );
-}
-
-function isNodeAssertFunction(
-  sourceCode: SourceCode,
-  identifier: ESTree.IdentifierReference,
-): boolean {
-  const variable = resolveVariable(sourceCode, identifier);
-  if (variable === null) {
-    return false;
-  }
-
-  return variable.defs.some(
-    (definition) =>
-      definition.type === "ImportBinding" &&
-      definition.parent?.type === "ImportDeclaration" &&
-      nodeAssertSources.has(definition.parent.source.value) &&
-      nodeAssertEqualityMethods.has(importedName(definition.node) ?? ""),
-  );
-}
-
 function nodeAssertSubject(
   sourceCode: SourceCode,
   node: ESTree.CallExpression,
 ): ESTree.Expression | null {
+  const assertion = nodeAssertCall(sourceCode, node);
   if (
-    node.callee.type === "Identifier" &&
-    isNodeAssertFunction(sourceCode, node.callee)
-  ) {
-    const [subject] = node.arguments;
-
-    return subject === undefined || subject.type === "SpreadElement"
-      ? null
-      : subject;
-  }
-  if (
-    node.callee.type !== "MemberExpression" ||
-    !nodeAssertEqualityMethods.has(staticMemberName(node.callee) ?? "") ||
-    !isNodeAssertMemberObject(sourceCode, node.callee.object)
+    assertion === null ||
+    !nodeAssertEqualityMethods.has(assertion.methodName)
   ) {
     return null;
   }
 
-  const [subject] = node.arguments;
+  const [subject] = assertion.arguments;
 
   return subject === undefined || subject.type === "SpreadElement"
     ? null

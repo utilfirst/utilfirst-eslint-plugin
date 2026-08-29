@@ -14,6 +14,7 @@ ruleTester.run("require-repository-test-subject", rule, {
   valid: [
     'import { run } from "./run.ts"; test("runs", () => run());',
     'import value from "#internal/value.ts"; it("reads", () => value);',
+    'import { run, type RunResult } from "./run.ts"; test("runs", () => run());',
     'import { exports } from "cloudflare:workers"; test("worker", () => exports.default);',
     'test("dynamic", async () => { await import("./subject.ts"); });',
     'import { test } from "vitest"; export const fixture = 1;',
@@ -25,6 +26,18 @@ ruleTester.run("require-repository-test-subject", rule, {
     },
     {
       code: 'import { test as verify } from "vitest"; verify.each([1, 2])("array", () => {});',
+      errors: [{ messageId: "missingSubject" }],
+    },
+    {
+      code: 'import test from "node:test"; test("array", () => {});',
+      errors: [{ messageId: "missingSubject" }],
+    },
+    {
+      code: 'import type { Subject } from "./subject.ts"; test("library", () => {});',
+      errors: [{ messageId: "missingSubject" }],
+    },
+    {
+      code: 'import { type Subject } from "./subject.ts"; test("library", () => {});',
       errors: [{ messageId: "missingSubject" }],
     },
   ],

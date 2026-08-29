@@ -3,7 +3,10 @@ import { z } from "zod";
 
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
-import { resolveVariable } from "../shared/scope.ts";
+import {
+  isTestFrameworkControlCall,
+  staticMemberName,
+} from "../shared/test-framework.ts";
 
 const moduleMockMethods = new Set(["doMock", "mock", "unstable_mockModule"]);
 
@@ -15,92 +18,18 @@ const ModuleMockContextOptionsSchema = ruleContextOptionsSchema(
   ModuleMockOptionsSchema,
 );
 
-function importedName(node: ESTree.Node): string | null {
-  if (node.type !== "ImportSpecifier") {
-    return null;
-  }
-
-  return node.imported.type === "Identifier"
-    ? node.imported.name
-    : node.imported.value;
-}
-
-function isGlobalReference(
-  sourceCode: SourceCode,
-  expression: ESTree.IdentifierReference,
-): boolean {
-  const variable = resolveVariable(sourceCode, expression);
-  return variable === null || variable.defs.length === 0;
-}
-
-function isTestFrameworkObject(
-  sourceCode: SourceCode,
-  expression: ESTree.Expression,
-): expression is ESTree.IdentifierReference {
-  if (expression.type !== "Identifier") {
-    return false;
-  }
-  if (
-    (expression.name === "vi" || expression.name === "jest") &&
-    isGlobalReference(sourceCode, expression)
-  ) {
-    return true;
-  }
-
-  const variable = resolveVariable(sourceCode, expression);
-  if (variable === null || variable.defs.length === 0) {
-    return expression.name === "vi" || expression.name === "jest";
-  }
-
-  return variable.defs.some((definition) => {
-    if (
-      definition.type !== "ImportBinding" ||
-      definition.parent?.type !== "ImportDeclaration"
-    ) {
-      return false;
-    }
-
-    const source = definition.parent.source.value;
-
-    const name = importedName(definition.node);
-
-    return (
-      (source === "vitest" && name === "vi") ||
-      (source === "@jest/globals" && name === "jest")
-    );
-  });
-}
-
 function moduleMockCall(
   sourceCode: SourceCode,
-  callee: ESTree.Expression,
+  node: ESTree.CallExpression,
 ): boolean {
-  if (
-    !("property" in callee) ||
-    !("object" in callee) ||
-    !("computed" in callee)
-  ) {
+  if (node.callee.type !== "MemberExpression") {
     return false;
   }
-  if (!isTestFrameworkObject(sourceCode, callee.object)) {
+  if (!isTestFrameworkControlCall(sourceCode, node)) {
     return false;
   }
 
-  const property = callee.property;
-  let method: string | null = null;
-  if (
-    callee.computed &&
-    property.type === "Literal" &&
-    (property.value === "doMock" ||
-      property.value === "mock" ||
-      property.value === "unstable_mockModule")
-  ) {
-    method = property.value;
-  } else if (!callee.computed && property.type === "Identifier") {
-    method = property.name;
-  }
-
-  return method !== null && moduleMockMethods.has(method);
+  return moduleMockMethods.has(staticMemberName(node.callee) ?? "");
 }
 
 function isRepositoryOwnedSpecifier(
@@ -117,6 +46,21 @@ function isRepositoryOwnedSpecifier(
 
 function isString<Value>(value: Value): value is Value & string {
   return typeof value === "string";
+}
+
+function moduleSpecifier(argument: ESTree.Argument | undefined): string | null {
+  if (argument?.type === "Literal" && isString(argument.value)) {
+    return argument.value;
+  }
+  if (
+    argument?.type === "ImportExpression" &&
+    argument.source.type === "Literal" &&
+    isString(argument.source.value)
+  ) {
+    return argument.source.value;
+  }
+
+  return null;
 }
 
 /** Ban test framework mocking of repository-owned modules. */
@@ -155,7 +99,7 @@ export const noModuleMockingRule = defineRule({
         ) {
           return;
         }
-        if (!moduleMockCall(context.sourceCode, node.callee)) {
+        if (!moduleMockCall(context.sourceCode, node)) {
           return;
         }
 
@@ -171,11 +115,10 @@ export const noModuleMockingRule = defineRule({
         const internalModulePrefixes =
           parsedOption?.internalModulePrefixes ?? [];
 
-        const [specifier] = node.arguments;
+        const specifier = moduleSpecifier(node.arguments[0]);
         if (
-          specifier?.type !== "Literal" ||
-          !isString(specifier.value) ||
-          !isRepositoryOwnedSpecifier(specifier.value, internalModulePrefixes)
+          specifier === null ||
+          !isRepositoryOwnedSpecifier(specifier, internalModulePrefixes)
         ) {
           return;
         }

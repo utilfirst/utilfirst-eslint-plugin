@@ -24,6 +24,10 @@ ruleTester.run("no-test-snapshots", rule, {
       errors: [{ messageId: "snapshot" }],
     },
     {
+      code: 'await expect(value).toMatchFileSnapshot("value.txt");',
+      errors: [{ messageId: "snapshot" }],
+    },
+    {
       code: 'import { expect as verify } from "vitest"; verify(value).toMatchSnapshot();',
       errors: [{ messageId: "snapshot" }],
     },

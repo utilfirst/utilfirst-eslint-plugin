@@ -7,6 +7,7 @@ import {
 
 const snapshotMatchers = new Set([
   "addSnapshotSerializer",
+  "toMatchFileSnapshot",
   "toMatchInlineSnapshot",
   "toMatchSnapshot",
   "toThrowErrorMatchingInlineSnapshot",

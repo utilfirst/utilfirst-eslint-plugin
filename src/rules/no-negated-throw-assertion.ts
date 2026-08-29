@@ -1,4 +1,5 @@
 import { defineRule } from "@oxlint/plugins";
+import { nodeAssertCall } from "../shared/node-assert.ts";
 import {
   hasExpectationModifier,
   isExpectationMatcher,
@@ -6,6 +7,7 @@ import {
 } from "../shared/test-framework.ts";
 
 const throwMatchers = new Set(["toThrow", "toThrowError"]);
+const nodeNegatedThrowMethods = new Set(["doesNotReject", "doesNotThrow"]);
 
 /** Require direct execution instead of redundant non-throw assertions. */
 export const noNegatedThrowAssertionRule = defineRule({
@@ -23,6 +25,14 @@ export const noNegatedThrowAssertionRule = defineRule({
   createOnce(context) {
     return {
       CallExpression(node) {
+        const assertion = nodeAssertCall(context.sourceCode, node);
+        if (
+          assertion !== null &&
+          nodeNegatedThrowMethods.has(assertion.methodName)
+        ) {
+          context.report({ node, messageId: "negatedThrow" });
+          return;
+        }
         if (
           node.callee.type !== "MemberExpression" ||
           !isExpectationMatcher(context.sourceCode, node) ||

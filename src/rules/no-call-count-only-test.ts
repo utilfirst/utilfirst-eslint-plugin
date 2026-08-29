@@ -1,5 +1,6 @@
 import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import { nodeAssertCall } from "../shared/node-assert.ts";
 import {
   isExpectationMatcher,
   isTestCaseCall,
@@ -51,10 +52,14 @@ export const noCallCountOnlyTestRule = defineRule({
         }
 
         const activeTest = activeTests.at(-1);
-        if (
-          activeTest === undefined ||
-          !isExpectationMatcher(context.sourceCode, node)
-        ) {
+        if (activeTest === undefined) {
+          return;
+        }
+        if (nodeAssertCall(context.sourceCode, node) !== null) {
+          activeTest.assertionCount += 1;
+          return;
+        }
+        if (!isExpectationMatcher(context.sourceCode, node)) {
           return;
         }
 

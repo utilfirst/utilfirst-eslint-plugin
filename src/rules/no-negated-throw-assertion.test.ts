@@ -12,6 +12,7 @@ ruleTester.run("no-negated-throw-assertion", rule, {
     "expect(run).toThrow();",
     "expect(value).not.toEqual('failed');",
     "object.not.toThrow();",
+    'import { doesNotThrow } from "./assert"; doesNotThrow(run);',
     "const expect = () => object; expect(run).not.toThrow();",
   ],
   invalid: [
@@ -29,6 +30,14 @@ ruleTester.run("no-negated-throw-assertion", rule, {
     },
     {
       code: "expect(load).resolves.not.toThrow();",
+      errors: [{ messageId: "negatedThrow" }],
+    },
+    {
+      code: 'import assert from "node:assert/strict"; assert.doesNotThrow(run);',
+      errors: [{ messageId: "negatedThrow" }],
+    },
+    {
+      code: 'import { doesNotReject as settles } from "node:assert/strict"; settles(load());',
       errors: [{ messageId: "negatedThrow" }],
     },
   ],

@@ -1,7 +1,7 @@
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { resolveVariable } from "./scope.ts";
 
-const testFrameworkSources = new Set(["@jest/globals", "vitest"]);
+const testFrameworkSources = new Set(["@jest/globals", "node:test", "vitest"]);
 const testCaseNames = new Set(["it", "test"]);
 const testControllerNames = new Set(["jest", "vi"]);
 const expectationNames = new Set(["expect"]);
@@ -73,7 +73,15 @@ function isTestFrameworkIdentifier({
     }
 
     const name = importedName(definition.node);
-    return name !== null && acceptedNames.has(name);
+    if (name !== null) {
+      return acceptedNames.has(name);
+    }
+
+    return (
+      definition.parent.source.value === "node:test" &&
+      definition.node.type === "ImportDefaultSpecifier" &&
+      acceptedNames.has("test")
+    );
   });
 }
 

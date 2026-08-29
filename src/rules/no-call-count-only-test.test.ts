@@ -12,6 +12,8 @@ ruleTester.run("no-call-count-only-test", rule, {
     'test("result", () => { expect(run()).toBe("ready"); });',
     'test("effect", () => { run(); expect(store.value).toBe("ready"); expect(send).toHaveBeenCalledOnce(); });',
     'test("payload", () => { run(); expect(send).toHaveBeenCalledWith("ready"); });',
+    'import assert from "node:assert/strict"; test("effect", () => { assert.equal(store.value, "ready"); expect(send).toHaveBeenCalledOnce(); });',
+    'import { equal as verifyEqual } from "node:assert/strict"; test("effect", () => { verifyEqual(store.value, "ready"); expect(send).toHaveBeenCalledOnce(); });',
     "expect(send).toHaveBeenCalledOnce();",
   ],
   invalid: [
@@ -33,6 +35,10 @@ ruleTester.run("no-call-count-only-test", rule, {
     },
     {
       code: 'import * as vitest from "vitest"; vitest.test("calls", () => { vitest.expect(send).toHaveBeenCalled(); });',
+      errors: [{ messageId: "callCountOnly" }],
+    },
+    {
+      code: 'import test from "node:test"; test("calls", () => { expect(send).toHaveBeenCalled(); });',
       errors: [{ messageId: "callCountOnly" }],
     },
   ],

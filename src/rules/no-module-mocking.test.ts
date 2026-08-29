@@ -22,6 +22,7 @@ ruleTester.run("no-module-mocking", rule, {
     'vi.mock("node:fs");',
     'jest.mock("external-package");',
     "vi.mock(moduleName);",
+    'vi.mock(import("external-package"));',
     'vi.mock("@external/package");',
   ],
   invalid: [
@@ -39,6 +40,14 @@ ruleTester.run("no-module-mocking", rule, {
     },
     {
       code: 'vi.mock("#internal/dependency");',
+      errors: [{ messageId: "moduleMock" }],
+    },
+    {
+      code: 'import { vi } from "vitest"; vi.mock(import("./dependency"));',
+      errors: [{ messageId: "moduleMock" }],
+    },
+    {
+      code: 'import * as vitest from "vitest"; vitest.vi.mock("./dependency");',
       errors: [{ messageId: "moduleMock" }],
     },
     {

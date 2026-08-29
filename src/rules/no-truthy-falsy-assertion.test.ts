@@ -12,6 +12,8 @@ ruleTester.run("no-truthy-falsy-assertion", rule, {
     "expect(isReady).toBe(true);",
     "expect(value).toBe('ready');",
     "object.toBeTruthy();",
+    'import assert from "node:assert/strict"; assert.ok(value > 0);',
+    'import assert from "node:assert/strict"; assert.ok(values.every(isValid));',
     "const expect = () => object; expect(value).toBeTruthy();",
   ],
   invalid: [
@@ -29,6 +31,22 @@ ruleTester.run("no-truthy-falsy-assertion", rule, {
     },
     {
       code: 'import * as vitest from "vitest"; vitest.expect(value).toBeFalsy();',
+      errors: [{ messageId: "truthiness" }],
+    },
+    {
+      code: 'import assert from "node:assert/strict"; assert.ok(value);',
+      errors: [{ messageId: "truthiness" }],
+    },
+    {
+      code: 'import { ok as verify } from "node:assert"; verify(owner.value);',
+      errors: [{ messageId: "truthiness" }],
+    },
+    {
+      code: 'import assert from "node:assert"; assert.strict(value);',
+      errors: [{ messageId: "truthiness" }],
+    },
+    {
+      code: 'import { strict as assert } from "node:assert"; assert(value);',
       errors: [{ messageId: "truthiness" }],
     },
   ],

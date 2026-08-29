@@ -8,6 +8,20 @@ function isRepositorySpecifier(specifier: string): boolean {
   return repositoryPrefixes.some((prefix) => specifier.startsWith(prefix));
 }
 
+function hasRuntimeImport(node: ESTree.ImportDeclaration): boolean {
+  if (node.importKind === "type") {
+    return false;
+  }
+  if (node.specifiers.length === 0) {
+    return true;
+  }
+
+  return node.specifiers.some(
+    (specifier) =>
+      specifier.type !== "ImportSpecifier" || specifier.importKind !== "type",
+  );
+}
+
 /** Require behavioral tests to exercise repository-owned code. */
 export const requireRepositoryTestSubjectRule = defineRule({
   meta: {
@@ -33,7 +47,8 @@ export const requireRepositoryTestSubjectRule = defineRule({
       "ImportDeclaration"(node) {
         if (
           typeof node.source.value === "string" &&
-          isRepositorySpecifier(node.source.value)
+          isRepositorySpecifier(node.source.value) &&
+          hasRuntimeImport(node)
         ) {
           hasRepositoryImport = true;
         }
