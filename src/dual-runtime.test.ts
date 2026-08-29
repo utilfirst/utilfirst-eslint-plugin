@@ -11,7 +11,8 @@ const execFileAsync = promisify(execFile);
 // Oxlint process startup approaches Vitest's default timeout under suite load.
 const DUAL_RUNTIME_TIMEOUT_MS = 15_000;
 
-const fixtureSource = `import { vi } from "vitest";
+const fixtureSource = `import { LIMIT } from "limits-package";
+import { vi } from "vitest";
 
 const topLevelFunction = () => 1;
 const paragraphStart = createValue();
@@ -50,6 +51,12 @@ test("promise settlement only", () => {
 });
 test("truthiness", () => {
   expect(value).toBeTruthy();
+});
+test("imported constant", () => {
+  expect(LIMIT).toBe(3);
+});
+test("wall clock", () => {
+  expect(Date.now()).toBeGreaterThan(0);
 });
 
 const chained = input as unknown as string;

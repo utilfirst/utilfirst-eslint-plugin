@@ -73,6 +73,7 @@ export default [
     "utilfirst/no-chained-type-assertions": "error",
     "utilfirst/no-conditional-undefined-properties": "error",
     "utilfirst/no-enum-declarations": "error",
+    "utilfirst/no-imported-constant-restatement": "error",
     "utilfirst/no-known-value-widening": "error",
     "utilfirst/no-module-mocking": [
       "error",
@@ -89,6 +90,7 @@ export default [
     "utilfirst/no-reflect-get": "error",
     "utilfirst/no-test-snapshots": "error",
     "utilfirst/no-truthy-falsy-assertion": "error",
+    "utilfirst/no-uncontrolled-time-in-test": "error",
     "utilfirst/no-unknown-parameters": [
       "error",
       { "allowParameterNames": ["externalPayload"] },
@@ -122,6 +124,7 @@ export default [
 | [`no-chained-type-assertions`](./docs/rules.md#type-evidence)                           | Reject chained TypeScript assertions                                              |
 | [`no-conditional-undefined-properties`](./docs/rules.md#object-and-api-construction)    | Reject conditional undefined object properties                                    |
 | [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                   | Reject repository-owned enums other than ambient declarations                     |
+| [`no-imported-constant-restatement`](./docs/rules.md#ownership-and-tests)               | Require behavior evidence instead of imported constant restatements               |
 | [`no-known-value-widening`](./docs/rules.md#type-evidence)                              | Reject known values widened into broad target types                               |
 | [`no-module-mocking`](./docs/rules.md#ownership-and-tests)                              | Reject Vitest and Jest mocking of repository-owned modules                        |
 | [`no-negated-throw-assertion`](./docs/rules.md#ownership-and-tests)                     | Replace negated throw assertions with direct execution                            |
@@ -132,6 +135,7 @@ export default [
 | [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                         | Reject `Reflect.get`                                                              |
 | [`no-test-snapshots`](./docs/rules.md#ownership-and-tests)                              | Require explicit observable assertions instead of snapshots                       |
 | [`no-truthy-falsy-assertion`](./docs/rules.md#ownership-and-tests)                      | Require exact expected values instead of truthiness                               |
+| [`no-uncontrolled-time-in-test`](./docs/rules.md#ownership-and-tests)                   | Require controlled wall-clock inputs in test files                                |
 | [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                           | Keep explicit `unknown` parameters at decoding boundaries                         |
 | [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                              | Reject `unknown` return contracts                                                 |
 | [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                         | Reject type aliases that resolve to `unknown`                                     |
@@ -147,7 +151,7 @@ export default [
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-unhandled-detached-promises`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 

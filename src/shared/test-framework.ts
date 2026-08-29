@@ -3,6 +3,7 @@ import { resolveVariable } from "./scope.ts";
 
 const testFrameworkSources = new Set(["@jest/globals", "vitest"]);
 const testCaseNames = new Set(["it", "test"]);
+const testControllerNames = new Set(["jest", "vi"]);
 const expectationNames = new Set(["expect"]);
 
 export function staticMemberName(
@@ -173,6 +174,21 @@ export function isTestCaseCall(
   return isTestFrameworkReference({
     acceptedNames: testCaseNames,
     expression: node.callee,
+    sourceCode,
+  });
+}
+
+export function isTestFrameworkControlCall(
+  sourceCode: SourceCode,
+  node: ESTree.CallExpression,
+): boolean {
+  if (node.callee.type !== "MemberExpression") {
+    return false;
+  }
+
+  return isTestFrameworkReference({
+    acceptedNames: testControllerNames,
+    expression: node.callee.object,
     sourceCode,
   });
 }

@@ -6,6 +6,7 @@ import { noCallCountOnlyTestRule } from "./rules/no-call-count-only-test.ts";
 import { noChainedTypeAssertionsRule } from "./rules/no-chained-type-assertions.ts";
 import { noConditionalUndefinedPropertiesRule } from "./rules/no-conditional-undefined-properties.ts";
 import { noEnumDeclarationsRule } from "./rules/no-enum-declarations.ts";
+import { noImportedConstantRestatementRule } from "./rules/no-imported-constant-restatement.ts";
 import { noKnownValueWideningRule } from "./rules/no-known-value-widening.ts";
 import { noModuleMockingRule } from "./rules/no-module-mocking.ts";
 import { noNegatedThrowAssertionRule } from "./rules/no-negated-throw-assertion.ts";
@@ -16,6 +17,7 @@ import { noReflectApplyRule } from "./rules/no-reflect-apply.ts";
 import { noReflectGetRule } from "./rules/no-reflect-get.ts";
 import { noTestSnapshotsRule } from "./rules/no-test-snapshots.ts";
 import { noTruthyFalsyAssertionRule } from "./rules/no-truthy-falsy-assertion.ts";
+import { noUncontrolledTimeInTestRule } from "./rules/no-uncontrolled-time-in-test.ts";
 import { noUnhandledDetachedPromisesRule } from "./rules/no-unhandled-detached-promises.ts";
 import { noUnknownParametersRule } from "./rules/no-unknown-parameters.ts";
 import { noUnknownReturnsRule } from "./rules/no-unknown-returns.ts";
@@ -41,6 +43,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-chained-type-assertions": noChainedTypeAssertionsRule,
     "no-conditional-undefined-properties": noConditionalUndefinedPropertiesRule,
     "no-enum-declarations": noEnumDeclarationsRule,
+    "no-imported-constant-restatement": noImportedConstantRestatementRule,
     "no-known-value-widening": noKnownValueWideningRule,
     "no-module-mocking": noModuleMockingRule,
     "no-negated-throw-assertion": noNegatedThrowAssertionRule,
@@ -52,6 +55,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-reflect-get": noReflectGetRule,
     "no-test-snapshots": noTestSnapshotsRule,
     "no-truthy-falsy-assertion": noTruthyFalsyAssertionRule,
+    "no-uncontrolled-time-in-test": noUncontrolledTimeInTestRule,
     "no-unknown-parameters": noUnknownParametersRule,
     "no-unknown-returns": noUnknownReturnsRule,
     "no-unknown-type-aliases": noUnknownTypeAliasesRule,
