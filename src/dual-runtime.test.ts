@@ -45,6 +45,12 @@ test("snapshot", () => {
 test("negated throw", () => {
   expect(run).not.toThrow();
 });
+test("promise settlement only", () => {
+  expect(operation).resolves.toBeUndefined();
+});
+test("truthiness", () => {
+  expect(value).toBeTruthy();
+});
 
 const chained = input as unknown as string;
 const narrowed = widened as { name: string };

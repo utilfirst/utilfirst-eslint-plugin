@@ -1,24 +1,11 @@
-import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 import {
+  hasExpectationModifier,
   isExpectationMatcher,
   staticMemberName,
 } from "../shared/test-framework.ts";
 
 const throwMatchers = new Set(["toThrow", "toThrowError"]);
-
-function hasNotModifier(expression: ESTree.Expression): boolean {
-  let currentExpression = expression;
-  while (currentExpression.type === "MemberExpression") {
-    if (staticMemberName(currentExpression) === "not") {
-      return true;
-    }
-
-    currentExpression = currentExpression.object;
-  }
-
-  return false;
-}
 
 /** Require direct execution instead of redundant non-throw assertions. */
 export const noNegatedThrowAssertionRule = defineRule({
@@ -40,7 +27,7 @@ export const noNegatedThrowAssertionRule = defineRule({
           node.callee.type !== "MemberExpression" ||
           !isExpectationMatcher(context.sourceCode, node) ||
           !throwMatchers.has(staticMemberName(node.callee) ?? "") ||
-          !hasNotModifier(node.callee.object)
+          !hasExpectationModifier(node.callee.object, "not")
         ) {
           return;
         }

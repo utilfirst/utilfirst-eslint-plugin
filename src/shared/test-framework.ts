@@ -22,6 +22,22 @@ export function staticMemberName(
   return null;
 }
 
+export function hasExpectationModifier(
+  expression: ESTree.Expression | ESTree.Super,
+  modifierName: string,
+): boolean {
+  let currentExpression = expression;
+  while (currentExpression.type === "MemberExpression") {
+    if (staticMemberName(currentExpression) === modifierName) {
+      return true;
+    }
+
+    currentExpression = currentExpression.object;
+  }
+
+  return false;
+}
+
 function importedName(node: ESTree.Node): string | null {
   if (node.type !== "ImportSpecifier") {
     return null;

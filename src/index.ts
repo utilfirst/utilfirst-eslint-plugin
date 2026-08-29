@@ -11,9 +11,11 @@ import { noModuleMockingRule } from "./rules/no-module-mocking.ts";
 import { noNegatedThrowAssertionRule } from "./rules/no-negated-throw-assertion.ts";
 import { noObjectParametersRule } from "./rules/no-object-parameters.ts";
 import { noPositionalBooleanParametersRule } from "./rules/no-positional-boolean-parameters.ts";
+import { noPromiseSettlementOnlyAssertionRule } from "./rules/no-promise-settlement-only-assertion.ts";
 import { noReflectApplyRule } from "./rules/no-reflect-apply.ts";
 import { noReflectGetRule } from "./rules/no-reflect-get.ts";
 import { noTestSnapshotsRule } from "./rules/no-test-snapshots.ts";
+import { noTruthyFalsyAssertionRule } from "./rules/no-truthy-falsy-assertion.ts";
 import { noUnhandledDetachedPromisesRule } from "./rules/no-unhandled-detached-promises.ts";
 import { noUnknownParametersRule } from "./rules/no-unknown-parameters.ts";
 import { noUnknownReturnsRule } from "./rules/no-unknown-returns.ts";
@@ -44,9 +46,12 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-negated-throw-assertion": noNegatedThrowAssertionRule,
     "no-object-parameters": noObjectParametersRule,
     "no-positional-boolean-parameters": noPositionalBooleanParametersRule,
+    "no-promise-settlement-only-assertion":
+      noPromiseSettlementOnlyAssertionRule,
     "no-reflect-apply": noReflectApplyRule,
     "no-reflect-get": noReflectGetRule,
     "no-test-snapshots": noTestSnapshotsRule,
+    "no-truthy-falsy-assertion": noTruthyFalsyAssertionRule,
     "no-unknown-parameters": noUnknownParametersRule,
     "no-unknown-returns": noUnknownReturnsRule,
     "no-unknown-type-aliases": noUnknownTypeAliasesRule,
