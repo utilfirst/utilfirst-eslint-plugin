@@ -67,6 +67,26 @@ function parameterName(parameter: Parameter, sourceText: string): string {
     : sourceText.replace(/\s*:\s*unknown\s*$/u, "");
 }
 
+function isPromiseCatchCallback(node: ParameterOwner): boolean {
+  if (
+    node.type !== "ArrowFunctionExpression" &&
+    node.type !== "FunctionExpression"
+  ) {
+    return false;
+  }
+
+  const call = node.parent;
+
+  return (
+    call.type === "CallExpression" &&
+    call.arguments[0] === node &&
+    call.callee.type === "MemberExpression" &&
+    !call.callee.computed &&
+    call.callee.property.type === "Identifier" &&
+    call.callee.property.name === "catch"
+  );
+}
+
 /** Keep unknown inputs at explicit decoding and error-enrichment boundaries. */
 export const noUnknownParametersRule = defineRule({
   meta: {
@@ -96,6 +116,10 @@ export const noUnknownParametersRule = defineRule({
   },
   createOnce(context) {
     const checkParameters = (node: ParameterOwner) => {
+      if (isPromiseCatchCallback(node)) {
+        return;
+      }
+
       const parsedOptions = ContextOptionsSchema.safeParse(context.options);
       const options = parsedOptions.success ? parsedOptions.data : undefined;
       for (const parameter of node.params) {

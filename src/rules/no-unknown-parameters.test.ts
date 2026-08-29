@@ -14,6 +14,8 @@ ruleTester.run("no-unknown-parameters", rule, {
     "function consume(value: { id: string }) {}",
     "function parse(value: unknown): string { return String(value); }",
     'function isString(value: unknown): value is string { return typeof value === "string"; }',
+    "promise.catch((error: unknown) => console.error(error));",
+    "promise.catch(function report(error: unknown) { console.error(error); });",
     "type Parser = (value: unknown) => string;",
     {
       code: "type ExternalCallback = (payload: unknown) => void;",
