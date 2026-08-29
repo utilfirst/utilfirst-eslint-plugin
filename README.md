@@ -116,7 +116,9 @@ export default [
 | [`no-conditional-undefined-properties`](./docs/rules.md#object-and-api-construction)    | Reject conditional undefined object properties                                    |
 | [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                   | Reject repository-owned enums other than ambient declarations                     |
 | [`no-known-value-widening`](./docs/rules.md#type-evidence)                              | Reject known values widened into broad target types                               |
+| [`no-call-count-only-test`](./docs/rules.md#ownership-and-tests)                        | Reject tests supported only by mock call counts or omission                       |
 | [`no-module-mocking`](./docs/rules.md#ownership-and-tests)                              | Reject Vitest and Jest mocking of repository-owned modules                        |
+| [`no-test-snapshots`](./docs/rules.md#ownership-and-tests)                              | Require explicit observable assertions instead of snapshots                       |
 | [`no-object-parameters`](./docs/rules.md#boundary-contracts)                            | Reject `object` function parameters                                               |
 | [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)       | Reject positional boolean flags on named functions and methods                    |
 | [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                       | Reject `Reflect.apply`                                                            |
@@ -131,11 +133,12 @@ export default [
 | [`prefer-switch-discriminator-chain`](./docs/rules.md#object-and-api-construction)      | Require a switch for four or more equality branches on one discriminator          |
 | [`prefer-top-level-function-declarations`](./docs/rules.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports   |
 | [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                        | Require a forcing reason on lint disable directives                               |
+| [`require-repository-test-subject`](./docs/rules.md#ownership-and-tests)                | Require behavioral tests to import repository-owned code                          |
 | [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)            | Require one `SAFETY:` comment for each outermost non-const assertion              |
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-positional-boolean-parameters`, `no-unhandled-detached-promises`, `prefer-options-parameter`, and `require-lint-suppression-reason`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-positional-boolean-parameters`, `no-test-snapshots`, `no-unhandled-detached-promises`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 

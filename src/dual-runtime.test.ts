@@ -36,6 +36,13 @@ enum Status {
 
 vi.mock("./dependency", () => ({}));
 
+test("interaction only", () => {
+  expect(send).toHaveBeenCalledTimes(2);
+});
+test("snapshot", () => {
+  expect(value).toMatchSnapshot();
+});
+
 const chained = input as unknown as string;
 const narrowed = widened as { name: string };
 

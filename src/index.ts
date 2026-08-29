@@ -2,6 +2,7 @@ import { eslintCompatPlugin } from "@oxlint/plugins";
 import type { TSESLint } from "@typescript-eslint/utils";
 import pkg from "../package.json" with { type: "json" };
 import { consistentBlankLines } from "./rules/consistent-blank-lines.ts";
+import { noCallCountOnlyTestRule } from "./rules/no-call-count-only-test.ts";
 import { noChainedTypeAssertionsRule } from "./rules/no-chained-type-assertions.ts";
 import { noConditionalUndefinedPropertiesRule } from "./rules/no-conditional-undefined-properties.ts";
 import { noEnumDeclarationsRule } from "./rules/no-enum-declarations.ts";
@@ -11,6 +12,7 @@ import { noObjectParametersRule } from "./rules/no-object-parameters.ts";
 import { noPositionalBooleanParametersRule } from "./rules/no-positional-boolean-parameters.ts";
 import { noReflectApplyRule } from "./rules/no-reflect-apply.ts";
 import { noReflectGetRule } from "./rules/no-reflect-get.ts";
+import { noTestSnapshotsRule } from "./rules/no-test-snapshots.ts";
 import { noUnhandledDetachedPromisesRule } from "./rules/no-unhandled-detached-promises.ts";
 import { noUnknownParametersRule } from "./rules/no-unknown-parameters.ts";
 import { noUnknownReturnsRule } from "./rules/no-unknown-returns.ts";
@@ -21,6 +23,7 @@ import { preferOptionsParameterRule } from "./rules/prefer-options-parameter.ts"
 import { preferSwitchDiscriminatorChainRule } from "./rules/prefer-switch-discriminator-chain.ts";
 import { preferTopLevelFunctionDeclarationsRule } from "./rules/prefer-top-level-function-declarations.ts";
 import { requireLintSuppressionReasonRule } from "./rules/require-lint-suppression-reason.ts";
+import { requireRepositoryTestSubjectRule } from "./rules/require-repository-test-subject.ts";
 import { requireSafetyCommentForTypeAssertionRule } from "./rules/require-safety-comment-for-type-assertion.ts";
 
 const meta = {
@@ -35,6 +38,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-conditional-undefined-properties": noConditionalUndefinedPropertiesRule,
     "no-enum-declarations": noEnumDeclarationsRule,
     "no-known-value-widening": noKnownValueWideningRule,
+    "no-call-count-only-test": noCallCountOnlyTestRule,
     "no-module-mocking": noModuleMockingRule,
     "no-object-parameters": noObjectParametersRule,
     "no-positional-boolean-parameters": noPositionalBooleanParametersRule,
@@ -44,6 +48,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-unknown-returns": noUnknownReturnsRule,
     "no-unknown-type-aliases": noUnknownTypeAliasesRule,
     "no-unsafe-dictionary-type": noUnsafeDictionaryTypeRule,
+    "no-test-snapshots": noTestSnapshotsRule,
     "no-unhandled-detached-promises": noUnhandledDetachedPromisesRule,
     "no-widen-then-assert": noWidenThenAssertRule,
     "prefer-options-parameter": preferOptionsParameterRule,
@@ -51,6 +56,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "prefer-top-level-function-declarations":
       preferTopLevelFunctionDeclarationsRule,
     "require-lint-suppression-reason": requireLintSuppressionReasonRule,
+    "require-repository-test-subject": requireRepositoryTestSubjectRule,
     "require-safety-comment-for-type-assertion":
       requireSafetyCommentForTypeAssertionRule,
   },
