@@ -1,8 +1,8 @@
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import {
   hasExpectationModifier,
   isExpectationMatcher,
-  staticMemberName,
 } from "../shared/test-framework.ts";
 
 /** Require promise assertions to describe a result or specific failure. */

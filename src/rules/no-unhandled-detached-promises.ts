@@ -1,5 +1,6 @@
 import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 
 function unwrapExpression(expression: ESTree.Expression): ESTree.Expression {
   if (
@@ -14,25 +15,6 @@ function unwrapExpression(expression: ESTree.Expression): ESTree.Expression {
   }
 
   return expression;
-}
-
-function isString<Value>(value: Value): value is Value & string {
-  return typeof value === "string";
-}
-
-function staticMemberName(expression: ESTree.MemberExpression): string | null {
-  if (!expression.computed && expression.property.type === "Identifier") {
-    return expression.property.name;
-  }
-  if (
-    expression.computed &&
-    expression.property.type === "Literal" &&
-    isString(expression.property.value)
-  ) {
-    return expression.property.value;
-  }
-
-  return null;
 }
 
 function isRejectionHandler(

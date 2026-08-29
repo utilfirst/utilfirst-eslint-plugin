@@ -1,15 +1,13 @@
 import { defineRule } from "@oxlint/plugins";
 
 import type { ESTree, SourceCode } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import {
   getInternalModulePrefixes,
   isRepositoryOwnedModuleSpecifier,
   repositoryModuleRuleSchema,
 } from "../shared/repository-module.ts";
-import {
-  isTestFrameworkControlCall,
-  staticMemberName,
-} from "../shared/test-framework.ts";
+import { isTestFrameworkControlCall } from "../shared/test-framework.ts";
 
 const moduleMockMethods = new Set(["doMock", "mock", "unstable_mockModule"]);
 

@@ -1,11 +1,11 @@
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import { nodeAssertCall } from "../shared/node-assert.ts";
 import { resolveVariable } from "../shared/scope.ts";
 import {
   hasExpectationModifier,
   isExpectationMatcher,
-  staticMemberName,
 } from "../shared/test-framework.ts";
 
 const equalityMatchers = new Set(["toBe", "toEqual", "toStrictEqual"]);

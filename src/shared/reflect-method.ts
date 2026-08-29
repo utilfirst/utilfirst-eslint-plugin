@@ -1,5 +1,6 @@
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 
+import { staticMemberName } from "./estree.ts";
 import { resolveVariable } from "./scope.ts";
 
 function isGlobalReflect(
@@ -21,21 +22,6 @@ function isGlobalReflect(
 
   const variable = resolveVariable(sourceCode, expression.object);
   return variable === null || variable.defs.length === 0;
-}
-
-function staticMemberName(expression: ESTree.MemberExpression): string | null {
-  if (!expression.computed && expression.property.type === "Identifier") {
-    return expression.property.name;
-  }
-  if (
-    expression.computed &&
-    expression.property.type === "Literal" &&
-    typeof expression.property.value === "string"
-  ) {
-    return expression.property.value;
-  }
-
-  return null;
 }
 
 /** Reports whether a call target names one method on the global Reflect object. */

@@ -1,4 +1,5 @@
 import type { ESTree, SourceCode, Variable } from "@oxlint/plugins";
+import { staticMemberName } from "./estree.ts";
 import { resolveVariable } from "./scope.ts";
 
 const testFrameworkSources = new Set(["@jest/globals", "node:test", "vitest"]);
@@ -27,23 +28,6 @@ export type TestFrameworkCall = {
   callback: TestCallback | null;
   kind: "setup-hook" | "suite" | "teardown-hook" | "test";
 };
-
-export function staticMemberName(
-  expression: ESTree.MemberExpression,
-): string | null {
-  if (!expression.computed && expression.property.type === "Identifier") {
-    return expression.property.name;
-  }
-  if (
-    expression.computed &&
-    expression.property.type === "Literal" &&
-    typeof expression.property.value === "string"
-  ) {
-    return expression.property.value;
-  }
-
-  return null;
-}
 
 export function hasExpectationModifier(
   expression: ESTree.Expression | ESTree.Super,

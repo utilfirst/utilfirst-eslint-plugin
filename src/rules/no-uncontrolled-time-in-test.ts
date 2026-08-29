@@ -1,10 +1,10 @@
 import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import { resolveVariable } from "../shared/scope.ts";
 import {
   getTestFrameworkCall,
   isTestFrameworkControlCall,
-  staticMemberName,
   type TestFrameworkCall,
   visitExecutedNodes,
 } from "../shared/test-framework.ts";

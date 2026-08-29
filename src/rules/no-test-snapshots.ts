@@ -1,8 +1,8 @@
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import {
   isExpectationMatcher,
   isExpectationMemberCall,
-  staticMemberName,
 } from "../shared/test-framework.ts";
 
 const snapshotMatchers = new Set([

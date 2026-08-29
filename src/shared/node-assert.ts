@@ -1,6 +1,6 @@
 import type { ESTree, SourceCode, Variable } from "@oxlint/plugins";
+import { staticMemberName } from "./estree.ts";
 import { resolveVariable } from "./scope.ts";
-import { staticMemberName } from "./test-framework.ts";
 
 const nodeAssertSources = new Set(["node:assert", "node:assert/strict"]);
 

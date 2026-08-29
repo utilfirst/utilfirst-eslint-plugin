@@ -1,9 +1,9 @@
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import { nodeAssertCall } from "../shared/node-assert.ts";
 import {
   hasExpectationModifier,
   isExpectationMatcher,
-  staticMemberName,
 } from "../shared/test-framework.ts";
 
 const throwMatchers = new Set(["toThrow", "toThrowError"]);

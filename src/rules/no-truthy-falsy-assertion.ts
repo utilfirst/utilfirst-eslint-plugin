@@ -1,10 +1,8 @@
 import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import { nodeAssertCall } from "../shared/node-assert.ts";
-import {
-  isExpectationMatcher,
-  staticMemberName,
-} from "../shared/test-framework.ts";
+import { isExpectationMatcher } from "../shared/test-framework.ts";
 
 const truthinessMatchers = new Set(["toBeFalsy", "toBeTruthy"]);
 

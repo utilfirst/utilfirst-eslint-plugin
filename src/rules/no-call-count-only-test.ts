@@ -1,9 +1,9 @@
 import { defineRule } from "@oxlint/plugins";
+import { staticMemberName } from "../shared/estree.ts";
 import { nodeAssertCall } from "../shared/node-assert.ts";
 import {
   getTestFrameworkCall,
   isExpectationMatcher,
-  staticMemberName,
   visitExecutedNodes,
 } from "../shared/test-framework.ts";
 
