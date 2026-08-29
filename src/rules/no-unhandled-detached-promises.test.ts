@@ -14,7 +14,7 @@ ruleTester.run("no-unhandled-detached-promises", rule, {
     "void send().catch((error) => report(error));",
     "void send().catch(getErrorHandler());",
     "void send().catch(isVerbose ? reportError : ignoreError);",
-    "void send().catch(handleError).finally(cleanup);",
+    "void send().finally(cleanup).catch(handleError);",
     "void 0;",
     "await send();",
     "return send();",
@@ -46,6 +46,10 @@ ruleTester.run("no-unhandled-detached-promises", rule, {
     },
     {
       code: "void (send() as Promise<void>);",
+      errors: [{ messageId: "unhandledDetachedPromise" }],
+    },
+    {
+      code: "void send().catch(handleError).finally(cleanup);",
       errors: [{ messageId: "unhandledDetachedPromise" }],
     },
   ],

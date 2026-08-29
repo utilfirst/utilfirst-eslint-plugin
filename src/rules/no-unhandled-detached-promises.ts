@@ -63,6 +63,7 @@ function hasRejectionHandler(expression: ESTree.Expression): boolean {
   if (unwrapped.type !== "CallExpression") {
     return false;
   }
+
   if (
     unwrapped.callee.type !== "Super" &&
     unwrapped.callee.type !== "V8IntrinsicExpression" &&
@@ -76,8 +77,9 @@ function hasRejectionHandler(expression: ESTree.Expression): boolean {
     if (memberName === "then") {
       return isRejectionHandler(unwrapped.arguments[1]);
     }
-
-    return hasRejectionHandler(unwrapped.callee.object);
+    if (memberName === "finally") {
+      return false;
+    }
   }
 
   return false;

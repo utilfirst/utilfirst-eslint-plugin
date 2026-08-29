@@ -6,6 +6,16 @@ const testCaseNames = new Set(["it", "test"]);
 const testControllerNames = new Set(["jest", "vi"]);
 const expectationNames = new Set(["expect"]);
 
+const testHookNames = new Set([
+  "afterAll",
+  "afterEach",
+  "beforeAll",
+  "beforeEach",
+]);
+
+const testSetupHookNames = new Set(["beforeAll", "beforeEach"]);
+const testSuiteNames = new Set(["describe", "suite"]);
+
 export function staticMemberName(
   expression: ESTree.MemberExpression,
 ): string | null {
@@ -169,6 +179,55 @@ export function isTestCaseCall(
   sourceCode: SourceCode,
   node: ESTree.CallExpression,
 ): boolean {
+  return isTestCallbackCall({
+    acceptedNames: testCaseNames,
+    node,
+    sourceCode,
+  });
+}
+
+export function isTestHookCall(
+  sourceCode: SourceCode,
+  node: ESTree.CallExpression,
+): boolean {
+  return isTestCallbackCall({
+    acceptedNames: testHookNames,
+    node,
+    sourceCode,
+  });
+}
+
+export function isTestSetupHookCall(
+  sourceCode: SourceCode,
+  node: ESTree.CallExpression,
+): boolean {
+  return isTestCallbackCall({
+    acceptedNames: testSetupHookNames,
+    node,
+    sourceCode,
+  });
+}
+
+export function isTestSuiteCall(
+  sourceCode: SourceCode,
+  node: ESTree.CallExpression,
+): boolean {
+  return isTestCallbackCall({
+    acceptedNames: testSuiteNames,
+    node,
+    sourceCode,
+  });
+}
+
+function isTestCallbackCall({
+  acceptedNames,
+  node,
+  sourceCode,
+}: {
+  acceptedNames: ReadonlySet<string>;
+  node: ESTree.CallExpression;
+  sourceCode: SourceCode;
+}): boolean {
   if (!node.arguments.some((argument) => isFunction(argument))) {
     return false;
   }
@@ -180,7 +239,7 @@ export function isTestCaseCall(
   }
 
   return isTestFrameworkReference({
-    acceptedNames: testCaseNames,
+    acceptedNames,
     expression: node.callee,
     sourceCode,
   });

@@ -41,7 +41,7 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 ## Async errors
 
-- `no-unhandled-detached-promises` defines `void call()` as the repository marker for detached asynchronous work and requires an observable rejection handler on that call chain. Add `.catch(...)` or pass a rejection callback as the second argument to `.then(...)`. Do not apply `void` to synchronous calls. The shared ESLint and Oxlint implementation enforces the marker syntax because Oxlint plugins do not expose TypeScript parser services.
+- `no-unhandled-detached-promises` defines `void call()` as the repository marker for detached asynchronous work and requires an observable terminal rejection handler on that call chain. Add `.catch(...)` or pass a rejection callback as the second argument to `.then(...)` after any finalizer. Do not apply `void` to synchronous calls. The shared ESLint and Oxlint implementation enforces the marker syntax because Oxlint plugins do not expose TypeScript parser services.
 
 ## Lint policy
 
@@ -56,7 +56,7 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 - `no-promise-settlement-only-assertion` rejects `.resolves.toBeUndefined()` and `.rejects.toBeDefined()`. Await successful work directly and assert its observable effect, or assert a rejection's class, code, message, or other behavioral contract.
 - `no-test-snapshots` rejects Vitest and Jest stored, inline, error, and file snapshot matchers plus snapshot serializers. Assert the exact observable fields that carry the contract. Use a reasoned suppression when a reviewed serialized public artifact must remain byte-stable.
 - `no-truthy-falsy-assertion` rejects `toBeTruthy()`, `toBeFalsy()`, and Node `assert.ok(...)` calls on bare values. Node predicate expressions remain valid because the predicate states the checked relationship. Assert the exact expected value so the test preserves value and type information.
-- `no-uncontrolled-time-in-test` rejects global `Date.now()` and zero-argument `new Date()` reads in files that contain tests unless the file sets system time or configures fake timers with a `now` value. Inject time or control the clock so the test has deterministic inputs.
+- `no-uncontrolled-time-in-test` rejects global `Date.now()` and zero-argument `new Date()` reads in test setup, hooks, and test cases unless the owning execution scope sets system time or configures fake timers with a `now` value. A suite hook controls tests in that suite but a controller call in one test does not exempt another test. Inject time or control the clock before reading it so each test has deterministic inputs.
 - `require-repository-test-subject` rejects Vitest, Jest, and Node test files that do not import repository-owned runtime code through a relative, absolute, `#`, `@/`, `~/`, or Cloudflare runtime specifier. Runtime static and dynamic imports establish the subject; type-only imports do not. Remove tests of library behavior or import the repository behavior whose failure the case is meant to identify.
 
 ## Layout
