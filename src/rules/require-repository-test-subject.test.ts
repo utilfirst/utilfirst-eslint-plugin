@@ -1,10 +1,10 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import { getRuleForTest } from "../rule-test.ts";
 
-const rule = getRuleForTest<"missingSubject">(
-  "require-repository-test-subject",
+const rule = getRuleForTest<
   "missingSubject",
-);
+  [{ internalModulePrefixes?: string[] }]
+>("require-repository-test-subject", "missingSubject");
 
 const ruleTester = new RuleTester({
   languageOptions: { parserOptions: { sourceType: "module" } },
@@ -16,6 +16,10 @@ ruleTester.run("require-repository-test-subject", rule, {
     'import value from "#internal/value.ts"; it("reads", () => value);',
     'import { run, type RunResult } from "./run.ts"; test("runs", () => run());',
     'import { exports } from "cloudflare:workers"; test("worker", () => exports.default);',
+    {
+      code: 'import { run } from "@workspace/package"; test("runs", () => run());',
+      options: [{ internalModulePrefixes: ["@workspace/"] }],
+    },
     'test("dynamic", async () => { await import("./subject.ts"); });',
     'import { test } from "vitest"; export const fixture = 1;',
   ],
@@ -46,6 +50,10 @@ ruleTester.run("require-repository-test-subject", rule, {
     },
     {
       code: 'import { runTest } from "test-helpers"; test("library", runTest);',
+      errors: [{ messageId: "missingSubject" }],
+    },
+    {
+      code: 'import { run } from "@workspace/package"; test("library", () => run());',
       errors: [{ messageId: "missingSubject" }],
     },
   ],

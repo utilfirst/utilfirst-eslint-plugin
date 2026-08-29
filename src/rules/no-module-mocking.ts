@@ -1,22 +1,17 @@
 import { defineRule } from "@oxlint/plugins";
-import { z } from "zod";
 
 import type { ESTree, SourceCode } from "@oxlint/plugins";
-import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
+import {
+  getInternalModulePrefixes,
+  isRepositoryOwnedModuleSpecifier,
+  repositoryModuleRuleSchema,
+} from "../shared/repository-module.ts";
 import {
   isTestFrameworkControlCall,
   staticMemberName,
 } from "../shared/test-framework.ts";
 
 const moduleMockMethods = new Set(["doMock", "mock", "unstable_mockModule"]);
-
-const ModuleMockOptionsSchema = z.object({
-  internalModulePrefixes: z.array(z.string()).optional(),
-});
-
-const ModuleMockContextOptionsSchema = ruleContextOptionsSchema(
-  ModuleMockOptionsSchema,
-);
 
 function moduleMockCall(
   sourceCode: SourceCode,
@@ -30,18 +25,6 @@ function moduleMockCall(
   }
 
   return moduleMockMethods.has(staticMemberName(node.callee) ?? "");
-}
-
-function isRepositoryOwnedSpecifier(
-  specifier: string,
-  internalModulePrefixes: readonly string[],
-): boolean {
-  return (
-    specifier.startsWith(".") ||
-    specifier.startsWith("/") ||
-    specifier.startsWith("#") ||
-    internalModulePrefixes.some((prefix) => specifier.startsWith(prefix))
-  );
 }
 
 function isString<Value>(value: Value): value is Value & string {
@@ -75,19 +58,7 @@ export const noModuleMockingRule = defineRule({
       moduleMock:
         "Replace this local module mock through a production dependency seam and a faithful test implementation.",
     },
-    schema: [
-      {
-        type: "object",
-        properties: {
-          internalModulePrefixes: {
-            type: "array",
-            items: { type: "string", minLength: 1 },
-            uniqueItems: true,
-          },
-        },
-        additionalProperties: false,
-      },
-    ],
+    schema: repositoryModuleRuleSchema,
     defaultOptions: [{ internalModulePrefixes: [] }],
   },
   createOnce(context) {
@@ -103,22 +74,17 @@ export const noModuleMockingRule = defineRule({
           return;
         }
 
-        const rawOptions: unknown = context.options;
-
-        const parsedOptions =
-          ModuleMockContextOptionsSchema.safeParse(rawOptions);
-
-        const parsedOption = parsedOptions.success
-          ? parsedOptions.data
-          : undefined;
-
-        const internalModulePrefixes =
-          parsedOption?.internalModulePrefixes ?? [];
+        const internalModulePrefixes = getInternalModulePrefixes(
+          context.options,
+        );
 
         const specifier = moduleSpecifier(node.arguments[0]);
         if (
           specifier === null ||
-          !isRepositoryOwnedSpecifier(specifier, internalModulePrefixes)
+          !isRepositoryOwnedModuleSpecifier({
+            internalModulePrefixes,
+            specifier,
+          })
         ) {
           return;
         }

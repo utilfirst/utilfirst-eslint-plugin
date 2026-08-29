@@ -1,12 +1,13 @@
 import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
+import {
+  getInternalModulePrefixes,
+  isRepositoryOwnedModuleSpecifier,
+  repositoryModuleRuleSchema,
+} from "../shared/repository-module.ts";
 import { isTestCaseCall } from "../shared/test-framework.ts";
 
-const repositoryPrefixes = [".", "/", "#", "@/", "~/", "cloudflare:"];
-
-function isRepositorySpecifier(specifier: string): boolean {
-  return repositoryPrefixes.some((prefix) => specifier.startsWith(prefix));
-}
+const runtimeRepositoryPrefixes = ["cloudflare:"];
 
 function hasRuntimeImport(node: ESTree.ImportDeclaration): boolean {
   if (node.importKind === "type") {
@@ -34,15 +35,27 @@ export const requireRepositoryTestSubjectRule = defineRule({
       missingSubject:
         "This test file exercises no repository-owned subject. Remove the test or import the behavior it protects.",
     },
+    schema: repositoryModuleRuleSchema,
+    defaultOptions: [{ internalModulePrefixes: [] }],
   },
   createOnce(context) {
     let firstTestCall: ESTree.CallExpression | null = null;
     let hasRepositoryImport = false;
+    let internalModulePrefixes: readonly string[] = [];
+
+    function isRepositorySpecifier(specifier: string): boolean {
+      return isRepositoryOwnedModuleSpecifier({
+        additionalPrefixes: runtimeRepositoryPrefixes,
+        internalModulePrefixes,
+        specifier,
+      });
+    }
 
     return {
       "Program"() {
         firstTestCall = null;
         hasRepositoryImport = false;
+        internalModulePrefixes = getInternalModulePrefixes(context.options);
       },
       "ImportDeclaration"(node) {
         if (

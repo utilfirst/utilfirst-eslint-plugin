@@ -37,6 +37,10 @@ export default [
         "error",
         { internalModulePrefixes: ["@workspace/"] },
       ],
+      "utilfirst/require-repository-test-subject": [
+        "error",
+        { internalModulePrefixes: ["@workspace/"] },
+      ],
       "utilfirst/no-positional-boolean-parameters": [
         "error",
         { allowFunctionNames: ["protocolCallback"] },
@@ -54,7 +58,7 @@ export default [
 ];
 ```
 
-- `internalModulePrefixes` marks package-style import prefixes as repository-owned for `no-module-mocking`.
+- `internalModulePrefixes` marks package-style import prefixes as repository-owned for `no-module-mocking` and `require-repository-test-subject`.
 - `allowFunctionNames` preserves named functions whose positional boolean or multi-input signature is fixed by an external protocol.
 - `allowParameterNames` preserves `unknown` parameters whose names identify an externally fixed callback or interface signature.
 
@@ -107,7 +111,10 @@ export default [
     "utilfirst/prefer-switch-discriminator-chain": "error",
     "utilfirst/prefer-top-level-function-declarations": "error",
     "utilfirst/require-lint-suppression-reason": "error",
-    "utilfirst/require-repository-test-subject": "error",
+    "utilfirst/require-repository-test-subject": [
+      "error",
+      { "internalModulePrefixes": ["@workspace/"] },
+    ],
     "utilfirst/require-safety-comment-for-type-assertion": "error",
   },
 }

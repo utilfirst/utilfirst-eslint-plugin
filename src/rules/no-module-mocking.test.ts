@@ -24,6 +24,7 @@ ruleTester.run("no-module-mocking", rule, {
     "vi.mock(moduleName);",
     'vi.mock(import("external-package"));',
     'vi.mock("@external/package");',
+    'vi.mock("@workspace/local-package");',
   ],
   invalid: [
     {
@@ -40,6 +41,10 @@ ruleTester.run("no-module-mocking", rule, {
     },
     {
       code: 'vi.mock("#internal/dependency");',
+      errors: [{ messageId: "moduleMock" }],
+    },
+    {
+      code: 'vi.mock("@/dependency");',
       errors: [{ messageId: "moduleMock" }],
     },
     {
