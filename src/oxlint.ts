@@ -102,7 +102,7 @@ export const oxlintBaseConfig = defineConfig({
     "react/jsx-no-constructed-context-values": "error",
     "react/jsx-no-useless-fragment": "error",
     "react/jsx-pascal-case": "error",
-    "react/no-unstable-nested-components": ["error", { allowAsProps: true }],
+    "react/no-unstable-nested-components": "error",
     "react/no-unescaped-entities": "off",
     "react/react-in-jsx-scope": "off",
     "react/rules-of-hooks": "error",

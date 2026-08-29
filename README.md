@@ -72,11 +72,12 @@ import { oxlintBaseConfig } from "@utilfirst/eslint-plugin/oxlint";
 export default defineConfig({
   extends: [oxlintBaseConfig],
   ignorePatterns: ["dist/**", "node_modules/**"],
+  options: { reportUnusedDisableDirectives: "error" },
   plugins: ["jsx-a11y", "nextjs", "node"],
 });
 ```
 
-The base config owns shared categories, environment defaults, plugins, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions.
+The base config owns shared categories, environment defaults, plugins, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain root-only unused-disable reporting, ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions.
 
 ## Rules
 
@@ -111,7 +112,7 @@ The base config owns shared categories, environment defaults, plugins, compiler-
 | [`prefer-hook-order`](./docs/rules.md#react-source-form)                                | Order built-in hooks by context, state, derivation, and effect role             |
 | [`prefer-jsx-boolean-and`](./docs/rules.md#jsx-conditionals)                            | Require boolean JSX guards and normalize null-branch conditionals               |
 | [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)               | Require options objects for named callable contracts with three or more inputs  |
-| [`prefer-react-props-reference`](./docs/rules.md#react-source-form)                     | Keep React component props behind one named parameter                           |
+| [`prefer-react-props-reference`](./docs/rules.md#react-source-form)                     | Keep React props behind canonical access and bounded destructuring              |
 | [`prefer-switch-discriminator-chain`](./docs/rules.md#object-and-api-construction)      | Require a switch for four or more equality branches on one discriminator        |
 | [`prefer-top-level-function-declarations`](./docs/rules.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports |
 | [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                        | Require a forcing reason on lint disable directives                             |
