@@ -109,6 +109,18 @@ function wallClockRead(
   return null;
 }
 
+function timeEvent(
+  sourceCode: SourceCode,
+  node: ESTree.Node,
+): TimeEvent | null {
+  if (node.type === "CallExpression" && controlsTime(sourceCode, node)) {
+    return { kind: "control" };
+  }
+
+  const read = wallClockRead(sourceCode, node);
+  return read === null ? null : { kind: "read", node: read };
+}
+
 function getTimeEvents({
   root,
   sourceCode,
@@ -121,14 +133,9 @@ function getTimeEvents({
     root,
     sourceCode,
     visit(node) {
-      if (node.type === "CallExpression" && controlsTime(sourceCode, node)) {
-        events.push({ kind: "control" });
-        return;
-      }
-
-      const read = wallClockRead(sourceCode, node);
-      if (read !== null) {
-        events.push({ kind: "read", node: read });
+      const event = timeEvent(sourceCode, node);
+      if (event !== null) {
+        events.push(event);
       }
     },
   });
@@ -143,7 +150,7 @@ function getSuiteExecution({
   sourceCode: SourceCode;
 }): SuiteExecution {
   const suite: SuiteExecution = {
-    events: getTimeEvents({ root, sourceCode }),
+    events: [],
     hooks: [],
     suites: [],
     tests: [],
@@ -153,6 +160,10 @@ function getSuiteExecution({
     root,
     sourceCode,
     visit(node) {
+      const event = timeEvent(sourceCode, node);
+      if (event !== null) {
+        suite.events.push(event);
+      }
       if (node.type !== "CallExpression") {
         return;
       }
