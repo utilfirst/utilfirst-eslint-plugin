@@ -99,7 +99,6 @@
     "promise/catch-or-return": "error",
     "promise/no-nesting": "error",
     "promise/no-return-in-finally": "error",
-    "promise/no-return-wrap": "error",
     "promise/param-names": "error",
     "require-await": "off",
     "typescript/adjacent-overload-signatures": "error",
@@ -177,7 +176,7 @@
     "typescript/unified-signatures": "error",
     "typescript/use-unknown-in-catch-callback-variable": "error",
     "unicode-bom": ["error", "never"],
-    "unicorn/consistent-function-scoping": "error",
+    "unicorn/consistent-function-scoping": "off",
     "unicorn/no-negated-condition": "off",
     "utilfirst/consistent-blank-lines": "error",
     "utilfirst/no-call-count-only-test": "error",
@@ -213,6 +212,7 @@
     "utilfirst/require-repository-test-subject": "error",
     "utilfirst/require-safety-comment-for-type-assertion": "error",
     "utilfirst/require-special-comment-tag": "error",
+    "vitest/expect-expect": "off",
     "vitest/no-conditional-in-test": "off"
   }
 }

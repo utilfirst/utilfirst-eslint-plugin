@@ -8,6 +8,7 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 - After changing another Prettier-supported file: `pnpm exec prettier --write <file>`
 - Update `README.md` in the same change when package installation, configuration usage, the published rule list, or development commands change.
 - Update `docs/rules/consistent-blank-lines.md` in the same change when `src/rules/consistent-blank-lines.ts` changes the rule's source-owned behavior or specification.
+- Follow `docs/runbooks/upgrade-oxlint.md` when upgrading Oxlint.
 - After finishing a set of related changes: `pnpm run test` and `pnpm run lint:oxlint`
 
 ## Test retention
@@ -38,6 +39,7 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 
 ```
 .github/workflows/publish.yml       Tag-triggered OIDC publish
+docs/runbooks/upgrade-oxlint.md     Oxlint upgrade and policy reconciliation procedure
 docs/rules/                         Source-owned specifications for rules that require detailed behavior contracts
 src/
 ├── index.ts                        Plugin entry: meta, rules map, configs.recommended
