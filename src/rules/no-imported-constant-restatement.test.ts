@@ -12,9 +12,12 @@ ruleTester.run("no-imported-constant-restatement", rule, {
     "const LIMIT = 3; expect(LIMIT).toBe(3);",
     'import { limit } from "./config"; expect(limit).toBe(3);',
     'import { LIMIT } from "./config"; expect(runWithLimit()).toBe(LIMIT);',
+    'import { LIMIT } from "./config"; expect(LIMIT).not.toBe(3);',
+    'import { LIMIT } from "./config"; expect(3).not.toBe(LIMIT);',
     'import { LIMIT } from "./config"; expect(run(LIMIT)).toBe("limited");',
     'import { LIMIT } from "./config"; expect(LIMIT).toBe(getExpectedLimit());',
     'import assert from "node:assert/strict"; import { PROFILE } from "./config"; assert.equal(run(PROFILE), 48);',
+    'import assert from "node:assert/strict"; import { PROFILE } from "./config"; assert.equal(run(), PROFILE.durationFrames);',
     'import assert from "node:assert/strict"; import { PROFILE } from "./config"; assert.equal(PROFILE[key], 48);',
     'import { equal } from "./assert"; import { PROFILE } from "./config"; equal(PROFILE.durationFrames, 48);',
     'import assert from "node:assert/strict"; import { PROFILE } from "./config"; function verify() { const assert = localAssert; assert.equal(PROFILE.durationFrames, 48); }',
@@ -38,7 +41,15 @@ ruleTester.run("no-imported-constant-restatement", rule, {
       errors: [{ messageId: "importedConstantRestatement" }],
     },
     {
+      code: 'import { LIMIT } from "./config"; expect(3).toBe(LIMIT);',
+      errors: [{ messageId: "importedConstantRestatement" }],
+    },
+    {
       code: 'import assert from "node:assert/strict"; import { PROFILE } from "./config"; assert.equal(PROFILE.durationFrames, 48);',
+      errors: [{ messageId: "importedConstantRestatement" }],
+    },
+    {
+      code: 'import assert from "node:assert/strict"; import { PROFILE } from "./config"; assert.equal(48, PROFILE.durationFrames);',
       errors: [{ messageId: "importedConstantRestatement" }],
     },
     {

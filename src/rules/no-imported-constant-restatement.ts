@@ -3,6 +3,7 @@ import { defineRule } from "@oxlint/plugins";
 import { nodeAssertCall } from "../shared/node-assert.ts";
 import { resolveVariable } from "../shared/scope.ts";
 import {
+  hasExpectationModifier,
   isExpectationMatcher,
   staticMemberName,
 } from "../shared/test-framework.ts";
@@ -133,6 +134,29 @@ function isImportedConstant(
   );
 }
 
+function isImportedConstantExpression(
+  sourceCode: SourceCode,
+  expression: ESTree.Expression,
+): boolean {
+  const constantRoot = importedConstantRoot(expression);
+  return constantRoot !== null && isImportedConstant(sourceCode, constantRoot);
+}
+
+function isImportedConstantRestatement({
+  left,
+  right,
+  sourceCode,
+}: {
+  left: ESTree.Expression;
+  right: ESTree.Expression;
+  sourceCode: SourceCode;
+}): boolean {
+  return (
+    (isImportedConstantExpression(sourceCode, left) && isStaticValue(right)) ||
+    (isStaticValue(left) && isImportedConstantExpression(sourceCode, right))
+  );
+}
+
 /** Require tests to exercise behavior instead of restating imported constants. */
 export const noImportedConstantRestatementRule = defineRule({
   meta: {
@@ -152,22 +176,23 @@ export const noImportedConstantRestatementRule = defineRule({
         const isExpectEquality =
           node.callee.type === "MemberExpression" &&
           isExpectationMatcher(context.sourceCode, node) &&
-          equalityMatchers.has(staticMemberName(node.callee) ?? "");
+          equalityMatchers.has(staticMemberName(node.callee) ?? "") &&
+          !hasExpectationModifier(node.callee.object, "not");
 
         const subject = isExpectEquality
           ? expectationSubject(node)
           : nodeAssertSubject(context.sourceCode, node);
 
-        const constantRoot =
-          subject === null ? null : importedConstantRoot(subject);
-
         const expected = node.arguments[isExpectEquality ? 0 : 1];
         if (
-          constantRoot === null ||
+          subject === null ||
           expected === undefined ||
           expected.type === "SpreadElement" ||
-          !isImportedConstant(context.sourceCode, constantRoot) ||
-          !isStaticValue(expected)
+          !isImportedConstantRestatement({
+            left: subject,
+            right: expected,
+            sourceCode: context.sourceCode,
+          })
         ) {
           return;
         }
