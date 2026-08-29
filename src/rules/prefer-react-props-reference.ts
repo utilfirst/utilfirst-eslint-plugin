@@ -33,12 +33,38 @@ function componentNameOf(node: ComponentFunction): string | null {
   return null;
 }
 
+function isNamedExport(node: ComponentFunction): boolean {
+  if (node.type !== "ArrowFunctionExpression") {
+    return node.parent.type === "ExportNamedDeclaration";
+  }
+
+  return (
+    node.parent.type === "VariableDeclarator" &&
+    node.parent.parent.type === "VariableDeclaration" &&
+    node.parent.parent.parent.type === "ExportNamedDeclaration"
+  );
+}
+
+function isHttpMethodHandlerExport(
+  node: ComponentFunction,
+  name: string,
+): boolean {
+  const [requestParameter] = node.params;
+
+  return (
+    HTTP_METHOD_EXPORT_NAMES.has(name) &&
+    isNamedExport(node) &&
+    requestParameter?.type === "Identifier" &&
+    requestParameter.name === "request"
+  );
+}
+
 function isComponent(node: ComponentFunction): boolean {
   const name = componentNameOf(node);
 
   return (
     name !== null &&
-    !HTTP_METHOD_EXPORT_NAMES.has(name) &&
+    !isHttpMethodHandlerExport(node, name) &&
     /^\p{Lu}/u.test(name)
   );
 }

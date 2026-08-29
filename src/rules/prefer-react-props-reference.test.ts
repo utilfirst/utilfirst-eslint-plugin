@@ -28,10 +28,23 @@ ruleTester.run("prefer-react-props-reference", rule, {
     "const format = ({ value }: { value: string }) => value;",
     "export function GET(request: Request) { return Response.json({ method: request.method }); }",
     "export async function POST(request: Request) { return Response.json({ body: await request.json() }); }",
+    "export const PATCH = (request: Request) => Response.json({ method: request.method });",
   ],
   invalid: [
     {
       code: "function Button({ disabled }: { disabled: boolean }) { return <button disabled={disabled} />; }",
+      errors: [{ messageId: "nameProps" }],
+    },
+    {
+      code: "function GET({ method }: { method: string }) { return <p>{method}</p>; }",
+      errors: [{ messageId: "nameProps" }],
+    },
+    {
+      code: "export function GET({ method }: { method: string }) { return <p>{method}</p>; }",
+      errors: [{ messageId: "nameProps" }],
+    },
+    {
+      code: "const POST = ({ method }: { method: string }) => <p>{method}</p>;",
       errors: [{ messageId: "nameProps" }],
     },
     {
