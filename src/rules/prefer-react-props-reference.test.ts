@@ -26,6 +26,8 @@ ruleTester.run("prefer-react-props-reference", rule, {
     "function Button(props: { tone: string; disabled: boolean }) { const { tone, ...buttonProps } = props; return <button {...buttonProps} data-tone={tone} />; }",
     "function Label(props: { value: string }) { const { value } = props; return <p>{value}{value}{value}</p>; }",
     "const format = ({ value }: { value: string }) => value;",
+    "export function GET(request: Request) { return Response.json({ method: request.method }); }",
+    "export async function POST(request: Request) { return Response.json({ body: await request.json() }); }",
   ],
   invalid: [
     {

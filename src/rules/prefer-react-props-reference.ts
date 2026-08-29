@@ -9,6 +9,16 @@ import {
 
 type ComponentFunction = ESTree.ArrowFunctionExpression | ESTree.Function;
 
+const HTTP_METHOD_EXPORT_NAMES = new Set([
+  "DELETE",
+  "GET",
+  "HEAD",
+  "OPTIONS",
+  "PATCH",
+  "POST",
+  "PUT",
+]);
+
 function componentNameOf(node: ComponentFunction): string | null {
   if (node.type !== "ArrowFunctionExpression") {
     return node.id?.name ?? null;
@@ -25,7 +35,12 @@ function componentNameOf(node: ComponentFunction): string | null {
 
 function isComponent(node: ComponentFunction): boolean {
   const name = componentNameOf(node);
-  return name !== null && /^\p{Lu}/u.test(name);
+
+  return (
+    name !== null &&
+    !HTTP_METHOD_EXPORT_NAMES.has(name) &&
+    /^\p{Lu}/u.test(name)
+  );
 }
 
 function propertyNameOf(key: ESTree.PropertyKey): string | null {

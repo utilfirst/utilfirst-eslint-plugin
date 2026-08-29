@@ -51,7 +51,7 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 - `prefer-forwarded-props-order` requires a `{...props}` JSX spread to precede component-controlled attributes. Later attributes then retain the values owned by the wrapper.
 - `prefer-hook-order` orders recognized built-in hooks as context, state and refs, derivations, then effects. A derivation may precede the state hook that consumes its binding as an initializer. Custom hooks remain unclassified because their domain role is not inferable from syntax.
-- `prefer-react-props-reference` rejects signature destructuring and non-canonical parameter names on PascalCase function components. Body-local destructuring remains valid when every selected field has at least three reads or a rest binding is forwarded through JSX. A locally declared `children` field requires an explicit `props.children` reference.
+- `prefer-react-props-reference` rejects signature destructuring and non-canonical parameter names on PascalCase function components. Standard uppercase HTTP method exports are excluded because framework route handlers use those protocol-owned names. Body-local destructuring remains valid when every selected field has at least three reads or a rest binding is forwarded through JSX. A locally declared `children` field requires an explicit `props.children` reference.
 
 ## Comments
 
