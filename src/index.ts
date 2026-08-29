@@ -24,13 +24,17 @@ import { noUnknownReturnsRule } from "./rules/no-unknown-returns.ts";
 import { noUnknownTypeAliasesRule } from "./rules/no-unknown-type-aliases.ts";
 import { noUnsafeDictionaryTypeRule } from "./rules/no-unsafe-dictionary-type.ts";
 import { noWidenThenAssertRule } from "./rules/no-widen-then-assert.ts";
+import { preferForwardedPropsOrderRule } from "./rules/prefer-forwarded-props-order.ts";
+import { preferHookOrderRule } from "./rules/prefer-hook-order.ts";
 import { preferJsxBooleanAndRule } from "./rules/prefer-jsx-boolean-and.ts";
 import { preferOptionsParameterRule } from "./rules/prefer-options-parameter.ts";
+import { preferReactPropsReferenceRule } from "./rules/prefer-react-props-reference.ts";
 import { preferSwitchDiscriminatorChainRule } from "./rules/prefer-switch-discriminator-chain.ts";
 import { preferTopLevelFunctionDeclarationsRule } from "./rules/prefer-top-level-function-declarations.ts";
 import { requireLintSuppressionReasonRule } from "./rules/require-lint-suppression-reason.ts";
 import { requireRepositoryTestSubjectRule } from "./rules/require-repository-test-subject.ts";
 import { requireSafetyCommentForTypeAssertionRule } from "./rules/require-safety-comment-for-type-assertion.ts";
+import { requireSpecialCommentTagRule } from "./rules/require-special-comment-tag.ts";
 
 const meta = {
   name: "@utilfirst/eslint-plugin",
@@ -63,8 +67,11 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-unsafe-dictionary-type": noUnsafeDictionaryTypeRule,
     "no-unhandled-detached-promises": noUnhandledDetachedPromisesRule,
     "no-widen-then-assert": noWidenThenAssertRule,
+    "prefer-forwarded-props-order": preferForwardedPropsOrderRule,
+    "prefer-hook-order": preferHookOrderRule,
     "prefer-jsx-boolean-and": preferJsxBooleanAndRule,
     "prefer-options-parameter": preferOptionsParameterRule,
+    "prefer-react-props-reference": preferReactPropsReferenceRule,
     "prefer-switch-discriminator-chain": preferSwitchDiscriminatorChainRule,
     "prefer-top-level-function-declarations":
       preferTopLevelFunctionDeclarationsRule,
@@ -72,6 +79,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "require-repository-test-subject": requireRepositoryTestSubjectRule,
     "require-safety-comment-for-type-assertion":
       requireSafetyCommentForTypeAssertionRule,
+    "require-special-comment-tag": requireSpecialCommentTagRule,
   },
 });
 

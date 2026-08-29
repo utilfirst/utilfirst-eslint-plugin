@@ -78,65 +78,6 @@ export default defineConfig({
 
 The base config owns shared categories, environment defaults, plugins, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions.
 
-```jsonc
-// .oxlintrc.json
-{
-  "jsPlugins": [
-    {
-      "name": "utilfirst",
-      "specifier": "@utilfirst/eslint-plugin",
-    },
-  ],
-  "rules": {
-    "utilfirst/consistent-blank-lines": "error",
-    "utilfirst/no-call-count-only-test": "error",
-    "utilfirst/no-chained-type-assertions": "error",
-    "utilfirst/no-conditional-undefined-properties": "error",
-    "utilfirst/no-enum-declarations": "error",
-    "utilfirst/no-imported-constant-restatement": "error",
-    "utilfirst/no-known-value-widening": "error",
-    "utilfirst/no-module-mocking": [
-      "error",
-      { "internalModulePrefixes": ["@workspace/"] },
-    ],
-    "utilfirst/no-negated-throw-assertion": "error",
-    "utilfirst/no-object-parameters": "error",
-    "utilfirst/no-positional-boolean-parameters": [
-      "error",
-      { "allowFunctionNames": ["protocolCallback"] },
-    ],
-    "utilfirst/no-promise-settlement-only-assertion": "error",
-    "utilfirst/no-reflect-apply": "error",
-    "utilfirst/no-reflect-get": "error",
-    "utilfirst/no-test-snapshots": "error",
-    "utilfirst/no-truthy-falsy-assertion": "error",
-    "utilfirst/no-uncontrolled-time-in-test": "error",
-    "utilfirst/no-unknown-parameters": [
-      "error",
-      { "allowParameterNames": ["externalPayload"] },
-    ],
-    "utilfirst/no-unknown-returns": "error",
-    "utilfirst/no-unknown-type-aliases": "error",
-    "utilfirst/no-unsafe-dictionary-type": "error",
-    "utilfirst/no-unhandled-detached-promises": "error",
-    "utilfirst/no-widen-then-assert": "error",
-    "utilfirst/prefer-jsx-boolean-and": "error",
-    "utilfirst/prefer-options-parameter": [
-      "error",
-      { "allowFunctionNames": ["protocolCallback"] },
-    ],
-    "utilfirst/prefer-switch-discriminator-chain": "error",
-    "utilfirst/prefer-top-level-function-declarations": "error",
-    "utilfirst/require-lint-suppression-reason": "error",
-    "utilfirst/require-repository-test-subject": [
-      "error",
-      { "internalModulePrefixes": ["@workspace/"] },
-    ],
-    "utilfirst/require-safety-comment-for-type-assertion": "error",
-  },
-}
-```
-
 ## Rules
 
 [`docs/rules.md`](./docs/rules.md) explains the policy boundary and expected replacement for every rule. The implementations and colocated tests remain the executable behavior owners.
@@ -166,17 +107,21 @@ The base config owns shared categories, environment defaults, plugins, compiler-
 | [`no-unsafe-dictionary-type`](./docs/rules.md#boundary-contracts)                       | Reject object and Map dictionary contracts with broad value types               |
 | [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                        | Require terminal rejection handling on `void`-marked detached chains            |
 | [`no-widen-then-assert`](./docs/rules.md#type-evidence)                                 | Reject const flows that widen a known value before narrowing it                 |
+| [`prefer-forwarded-props-order`](./docs/rules.md#react-source-form)                     | Put forwarded props before component-controlled JSX attributes                  |
+| [`prefer-hook-order`](./docs/rules.md#react-source-form)                                | Order built-in hooks by context, state, derivation, and effect role             |
 | [`prefer-jsx-boolean-and`](./docs/rules.md#jsx-conditionals)                            | Require boolean JSX guards and normalize null-branch conditionals               |
 | [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)               | Require options objects for named callable contracts with three or more inputs  |
+| [`prefer-react-props-reference`](./docs/rules.md#react-source-form)                     | Keep React component props behind one named parameter                           |
 | [`prefer-switch-discriminator-chain`](./docs/rules.md#object-and-api-construction)      | Require a switch for four or more equality branches on one discriminator        |
 | [`prefer-top-level-function-declarations`](./docs/rules.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports |
 | [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                        | Require a forcing reason on lint disable directives                             |
 | [`require-repository-test-subject`](./docs/rules.md#ownership-and-tests)                | Require behavioral tests to import repository-owned code                        |
 | [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)            | Require one `SAFETY:` comment for each outermost non-const assertion            |
+| [`require-special-comment-tag`](./docs/rules.md#comments)                               | Require canonical uppercase tags and colons on special comments                 |
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-jsx-boolean-and`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-forwarded-props-order`, `prefer-hook-order`, `prefer-jsx-boolean-and`, `prefer-options-parameter`, `prefer-react-props-reference`, `require-lint-suppression-reason`, `require-repository-test-subject`, and `require-special-comment-tag`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 

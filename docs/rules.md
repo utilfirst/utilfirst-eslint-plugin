@@ -47,6 +47,16 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 - `prefer-jsx-boolean-and` replaces a boolean JSX conditional with one `null` branch by the equivalent logical AND form. It also rejects source-provable string and number operands on JSX logical AND expressions because `0` and `""` need explicit rendering predicates. Boolean and nullable-boolean operands remain valid. Unresolved operand types remain untouched because the shared ESLint and Oxlint implementation has no TypeScript checker.
 
+## React source form
+
+- `prefer-forwarded-props-order` requires a `{...props}` JSX spread to precede component-controlled attributes. Later attributes then retain the values owned by the wrapper.
+- `prefer-hook-order` orders recognized built-in hooks as context, state and refs, derivations, then effects. A derivation may precede the state hook that consumes its binding as an initializer. Custom hooks remain unclassified because their domain role is not inferable from syntax.
+- `prefer-react-props-reference` rejects signature destructuring on PascalCase function components. Accept one named props parameter and destructure component-owned fields inside the body only when forwarding requires it.
+
+## Comments
+
+- `require-special-comment-tag` requires `TODO:`, `NOTE:`, `HACK:`, and `FIXME:` to use an uppercase tag followed by a colon. Ordinary narrative uses of those words remain untouched.
+
 ## Lint policy
 
 - `require-lint-suppression-reason` requires ESLint and Oxlint disable directives to include a non-empty reason after `--`. State the runtime, framework, or external boundary that forces the suppression.

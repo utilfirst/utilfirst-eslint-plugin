@@ -73,7 +73,13 @@
     "vitest": "^4.0.7"
   },
   "peerDependencies": {
-    "eslint": "^10.0.0"
+    "eslint": "^10.0.0",
+    "oxlint": ">=1.78.0 <2"
+  },
+  "peerDependenciesMeta": {
+    "oxlint": {
+      "optional": true
+    }
   },
   "packageManager": "pnpm@11.21.0",
   "engines": {

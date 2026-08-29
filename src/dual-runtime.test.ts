@@ -89,11 +89,23 @@ const owner = {
 };
 
 const conditionalView = <main>{!true ? null : <span />}</main>;
+const forwardedView = <button type="button" {...props} />;
+
+function PropsView({ label }: { label: string }) {
+  return <p>{label}</p>;
+}
+
+function HookView() {
+  useEffect(sync, []);
+  const [open] = useState(false);
+  return <p>{open}</p>;
+}
 
 void Promise.resolve();
 
+// todo remove after migration
 // eslint-disable-next-line no-console
-console.log(conditionalView, topLevelFunction(), owner.combine("a", "b", "c"));
+console.log(conditionalView, forwardedView, HookView, PropsView, topLevelFunction(), owner.combine("a", "b", "c"));
 `;
 
 const ruleNames = Object.keys(plugin.rules);

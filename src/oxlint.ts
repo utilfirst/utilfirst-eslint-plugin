@@ -1,4 +1,4 @@
-import type { OxlintConfig } from "oxlint";
+import { defineConfig } from "oxlint";
 
 import plugin from "./index.ts";
 
@@ -10,7 +10,7 @@ const utilfirstRules = Object.fromEntries(
 );
 
 /** Shared Oxlint policy for TypeScript and React repositories. */
-export const oxlintBaseConfig = {
+export const oxlintBaseConfig = defineConfig({
   categories: {
     correctness: "error",
     pedantic: "error",
@@ -79,7 +79,10 @@ export const oxlintBaseConfig = {
     "max-lines": "off",
     "max-lines-per-function": "off",
     "no-await-in-loop": "off",
+    "no-else-return": "error",
     "no-negated-condition": "off",
+    "no-nested-ternary": "error",
+    "no-shadow": "error",
     "no-underscore-dangle": "off",
     "no-useless-assignment": "error",
     "object-shorthand": "error",
@@ -92,12 +95,17 @@ export const oxlintBaseConfig = {
     "promise/no-return-in-finally": "error",
     "promise/no-return-wrap": "error",
     "promise/param-names": "error",
+    "react/exhaustive-deps": "error",
     "react/function-component-definition": "error",
     "react/hook-use-state": "error",
     "react/jsx-curly-brace-presence": "error",
+    "react/jsx-no-constructed-context-values": "error",
+    "react/jsx-no-useless-fragment": "error",
+    "react/jsx-pascal-case": "error",
     "react/no-unstable-nested-components": ["error", { allowAsProps: true }],
     "react/no-unescaped-entities": "off",
     "react/react-in-jsx-scope": "off",
+    "react/rules-of-hooks": "error",
     "require-await": "off",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/array-type": "error",
@@ -116,16 +124,21 @@ export const oxlintBaseConfig = {
     "typescript/no-dynamic-delete": "error",
     "typescript/no-empty-object-type": "error",
     "typescript/no-explicit-any": "error",
+    "typescript/no-floating-promises": "error",
     "typescript/no-inferrable-types": "error",
     "typescript/no-invalid-void-type": "error",
+    "typescript/no-misused-promises": "error",
     "typescript/no-namespace": "error",
     "typescript/no-non-null-asserted-nullish-coalescing": "error",
     "typescript/no-require-imports": "error",
+    "typescript/no-unnecessary-boolean-literal-compare": "error",
     "typescript/no-unnecessary-condition": [
       "error",
       { allowConstantLoopConditions: true },
     ],
+    "typescript/no-unnecessary-template-expression": "error",
     "typescript/non-nullable-type-assertion-style": "error",
+    "typescript/prefer-as-const": "error",
     "typescript/prefer-find": "error",
     "typescript/prefer-for-of": "error",
     "typescript/prefer-function-type": "error",
@@ -146,9 +159,24 @@ export const oxlintBaseConfig = {
       },
     ],
     "typescript/return-await": ["error", "error-handling-correctness-only"],
+    "typescript/strict-boolean-expressions": [
+      "error",
+      {
+        allowAny: false,
+        allowNullableBoolean: true,
+        allowNullableEnum: false,
+        allowNullableNumber: false,
+        allowNullableObject: true,
+        allowNullableString: false,
+        allowNumber: false,
+        allowString: false,
+      },
+    ],
+    "typescript/switch-exhaustiveness-check": "error",
     "typescript/unified-signatures": "error",
     "typescript/use-unknown-in-catch-callback-variable": "error",
     "unicode-bom": ["error", "never"],
+    "unicorn/consistent-function-scoping": "error",
     "unicorn/no-negated-condition": "off",
     "unicorn/no-useless-undefined": "off",
     "unicorn/prefer-top-level-await": "off",
@@ -159,4 +187,4 @@ export const oxlintBaseConfig = {
       version: "19",
     },
   },
-} satisfies OxlintConfig;
+});
