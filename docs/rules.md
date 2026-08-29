@@ -43,6 +43,10 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 - `no-unhandled-detached-promises` defines `void call()` as the repository marker for detached asynchronous work and requires an observable terminal rejection handler on that call chain. Add `.catch(...)` or pass a rejection callback as the second argument to `.then(...)` after any finalizer. Do not apply `void` to synchronous calls. The shared ESLint and Oxlint implementation enforces the marker syntax because Oxlint plugins do not expose TypeScript parser services.
 
+## JSX conditionals
+
+- `prefer-jsx-boolean-and` replaces a boolean JSX conditional with one `null` branch by the equivalent logical AND form. It also rejects source-provable string and number operands on JSX logical AND expressions because `0` and `""` need explicit rendering predicates. Boolean and nullable-boolean operands remain valid. Unresolved operand types remain untouched because the shared ESLint and Oxlint implementation has no TypeScript checker.
+
 ## Lint policy
 
 - `require-lint-suppression-reason` requires ESLint and Oxlint disable directives to include a non-empty reason after `--`. State the runtime, framework, or external boundary that forces the suppression.

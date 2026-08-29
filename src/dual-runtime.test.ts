@@ -88,10 +88,12 @@ const owner = {
   },
 };
 
+const conditionalView = <main>{!true ? null : <span />}</main>;
+
 void Promise.resolve();
 
 // eslint-disable-next-line no-console
-console.log(topLevelFunction(), owner.combine("a", "b", "c"));
+console.log(conditionalView, topLevelFunction(), owner.combine("a", "b", "c"));
 `;
 
 const ruleNames = Object.keys(plugin.rules);
@@ -99,7 +101,7 @@ const ruleNames = Object.keys(plugin.rules);
 async function getOxlintOutput(): Promise<string> {
   const testDirectory = await mkdtemp(join(tmpdir(), "utilfirst-oxlint-"));
   const configPath = join(testDirectory, ".oxlintrc.json");
-  const sourcePath = join(testDirectory, "fixture.ts");
+  const sourcePath = join(testDirectory, "fixture.tsx");
 
   const pluginPath = new URL("./index.ts", import.meta.url).pathname;
   await writeFile(

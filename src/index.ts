@@ -24,6 +24,7 @@ import { noUnknownReturnsRule } from "./rules/no-unknown-returns.ts";
 import { noUnknownTypeAliasesRule } from "./rules/no-unknown-type-aliases.ts";
 import { noUnsafeDictionaryTypeRule } from "./rules/no-unsafe-dictionary-type.ts";
 import { noWidenThenAssertRule } from "./rules/no-widen-then-assert.ts";
+import { preferJsxBooleanAndRule } from "./rules/prefer-jsx-boolean-and.ts";
 import { preferOptionsParameterRule } from "./rules/prefer-options-parameter.ts";
 import { preferSwitchDiscriminatorChainRule } from "./rules/prefer-switch-discriminator-chain.ts";
 import { preferTopLevelFunctionDeclarationsRule } from "./rules/prefer-top-level-function-declarations.ts";
@@ -62,6 +63,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "no-unsafe-dictionary-type": noUnsafeDictionaryTypeRule,
     "no-unhandled-detached-promises": noUnhandledDetachedPromisesRule,
     "no-widen-then-assert": noWidenThenAssertRule,
+    "prefer-jsx-boolean-and": preferJsxBooleanAndRule,
     "prefer-options-parameter": preferOptionsParameterRule,
     "prefer-switch-discriminator-chain": preferSwitchDiscriminatorChainRule,
     "prefer-top-level-function-declarations":

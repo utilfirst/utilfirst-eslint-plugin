@@ -104,6 +104,7 @@ export default [
     "utilfirst/no-unsafe-dictionary-type": "error",
     "utilfirst/no-unhandled-detached-promises": "error",
     "utilfirst/no-widen-then-assert": "error",
+    "utilfirst/prefer-jsx-boolean-and": "error",
     "utilfirst/prefer-options-parameter": [
       "error",
       { "allowFunctionNames": ["protocolCallback"] },
@@ -149,6 +150,7 @@ export default [
 | [`no-unsafe-dictionary-type`](./docs/rules.md#boundary-contracts)                       | Reject object and Map dictionary contracts with broad value types               |
 | [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                        | Require terminal rejection handling on `void`-marked detached chains            |
 | [`no-widen-then-assert`](./docs/rules.md#type-evidence)                                 | Reject const flows that widen a known value before narrowing it                 |
+| [`prefer-jsx-boolean-and`](./docs/rules.md#jsx-conditionals)                            | Require boolean JSX guards and normalize null-branch conditionals               |
 | [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)               | Require options objects for named callable contracts with three or more inputs  |
 | [`prefer-switch-discriminator-chain`](./docs/rules.md#object-and-api-construction)      | Require a switch for four or more equality branches on one discriminator        |
 | [`prefer-top-level-function-declarations`](./docs/rules.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports |
@@ -158,7 +160,7 @@ export default [
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-jsx-boolean-and`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 
