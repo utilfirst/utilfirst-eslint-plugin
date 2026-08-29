@@ -5,7 +5,7 @@ import {
   isRepositoryOwnedModuleSpecifier,
   repositoryModuleRuleSchema,
 } from "../shared/repository-module.ts";
-import { isTestCaseCall } from "../shared/test-framework.ts";
+import { getTestFrameworkCall } from "../shared/test-framework.ts";
 
 const runtimeRepositoryPrefixes = ["cloudflare:"];
 
@@ -78,7 +78,7 @@ export const requireRepositoryTestSubjectRule = defineRule({
       "CallExpression"(node) {
         if (
           firstTestCall === null &&
-          isTestCaseCall(context.sourceCode, node)
+          getTestFrameworkCall(context.sourceCode, node)?.kind === "test"
         ) {
           firstTestCall = node;
         }

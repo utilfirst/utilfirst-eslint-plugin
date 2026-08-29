@@ -71,60 +71,6 @@ function importedName(node: ESTree.Node): string | null {
     : node.imported.value;
 }
 
-function isTestFrameworkIdentifier({
-  acceptedNames,
-  identifier,
-  sourceCode,
-}: {
-  acceptedNames: ReadonlySet<string>;
-  identifier: ESTree.IdentifierReference;
-  sourceCode: SourceCode;
-}): boolean {
-  const variable = resolveVariable(sourceCode, identifier);
-  if (variable === null || variable.defs.length === 0) {
-    return acceptedNames.has(identifier.name);
-  }
-
-  return variable.defs.some((definition) => {
-    if (
-      definition.type !== "ImportBinding" ||
-      definition.parent?.type !== "ImportDeclaration" ||
-      !testFrameworkSources.has(definition.parent.source.value)
-    ) {
-      return false;
-    }
-
-    const name = importedName(definition.node);
-    if (name !== null) {
-      return acceptedNames.has(name);
-    }
-
-    return (
-      definition.parent.source.value === "node:test" &&
-      definition.node.type === "ImportDefaultSpecifier" &&
-      acceptedNames.has("test")
-    );
-  });
-}
-
-function isTestFrameworkNamespace(
-  sourceCode: SourceCode,
-  identifier: ESTree.IdentifierReference,
-): boolean {
-  const variable = resolveVariable(sourceCode, identifier);
-  if (variable === null) {
-    return false;
-  }
-
-  return variable.defs.some(
-    (definition) =>
-      definition.type === "ImportBinding" &&
-      definition.node.type === "ImportNamespaceSpecifier" &&
-      definition.parent?.type === "ImportDeclaration" &&
-      testFrameworkSources.has(definition.parent.source.value),
-  );
-}
-
 function memberChain(
   expression: ESTree.Expression | ESTree.Super,
 ): { names: string[]; root: ESTree.IdentifierReference } | null {
@@ -164,26 +110,12 @@ function isTestFrameworkReference({
   expression: ESTree.Expression | ESTree.Super;
   sourceCode: SourceCode;
 }): boolean {
-  const chain = memberChain(expression);
-  if (chain === null) {
-    return false;
-  }
-  if (
-    isTestFrameworkIdentifier({
-      acceptedNames,
-      identifier: chain.root,
-      sourceCode,
-    })
-  ) {
-    return true;
-  }
-
-  const [frameworkMember] = chain.names;
-
   return (
-    frameworkMember !== undefined &&
-    acceptedNames.has(frameworkMember) &&
-    isTestFrameworkNamespace(sourceCode, chain.root)
+    testFrameworkReferenceName({
+      acceptedNames,
+      expression,
+      sourceCode,
+    }) !== null
   );
 }
 
@@ -510,35 +442,6 @@ export function visitExecutedNodes({
   } else {
     walkFunction(root);
   }
-}
-
-export function isTestCaseCall(
-  sourceCode: SourceCode,
-  node: ESTree.CallExpression,
-): boolean {
-  return getTestFrameworkCall(sourceCode, node)?.kind === "test";
-}
-
-export function isTestHookCall(
-  sourceCode: SourceCode,
-  node: ESTree.CallExpression,
-): boolean {
-  const kind = getTestFrameworkCall(sourceCode, node)?.kind;
-  return kind === "setup-hook" || kind === "teardown-hook";
-}
-
-export function isTestSetupHookCall(
-  sourceCode: SourceCode,
-  node: ESTree.CallExpression,
-): boolean {
-  return getTestFrameworkCall(sourceCode, node)?.kind === "setup-hook";
-}
-
-export function isTestSuiteCall(
-  sourceCode: SourceCode,
-  node: ESTree.CallExpression,
-): boolean {
-  return getTestFrameworkCall(sourceCode, node)?.kind === "suite";
 }
 
 export function isTestFrameworkControlCall(
