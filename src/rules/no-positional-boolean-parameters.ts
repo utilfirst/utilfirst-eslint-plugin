@@ -2,11 +2,13 @@ import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 import { z } from "zod";
 
+import { lexicalTypeParameterNames } from "../shared/lexical-type-parameters.ts";
 import {
   getOwnedFunctionName,
-  type OwnedFunction,
+  type OwnedCallable,
 } from "../shared/owned-function.ts";
 import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
+import { resolvedTypeIncludesMatch } from "../shared/type-alias.ts";
 
 const OptionsSchema = z.object({
   allowFunctionNames: z.array(z.string()).optional(),
@@ -73,7 +75,7 @@ export const noPositionalBooleanParametersRule = defineRule({
     defaultOptions: [{ allowFunctionNames: [] }],
   },
   createOnce(context) {
-    const checkFunction = (node: OwnedFunction) => {
+    const checkFunction = (node: OwnedCallable) => {
       const functionName = getOwnedFunctionName(node);
       if (functionName === null) {
         return;
@@ -92,7 +94,19 @@ export const noPositionalBooleanParametersRule = defineRule({
         }
 
         const annotation = annotationOf(parameter);
-        if (annotation?.typeAnnotation.type !== "TSBooleanKeyword") {
+        if (
+          annotation === null ||
+          annotation === undefined ||
+          !resolvedTypeIncludesMatch({
+            isMatch: (type) => type.type === "TSBooleanKeyword",
+            shadowedTypeNames: lexicalTypeParameterNames(
+              node,
+              context.sourceCode.visitorKeys,
+            ),
+            sourceCode: context.sourceCode,
+            type: annotation.typeAnnotation,
+          })
+        ) {
           continue;
         }
 
@@ -111,6 +125,13 @@ export const noPositionalBooleanParametersRule = defineRule({
       ArrowFunctionExpression: checkFunction,
       FunctionDeclaration: checkFunction,
       FunctionExpression: checkFunction,
+      TSCallSignatureDeclaration: checkFunction,
+      TSConstructSignatureDeclaration: checkFunction,
+      TSConstructorType: checkFunction,
+      TSDeclareFunction: checkFunction,
+      TSEmptyBodyFunctionExpression: checkFunction,
+      TSFunctionType: checkFunction,
+      TSMethodSignature: checkFunction,
     };
   },
 });

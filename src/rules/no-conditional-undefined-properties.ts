@@ -3,9 +3,18 @@ import { defineRule } from "@oxlint/plugins";
 
 import { resolveVariable } from "../shared/scope.ts";
 
-function unwrapParentheses(expression: ESTree.Expression): ESTree.Expression {
+function unwrapTransparentExpression(
+  expression: ESTree.Expression,
+): ESTree.Expression {
   let current = expression;
-  while (current.type === "ParenthesizedExpression") {
+  while (
+    current.type === "ChainExpression" ||
+    current.type === "ParenthesizedExpression" ||
+    current.type === "TSAsExpression" ||
+    current.type === "TSNonNullExpression" ||
+    current.type === "TSSatisfiesExpression" ||
+    current.type === "TSTypeAssertion"
+  ) {
     current = current.expression;
   }
 
@@ -16,7 +25,7 @@ function isUndefinedExpression(
   sourceCode: SourceCode,
   expression: ESTree.Expression,
 ): boolean {
-  const unwrapped = unwrapParentheses(expression);
+  const unwrapped = unwrapTransparentExpression(expression);
 
   const undefinedVariable =
     unwrapped.type === "Identifier" && unwrapped.name === "undefined"
@@ -35,7 +44,7 @@ function hasConditionalUndefinedValue(
   sourceCode: SourceCode,
   value: ESTree.Expression,
 ): boolean {
-  const unwrapped = unwrapParentheses(value);
+  const unwrapped = unwrapTransparentExpression(value);
   if (unwrapped.type !== "ConditionalExpression") {
     return false;
   }

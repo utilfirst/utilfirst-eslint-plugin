@@ -32,6 +32,22 @@ ruleTester.run("no-conditional-undefined-properties", rule, {
       code: "const value = { enabled: first ? true : second ? false : undefined };",
       errors: [{ messageId: "conditionalUndefined" }],
     },
+    {
+      code: "const value = { enabled: condition ? true : (undefined as undefined) };",
+      errors: [{ messageId: "conditionalUndefined" }],
+    },
+    {
+      code: "const value = { enabled: condition ? true : (undefined satisfies undefined) };",
+      errors: [{ messageId: "conditionalUndefined" }],
+    },
+    {
+      code: "const value = { enabled: (condition ? true : undefined) as boolean | undefined };",
+      errors: [{ messageId: "conditionalUndefined" }],
+    },
+    {
+      code: "const value = { enabled: condition ? true : undefined! };",
+      errors: [{ messageId: "conditionalUndefined" }],
+    },
   ],
 });
 

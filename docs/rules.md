@@ -30,12 +30,12 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 ## Object and API construction
 
-- `no-conditional-undefined-properties` rejects object properties whose conditional value is `undefined`. Omit the property through a branched call or a typed local object so presence has one meaning.
+- `no-conditional-undefined-properties` rejects object properties whose conditional value is `undefined`, including conditions and undefined branches wrapped in TypeScript assertions. Omit the property through a branched call or a typed local object so presence has one meaning.
 - `no-enum-declarations` rejects repository-owned TypeScript enums, including const enums. Use literal unions or inferred constant objects. Ambient and declaration-file enums remain valid when a boundary requires them.
-- `no-positional-boolean-parameters` rejects boolean flags on repository-owned named functions and methods. Use a named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
+- `no-positional-boolean-parameters` rejects direct and aliased boolean flags on repository-owned named functions, methods, and declaration-only callable contracts. Use a named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
 - `no-reflect-apply` rejects dynamic invocation through `Reflect.apply`. Call a typed function directly or place dynamic dispatch behind a named interface.
 - `no-reflect-get` rejects dynamic reads through `Reflect.get`. Use typed property access or parse a dynamic value into a named contract before reading it.
-- `prefer-options-parameter` rejects repository-owned named functions and methods with three or more inputs. Replace the positional inputs with one named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
+- `prefer-options-parameter` rejects repository-owned named functions, methods, and declaration-only callable contracts with three or more inputs. Replace the positional inputs with one named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
 - `prefer-switch-discriminator-chain` rejects four or more `if`/`else if` strict-equality branches on the same identifier. Replace the chain with a switch so the finite dispatch structure is explicit. Property access remains valid because repeated reads can differ from the switch's single read when a getter or proxy owns the property. Loose equality, mixed discriminators, non-literal comparisons, compound conditions, and range checks remain valid because a switch cannot preserve their contract mechanically.
 - `prefer-top-level-function-declarations` rejects direct top-level arrow and function-expression bindings plus anonymous default-exported functions. Use a function declaration so stack frames, search, and hoisting identify the function's owner. Nested callbacks and functions passed through a wrapper remain valid because their containing call or function owns their role.
 

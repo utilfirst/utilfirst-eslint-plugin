@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import {
   getOwnedFunctionName,
-  type OwnedFunction,
+  type OwnedCallable,
 } from "../shared/owned-function.ts";
 import { ruleContextOptionsSchema } from "../shared/rule-options.ts";
 
@@ -41,7 +41,7 @@ export const preferOptionsParameterRule = defineRule({
     defaultOptions: [{ allowFunctionNames: [] }],
   },
   createOnce(context) {
-    const checkFunction = (node: OwnedFunction) => {
+    const checkFunction = (node: OwnedCallable) => {
       const functionName = getOwnedFunctionName(node);
 
       const parameterCount = node.params.filter(
@@ -74,6 +74,13 @@ export const preferOptionsParameterRule = defineRule({
       ArrowFunctionExpression: checkFunction,
       FunctionDeclaration: checkFunction,
       FunctionExpression: checkFunction,
+      TSCallSignatureDeclaration: checkFunction,
+      TSConstructSignatureDeclaration: checkFunction,
+      TSConstructorType: checkFunction,
+      TSDeclareFunction: checkFunction,
+      TSEmptyBodyFunctionExpression: checkFunction,
+      TSFunctionType: checkFunction,
+      TSMethodSignature: checkFunction,
     };
   },
 });

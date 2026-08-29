@@ -11,6 +11,7 @@ ruleTester.run("no-positional-boolean-parameters", rule, {
   valid: [
     "function load(options: { isFresh: boolean }) {}",
     "items.filter((item, isSelected: boolean) => isSelected);",
+    "type Mapper = (callback: (isSelected: boolean) => void) => void;",
     "const owner = { [methodName](isFresh: boolean) {} };",
     {
       code: "function protocol(isFresh: boolean) {}",
@@ -67,6 +68,41 @@ ruleTester.run("no-positional-boolean-parameters", rule, {
         {
           messageId: "positionalBoolean",
           data: { functionName: "#load", parameter: "isFresh" },
+        },
+      ],
+    },
+    {
+      code: "type Flag = boolean; function load(isFresh: Flag) {}",
+      errors: [{ messageId: "positionalBoolean" }],
+    },
+    {
+      code: "declare function load(isFresh: boolean): void;",
+      errors: [{ messageId: "positionalBoolean" }],
+    },
+    {
+      code: "interface Owner { load(isFresh: boolean): void }",
+      errors: [
+        {
+          messageId: "positionalBoolean",
+          data: { functionName: "load", parameter: "isFresh" },
+        },
+      ],
+    },
+    {
+      code: "type Loader = (isFresh: boolean) => void;",
+      errors: [
+        {
+          messageId: "positionalBoolean",
+          data: { functionName: "Loader", parameter: "isFresh" },
+        },
+      ],
+    },
+    {
+      code: "interface Owner { load: (isFresh: boolean) => void }",
+      errors: [
+        {
+          messageId: "positionalBoolean",
+          data: { functionName: "load", parameter: "isFresh" },
         },
       ],
     },
