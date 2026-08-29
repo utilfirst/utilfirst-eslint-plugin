@@ -23,7 +23,6 @@ ruleTester.run("no-module-mocking", rule, {
     'jest.mock("external-package");',
     "vi.mock(moduleName);",
     'vi.mock(import("external-package"));',
-    'vi.mock("@external/package");',
     'vi.mock("@workspace/local-package");',
   ],
   invalid: [

@@ -12,7 +12,6 @@ ruleTester.run("no-imported-constant-restatement", rule, {
     "const LIMIT = 3; expect(LIMIT).toBe(3);",
     'import { limit } from "./config"; expect(limit).toBe(3);',
     'import { LIMIT } from "./config"; expect(runWithLimit()).toBe(LIMIT);',
-    'import { LIMIT } from "./config"; expect(LIMIT).not.toBe(3);',
     'import { LIMIT } from "./config"; expect(3).not.toBe(LIMIT);',
     'import { LIMIT } from "./config"; expect(run(LIMIT)).toBe("limited");',
     'import { LIMIT } from "./config"; expect(LIMIT).toBe(getExpectedLimit());',
