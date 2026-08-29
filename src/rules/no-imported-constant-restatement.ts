@@ -7,11 +7,20 @@ import {
 } from "../shared/test-framework.ts";
 
 const equalityMatchers = new Set(["toBe", "toEqual", "toStrictEqual"]);
+
+const nodeAssertEqualityMethods = new Set([
+  "deepEqual",
+  "deepStrictEqual",
+  "equal",
+  "strictEqual",
+]);
+
+const nodeAssertSources = new Set(["node:assert", "node:assert/strict"]);
 const importedConstantName = /^[A-Z][A-Z0-9_]*$/u;
 
 function expectationSubject(
   node: ESTree.CallExpression,
-): ESTree.IdentifierReference | null {
+): ESTree.Expression | null {
   if (node.callee.type !== "MemberExpression") {
     return null;
   }
@@ -26,7 +35,139 @@ function expectationSubject(
   }
 
   const [subject] = expression.arguments;
-  return subject?.type === "Identifier" ? subject : null;
+
+  return subject === undefined || subject.type === "SpreadElement"
+    ? null
+    : subject;
+}
+
+function importedConstantRoot(
+  expression: ESTree.Expression,
+): ESTree.IdentifierReference | null {
+  let currentExpression = expression;
+  while (currentExpression.type === "MemberExpression") {
+    if (staticMemberName(currentExpression) === null) {
+      return null;
+    }
+
+    currentExpression = currentExpression.object;
+  }
+
+  return currentExpression.type === "Identifier" ? currentExpression : null;
+}
+
+function importedName(node: ESTree.Node): string | null {
+  if (node.type !== "ImportSpecifier") {
+    return null;
+  }
+
+  return node.imported.type === "Identifier"
+    ? node.imported.name
+    : node.imported.value;
+}
+
+function isNodeAssertModule(
+  sourceCode: SourceCode,
+  identifier: ESTree.IdentifierReference,
+): boolean {
+  const variable = resolveVariable(sourceCode, identifier);
+  if (variable === null) {
+    return false;
+  }
+
+  return variable.defs.some(
+    (definition) =>
+      definition.type === "ImportBinding" &&
+      (definition.node.type === "ImportDefaultSpecifier" ||
+        definition.node.type === "ImportNamespaceSpecifier") &&
+      definition.parent?.type === "ImportDeclaration" &&
+      nodeAssertSources.has(definition.parent.source.value),
+  );
+}
+
+function isNodeAssertObject(
+  sourceCode: SourceCode,
+  identifier: ESTree.IdentifierReference,
+): boolean {
+  if (isNodeAssertModule(sourceCode, identifier)) {
+    return true;
+  }
+
+  const variable = resolveVariable(sourceCode, identifier);
+  if (variable === null) {
+    return false;
+  }
+
+  return variable.defs.some(
+    (definition) =>
+      definition.type === "ImportBinding" &&
+      definition.parent?.type === "ImportDeclaration" &&
+      definition.parent.source.value === "node:assert" &&
+      importedName(definition.node) === "strict",
+  );
+}
+
+function isNodeAssertMemberObject(
+  sourceCode: SourceCode,
+  expression: ESTree.Expression | ESTree.Super,
+): boolean {
+  if (expression.type === "Identifier") {
+    return isNodeAssertObject(sourceCode, expression);
+  }
+
+  return (
+    expression.type === "MemberExpression" &&
+    staticMemberName(expression) === "strict" &&
+    expression.object.type === "Identifier" &&
+    isNodeAssertModule(sourceCode, expression.object)
+  );
+}
+
+function isNodeAssertFunction(
+  sourceCode: SourceCode,
+  identifier: ESTree.IdentifierReference,
+): boolean {
+  const variable = resolveVariable(sourceCode, identifier);
+  if (variable === null) {
+    return false;
+  }
+
+  return variable.defs.some(
+    (definition) =>
+      definition.type === "ImportBinding" &&
+      definition.parent?.type === "ImportDeclaration" &&
+      nodeAssertSources.has(definition.parent.source.value) &&
+      nodeAssertEqualityMethods.has(importedName(definition.node) ?? ""),
+  );
+}
+
+function nodeAssertSubject(
+  sourceCode: SourceCode,
+  node: ESTree.CallExpression,
+): ESTree.Expression | null {
+  if (
+    node.callee.type === "Identifier" &&
+    isNodeAssertFunction(sourceCode, node.callee)
+  ) {
+    const [subject] = node.arguments;
+
+    return subject === undefined || subject.type === "SpreadElement"
+      ? null
+      : subject;
+  }
+  if (
+    node.callee.type !== "MemberExpression" ||
+    !nodeAssertEqualityMethods.has(staticMemberName(node.callee) ?? "") ||
+    !isNodeAssertMemberObject(sourceCode, node.callee.object)
+  ) {
+    return null;
+  }
+
+  const [subject] = node.arguments;
+
+  return subject === undefined || subject.type === "SpreadElement"
+    ? null
+    : subject;
 }
 
 function isStaticValue(expression: ESTree.Expression): boolean {
@@ -93,7 +234,7 @@ export const noImportedConstantRestatementRule = defineRule({
     type: "problem",
     docs: {
       description:
-        "Disallow assertions that compare an imported constant directly with a static literal.",
+        "Disallow equality assertions that restate an imported constant through a static literal.",
     },
     messages: {
       importedConstantRestatement:
@@ -103,22 +244,24 @@ export const noImportedConstantRestatementRule = defineRule({
   createOnce(context) {
     return {
       CallExpression(node) {
-        if (
-          node.callee.type !== "MemberExpression" ||
-          !isExpectationMatcher(context.sourceCode, node) ||
-          !equalityMatchers.has(staticMemberName(node.callee) ?? "")
-        ) {
-          return;
-        }
+        const isExpectEquality =
+          node.callee.type === "MemberExpression" &&
+          isExpectationMatcher(context.sourceCode, node) &&
+          equalityMatchers.has(staticMemberName(node.callee) ?? "");
 
-        const subject = expectationSubject(node);
+        const subject = isExpectEquality
+          ? expectationSubject(node)
+          : nodeAssertSubject(context.sourceCode, node);
 
-        const [expected] = node.arguments;
+        const constantRoot =
+          subject === null ? null : importedConstantRoot(subject);
+
+        const expected = node.arguments[isExpectEquality ? 0 : 1];
         if (
-          subject === null ||
+          constantRoot === null ||
           expected === undefined ||
           expected.type === "SpreadElement" ||
-          !isImportedConstant(context.sourceCode, subject) ||
+          !isImportedConstant(context.sourceCode, constantRoot) ||
           !isStaticValue(expected)
         ) {
           return;
