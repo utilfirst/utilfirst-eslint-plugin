@@ -1,8 +1,10 @@
 import { defineRule } from "@oxlint/plugins";
 
 import type { ESTree, SourceCode } from "@oxlint/plugins";
-
-type TypeAssertion = ESTree.TSAsExpression | ESTree.TSTypeAssertion;
+import {
+  isOutermostTypeAssertion,
+  type TypeAssertionExpression,
+} from "../shared/type-assertion.ts";
 
 const commentOwnerKinds = new Set([
   "ExpressionStatement",
@@ -12,7 +14,7 @@ const commentOwnerKinds = new Set([
   "VariableDeclaration",
 ]);
 
-function isConstAssertion(node: TypeAssertion): boolean {
+function isConstAssertion(node: TypeAssertionExpression): boolean {
   return (
     node.typeAnnotation.type === "TSTypeReference" &&
     node.typeAnnotation.typeName.type === "Identifier" &&
@@ -20,26 +22,9 @@ function isConstAssertion(node: TypeAssertion): boolean {
   );
 }
 
-function isNestedAssertion(node: TypeAssertion): boolean {
-  let current: ESTree.Expression = node;
-  let parent = node.parent;
-  while (
-    parent.type === "ParenthesizedExpression" &&
-    parent.expression === current
-  ) {
-    current = parent;
-    parent = parent.parent;
-  }
-
-  return (
-    (parent.type === "TSAsExpression" || parent.type === "TSTypeAssertion") &&
-    parent.expression === current
-  );
-}
-
 function hasSafetyComment(
   sourceCode: SourceCode,
-  node: TypeAssertion,
+  node: TypeAssertionExpression,
 ): boolean {
   let current: ESTree.Node = node;
   while (true) {
@@ -79,10 +64,10 @@ export const requireSafetyCommentForTypeAssertionRule = defineRule({
     },
   },
   createOnce(context) {
-    const checkAssertion = (node: TypeAssertion) => {
+    const checkAssertion = (node: TypeAssertionExpression) => {
       if (
         isConstAssertion(node) ||
-        isNestedAssertion(node) ||
+        !isOutermostTypeAssertion(node) ||
         hasSafetyComment(context.sourceCode, node)
       ) {
         return;

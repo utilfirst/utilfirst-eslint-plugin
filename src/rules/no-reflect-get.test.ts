@@ -9,6 +9,7 @@ ruleTester.run("no-reflect-get", rule, {
     "const value = owner[key];",
     "Reflect.set(owner, key, value);",
     "const Reflect = { get() {} }; Reflect.get();",
+    "const globalThis = { Reflect: { get() {} } }; globalThis.Reflect.get();",
   ],
   invalid: [
     {
@@ -17,6 +18,14 @@ ruleTester.run("no-reflect-get", rule, {
     },
     {
       code: 'Reflect["get"](owner, key);',
+      errors: [{ messageId: "reflectGet" }],
+    },
+    {
+      code: "globalThis.Reflect.get(owner, key);",
+      errors: [{ messageId: "reflectGet" }],
+    },
+    {
+      code: 'globalThis["Reflect"]["get"](owner, key);',
       errors: [{ messageId: "reflectGet" }],
     },
   ],

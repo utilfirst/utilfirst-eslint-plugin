@@ -11,6 +11,7 @@ ruleTester.run("no-known-value-widening", rule, {
     "const handlers: Record<string, Handler> = { start };",
     "const handlers = { start } satisfies Record<string, Handler>;",
     "type Handlers = { start: Handler }; const handlers: Handlers = { start };",
+    "const value = ({} as unknown)! as string;",
   ],
   invalid: [
     {
@@ -23,6 +24,14 @@ ruleTester.run("no-known-value-widening", rule, {
     },
     {
       code: "function create(): unknown { return {}; }",
+      errors: [{ messageId: "widening" }],
+    },
+    {
+      code: "const value: any = { id: 1 };",
+      errors: [{ messageId: "widening" }],
+    },
+    {
+      code: "type Identity<Value> = Value; const value: Identity<any> = { id: 1 };",
       errors: [{ messageId: "widening" }],
     },
   ],

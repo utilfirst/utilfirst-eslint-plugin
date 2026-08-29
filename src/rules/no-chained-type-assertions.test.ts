@@ -23,5 +23,13 @@ ruleTester.run("no-chained-type-assertions", rule, {
       code: "const value = <string>(<unknown>input);",
       errors: [{ messageId: "chained" }],
     },
+    {
+      code: "const value = (input as unknown)! as string;",
+      errors: [{ messageId: "chained" }],
+    },
+    {
+      code: "const value = ((input as unknown) satisfies unknown) as string;",
+      errors: [{ messageId: "chained" }],
+    },
   ],
 });

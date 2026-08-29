@@ -76,6 +76,10 @@ ruleTester.run("no-positional-boolean-parameters", rule, {
       errors: [{ messageId: "positionalBoolean" }],
     },
     {
+      code: "type Flag = true | false; function load(isFresh: Flag) {}",
+      errors: [{ messageId: "positionalBoolean" }],
+    },
+    {
       code: "declare function load(isFresh: boolean): void;",
       errors: [{ messageId: "positionalBoolean" }],
     },

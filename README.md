@@ -117,37 +117,37 @@ export default [
 
 [`docs/rules.md`](./docs/rules.md) explains the policy boundary and expected replacement for every rule. The implementations and colocated tests remain the executable behavior owners.
 
-| Rule                                                                                    | Description                                                                       |
-| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md)                      | Apply tight, separate, or preserved gaps between statements and JSX children      |
-| [`no-call-count-only-test`](./docs/rules.md#ownership-and-tests)                        | Reject tests supported only by mock call counts or omission                       |
-| [`no-chained-type-assertions`](./docs/rules.md#type-evidence)                           | Reject chained TypeScript assertions                                              |
-| [`no-conditional-undefined-properties`](./docs/rules.md#object-and-api-construction)    | Reject conditional undefined object properties                                    |
-| [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                   | Reject repository-owned enums other than ambient declarations                     |
-| [`no-imported-constant-restatement`](./docs/rules.md#ownership-and-tests)               | Require behavior evidence instead of imported constant restatements               |
-| [`no-known-value-widening`](./docs/rules.md#type-evidence)                              | Reject known values widened into broad target types                               |
-| [`no-module-mocking`](./docs/rules.md#ownership-and-tests)                              | Reject Vitest and Jest mocking of repository-owned modules                        |
-| [`no-negated-throw-assertion`](./docs/rules.md#ownership-and-tests)                     | Replace negated throw assertions with direct execution                            |
-| [`no-object-parameters`](./docs/rules.md#boundary-contracts)                            | Reject `object` function parameters                                               |
-| [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)       | Reject positional boolean flags on named functions and methods                    |
-| [`no-promise-settlement-only-assertion`](./docs/rules.md#ownership-and-tests)           | Require a promise assertion to describe its result or specific failure            |
-| [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                       | Reject `Reflect.apply`                                                            |
-| [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                         | Reject `Reflect.get`                                                              |
-| [`no-test-snapshots`](./docs/rules.md#ownership-and-tests)                              | Require explicit observable assertions instead of snapshots                       |
-| [`no-truthy-falsy-assertion`](./docs/rules.md#ownership-and-tests)                      | Require exact expected values instead of truthiness                               |
-| [`no-uncontrolled-time-in-test`](./docs/rules.md#ownership-and-tests)                   | Require controlled wall-clock inputs in test files                                |
-| [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                           | Keep explicit `unknown` parameters at decoding boundaries                         |
-| [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                              | Reject `unknown` return contracts                                                 |
-| [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                         | Reject type aliases that resolve to `unknown`                                     |
-| [`no-unsafe-dictionary-type`](./docs/rules.md#boundary-contracts)                       | Reject dictionary contracts with broad value types                                |
-| [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                        | Require rejection handling on `void`-marked detached call chains                  |
-| [`no-widen-then-assert`](./docs/rules.md#type-evidence)                                 | Reject const flows that widen a known value before narrowing it                   |
-| [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)               | Require options objects for named functions and methods with three or more inputs |
-| [`prefer-switch-discriminator-chain`](./docs/rules.md#object-and-api-construction)      | Require a switch for four or more equality branches on one discriminator          |
-| [`prefer-top-level-function-declarations`](./docs/rules.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports   |
-| [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                        | Require a forcing reason on lint disable directives                               |
-| [`require-repository-test-subject`](./docs/rules.md#ownership-and-tests)                | Require behavioral tests to import repository-owned code                          |
-| [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)            | Require one `SAFETY:` comment for each outermost non-const assertion              |
+| Rule                                                                                    | Description                                                                     |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md)                      | Apply tight, separate, or preserved gaps between statements and JSX children    |
+| [`no-call-count-only-test`](./docs/rules.md#ownership-and-tests)                        | Reject tests supported only by mock call counts or omission                     |
+| [`no-chained-type-assertions`](./docs/rules.md#type-evidence)                           | Reject chained TypeScript assertions                                            |
+| [`no-conditional-undefined-properties`](./docs/rules.md#object-and-api-construction)    | Reject conditional undefined object properties                                  |
+| [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                   | Reject repository-owned enums other than ambient declarations                   |
+| [`no-imported-constant-restatement`](./docs/rules.md#ownership-and-tests)               | Require behavior evidence instead of imported constant restatements             |
+| [`no-known-value-widening`](./docs/rules.md#type-evidence)                              | Reject known values widened into broad target types                             |
+| [`no-module-mocking`](./docs/rules.md#ownership-and-tests)                              | Reject Vitest and Jest mocking of repository-owned modules                      |
+| [`no-negated-throw-assertion`](./docs/rules.md#ownership-and-tests)                     | Replace negated throw assertions with direct execution                          |
+| [`no-object-parameters`](./docs/rules.md#boundary-contracts)                            | Reject `object` function parameters                                             |
+| [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)       | Reject positional boolean flags on directly named callable contracts            |
+| [`no-promise-settlement-only-assertion`](./docs/rules.md#ownership-and-tests)           | Require a promise assertion to describe its result or specific failure          |
+| [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                       | Reject `Reflect.apply`                                                          |
+| [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                         | Reject `Reflect.get`                                                            |
+| [`no-test-snapshots`](./docs/rules.md#ownership-and-tests)                              | Require explicit observable assertions instead of snapshots                     |
+| [`no-truthy-falsy-assertion`](./docs/rules.md#ownership-and-tests)                      | Require exact expected values instead of truthiness                             |
+| [`no-uncontrolled-time-in-test`](./docs/rules.md#ownership-and-tests)                   | Require clock control in each owning test or setup scope                        |
+| [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                           | Keep `unknown` inputs at declared or input-consuming decoder boundaries         |
+| [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                              | Reject `unknown` return contracts                                               |
+| [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                         | Reject type aliases that resolve to `unknown`                                   |
+| [`no-unsafe-dictionary-type`](./docs/rules.md#boundary-contracts)                       | Reject object and Map dictionary contracts with broad value types               |
+| [`no-unhandled-detached-promises`](./docs/rules.md#async-errors)                        | Require terminal rejection handling on `void`-marked detached chains            |
+| [`no-widen-then-assert`](./docs/rules.md#type-evidence)                                 | Reject const flows that widen a known value before narrowing it                 |
+| [`prefer-options-parameter`](./docs/rules.md#object-and-api-construction)               | Require options objects for named callable contracts with three or more inputs  |
+| [`prefer-switch-discriminator-chain`](./docs/rules.md#object-and-api-construction)      | Require a switch for four or more equality branches on one discriminator        |
+| [`prefer-top-level-function-declarations`](./docs/rules.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports |
+| [`require-lint-suppression-reason`](./docs/rules.md#lint-policy)                        | Require a forcing reason on lint disable directives                             |
+| [`require-repository-test-subject`](./docs/rules.md#ownership-and-tests)                | Require behavioral tests to import repository-owned code                        |
+| [`require-safety-comment-for-type-assertion`](./docs/rules.md#type-evidence)            | Require one `SAFETY:` comment for each outermost non-const assertion            |
 
 ## Attribution
 

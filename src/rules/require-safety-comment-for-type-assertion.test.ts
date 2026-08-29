@@ -12,6 +12,7 @@ ruleTester.run("require-safety-comment-for-type-assertion", rule, {
     'const value = { name: "Ada" } as const;',
     "// SAFETY: The schema validated this value.\nconst value = input as string;",
     "const value = (\n  // SAFETY: The framework owns this element.\n  input as HTMLElement\n);",
+    "// SAFETY: The parser validated this value.\nconst value = (input as unknown)! as string;",
   ],
   invalid: [
     {
@@ -28,6 +29,10 @@ ruleTester.run("require-safety-comment-for-type-assertion", rule, {
     },
     {
       code: "// The schema validated this value.\nconst value = input as string;",
+      errors: [{ messageId: "missingSafetyComment" }],
+    },
+    {
+      code: "const value = (input as unknown)! as string;",
       errors: [{ messageId: "missingSafetyComment" }],
     },
   ],

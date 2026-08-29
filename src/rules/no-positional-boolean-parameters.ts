@@ -47,6 +47,15 @@ function parameterName(
     : sourceCode.getText(parameter);
 }
 
+function isBooleanType(type: ESTree.TSType): boolean {
+  return (
+    type.type === "TSBooleanKeyword" ||
+    (type.type === "TSLiteralType" &&
+      "value" in type.literal &&
+      typeof type.literal.value === "boolean")
+  );
+}
+
 /** Disallow positional boolean flags on repository-owned named callables. */
 export const noPositionalBooleanParametersRule = defineRule({
   meta: {
@@ -98,7 +107,7 @@ export const noPositionalBooleanParametersRule = defineRule({
           annotation === null ||
           annotation === undefined ||
           !resolvedTypeIncludesMatch({
-            isMatch: (type) => type.type === "TSBooleanKeyword",
+            isMatch: isBooleanType,
             shadowedTypeNames: lexicalTypeParameterNames(
               node,
               context.sourceCode.visitorKeys,

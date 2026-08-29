@@ -18,6 +18,7 @@ ruleTester.run("no-uncontrolled-time-in-test", rule, {
     'describe("controlled", () => { beforeEach(() => { vi.setSystemTime(1000); }); test("time", () => { expect(Date.now()).toBe(1000); }); }); test("plain", () => { expect(1).toBe(1); });',
     'test("first", () => { vi.setSystemTime(1000); expect(Date.now()).toBe(1000); }); test("second", () => { vi.setSystemTime(2000); expect(Date.now()).toBe(2000); });',
     'const Date = { now: () => 1000 }; test("time", () => { expect(Date.now()).toBe(1000); });',
+    'function Date() { return "fixed"; } test("time", () => { expect(Date()).toBe("fixed"); });',
     'class Date { constructor() {} } test("time", () => { expect(new Date()).toBeInstanceOf(Date); });',
   ],
   invalid: [
@@ -51,6 +52,10 @@ ruleTester.run("no-uncontrolled-time-in-test", rule, {
     },
     {
       code: 'afterEach(() => { vi.setSystemTime(1000); }); test("uncontrolled", () => { expect(Date.now()).toBeGreaterThan(0); });',
+      errors: [{ messageId: "uncontrolledTime" }],
+    },
+    {
+      code: 'test("time", () => { expect(Date()).toContain("GMT"); });',
       errors: [{ messageId: "uncontrolledTime" }],
     },
   ],

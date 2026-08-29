@@ -101,6 +101,17 @@ function readsDateNow(
   );
 }
 
+function readsCurrentDate(
+  sourceCode: SourceCode,
+  node: ESTree.CallExpression,
+): boolean {
+  return (
+    node.callee.type === "Identifier" &&
+    node.callee.name === "Date" &&
+    isGlobalDate(sourceCode, node.callee)
+  );
+}
+
 /** Require tests to control wall-clock inputs. */
 export const noUncontrolledTimeInTestRule = defineRule({
   meta: {
@@ -192,7 +203,10 @@ export const noUncontrolledTimeInTestRule = defineRule({
         if (controlsTime(context.sourceCode, node)) {
           registerControl();
         }
-        if (readsDateNow(context.sourceCode, node)) {
+        if (
+          readsDateNow(context.sourceCode, node) ||
+          readsCurrentDate(context.sourceCode, node)
+        ) {
           registerWallClockRead(node);
         }
       },

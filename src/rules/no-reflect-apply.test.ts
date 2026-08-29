@@ -9,6 +9,7 @@ ruleTester.run("no-reflect-apply", rule, {
     "operation.apply(owner, args);",
     "Reflect.get(owner, key);",
     "const Reflect = { apply() {} }; Reflect.apply();",
+    "const globalThis = { Reflect: { apply() {} } }; globalThis.Reflect.apply();",
   ],
   invalid: [
     {
@@ -17,6 +18,14 @@ ruleTester.run("no-reflect-apply", rule, {
     },
     {
       code: 'Reflect["apply"](operation, owner, args);',
+      errors: [{ messageId: "reflectApply" }],
+    },
+    {
+      code: "globalThis.Reflect.apply(operation, owner, args);",
+      errors: [{ messageId: "reflectApply" }],
+    },
+    {
+      code: 'globalThis["Reflect"]["apply"](operation, owner, args);',
       errors: [{ messageId: "reflectApply" }],
     },
   ],

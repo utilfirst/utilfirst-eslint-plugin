@@ -8,6 +8,7 @@ import {
   type WideningTarget,
 } from "../shared/dictionary-types.ts";
 import { resolveVariable } from "../shared/scope.ts";
+import { isOutermostTypeAssertion } from "../shared/type-assertion.ts";
 
 import type { ESTree, SourceCode, Variable } from "@oxlint/plugins";
 
@@ -174,8 +175,8 @@ function isObjectExpression(expression: ESTree.Expression): boolean {
 
 function hasParentAssertion(node: ESTree.Node): boolean {
   return (
-    node.parent?.type === "TSAsExpression" ||
-    node.parent?.type === "TSTypeAssertion"
+    (node.type === "TSAsExpression" || node.type === "TSTypeAssertion") &&
+    !isOutermostTypeAssertion(node)
   );
 }
 

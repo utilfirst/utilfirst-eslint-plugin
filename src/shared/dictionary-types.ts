@@ -40,6 +40,7 @@ export type UnsafeDictionary = {
 
 export type WideningTargetKind =
   | "anonymous object"
+  | "any"
   | "generic container"
   | "object"
   | "open dictionary"
@@ -618,6 +619,9 @@ export function classifyWideningTarget(
   environment: TypeEnvironment,
 ): WideningTarget | null {
   const unwrapped = unwrapTransparentType(type);
+  if (unwrapped.type === "TSAnyKeyword") {
+    return { kind: "any" };
+  }
   if (unwrapped.type === "TSUnknownKeyword") {
     return { kind: "unknown" };
   }
@@ -672,15 +676,31 @@ export function classifyWideningTarget(
       type: unwrapped,
     });
 
-    return substitutions !== null &&
-      resolvesToDictionary({
-        environment,
-        type: alias.typeAnnotation,
-        substitutions,
-        resolvingAliases: new Set([name]),
-      })
+    if (substitutions === null) {
+      return null;
+    }
+
+    const resolvingAliases = new Set([name]);
+
+    const broadTarget = classifyAliasBroadTarget({
+      environment,
+      resolvingAliases,
+      substitutions,
+      type: alias.typeAnnotation,
+    });
+
+    if (broadTarget !== null && broadTarget.kind !== "open dictionary") {
+      return broadTarget;
+    }
+
+    return resolvesToDictionary({
+      environment,
+      type: alias.typeAnnotation,
+      substitutions,
+      resolvingAliases,
+    })
       ? { kind: "generic container" }
-      : null;
+      : broadTarget;
   }
 
   const substitutions = aliasSubstitution({
@@ -764,6 +784,9 @@ function classifyAliasBroadTarget({
   type: ESTree.TSType;
 }): WideningTarget | null {
   const unwrapped = unwrapTransparentType(type);
+  if (unwrapped.type === "TSAnyKeyword") {
+    return { kind: "any" };
+  }
   if (unwrapped.type === "TSUnknownKeyword") {
     return { kind: "unknown" };
   }
