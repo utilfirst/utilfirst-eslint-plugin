@@ -6,7 +6,7 @@ This runbook upgrades Oxlint and reconciles its built-in rules and category conf
 
 - Start from a classified worktree and keep unrelated changes outside the upgrade commit.
 - Read `package.json` and `mise.toml` for the runtime, peer, dependency, and toolchain contracts.
-- Read `src/oxlint.ts`, `.oxlintrc.json`, `src/index.ts`, and `docs/rules.md` for the canonical config, repository config, custom-rule registry, and rule-policy owners.
+- Read `src/oxlint.ts`, `oxlint.config.ts`, `src/index.ts`, and `docs/rules.md` for the canonical config, repository config, custom-rule registry, and rule-policy owners.
 - Identify a representative consumer that can load the package through a temporary `link:` dependency and run its canonical lint and test gates.
 
 ## Capture the current rule surface
@@ -38,7 +38,7 @@ This runbook upgrades Oxlint and reconciles its built-in rules and category conf
 3. Keep correctness, pedantic, performance, and suspicious categories enabled. Assess restriction, style, and nursery rules individually because their complete sets contain project-specific preferences and conflicting contracts.
 4. Remove plain explicit rule entries already enabled at the same severity by an active category. Retain an explicit entry when it sets options, enables an extra-category policy, or overrides an active category rule.
 5. Remove suppressions for rules that no active category enables. Keep suppressions that reject an otherwise active category policy.
-6. Reconcile `.oxlintrc.json` with the canonical decisions while preserving repository-only environments, file overrides, and the local plugin specifier.
+6. Reconcile `oxlint.config.ts` with the canonical decisions while preserving repository-only environments, file overrides, and the local plugin specifier. Keep the canonical config in `extends` rather than copying its rules.
 7. Compare the resulting custom rules and canonical config with active global agent instructions. Route a portable guidance change to its configured global source owner, and keep exact rule behavior and repository exceptions local.
 8. Update `README.md` when configuration usage or the published rule surface changes. Update `docs/rules.md` and source-owned rule documentation when a custom rule contract changes.
 

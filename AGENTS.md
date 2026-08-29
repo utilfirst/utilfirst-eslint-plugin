@@ -33,7 +33,7 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 ## Structure
 
 - Read `package.json` and `mise.toml` for the peer contract, dependencies, scripts, and toolchain versions.
-- Let `.oxlintrc.json` own repository lint and type-check policy.
+- Let `oxlint.config.ts` own repository lint and type-check policy by extending the canonical config and retaining repository-only boundaries.
 - Read `tsdown.config.ts` and the `package.json` exports before changing bundle output.
 - Read `.github/workflows/publish.yml` before changing release delivery.
 
