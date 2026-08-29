@@ -39,6 +39,14 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       name: "keeps JSX siblings in a literal-text run tight",
       code: `const node = (\n  <p>\n    before\n    <span />\n    <span />\n  </p>\n);\n`,
     },
+    {
+      name: "preserves user grouping between re-exports",
+      code: `export { a } from "a";\n\nexport * from "b";\n`,
+    },
+    {
+      name: "keeps matching optional calls grouped",
+      code: `const a = owner?.load?.();\nconst b = owner?.load?.();\n`,
+    },
   ],
   invalid: [
     {
@@ -88,6 +96,63 @@ ruleTester.run("consistent-blank-lines", consistentBlankLines, {
       code: `const node = (\n  <div>\n    <span\n      x={1}\n    />\n    <span />\n  </div>\n);\n`,
       output: `const node = (\n  <div>\n    <span\n      x={1}\n    />\n\n    <span />\n  </div>\n);\n`,
       errors: [{ messageId: "missing", line: 6, column: 5 }],
+    },
+    {
+      name: "separates same-line unrelated calls",
+      code: `const a = foo(); const b = bar();\n`,
+      output: `const a = foo();\n\nconst b = bar();\n`,
+      errors: [{ messageId: "missing", line: 1, column: 18 }],
+    },
+    {
+      name: "places separation before leading documentation",
+      code: `const a = 1;\n/**\n * Documents b.\n */\nconst b = 2;\n`,
+      output: `const a = 1;\n\n/**\n * Documents b.\n */\nconst b = 2;\n`,
+      errors: [{ messageId: "missing", line: 5, column: 1 }],
+    },
+    {
+      name: "separates unrelated declarations in switch cases",
+      code: `switch (kind) {\n  case "ready":\n    const a = foo();\n    const b = bar();\n}\n`,
+      output: `switch (kind) {\n  case "ready":\n    const a = foo();\n\n    const b = bar();\n}\n`,
+      errors: [{ messageId: "missing", line: 4, column: 5 }],
+    },
+    {
+      name: "separates unrelated declarations in static blocks",
+      code: `class Owner {\n  static {\n    const a = foo();\n    const b = bar();\n  }\n}\n`,
+      output: `class Owner {\n  static {\n    const a = foo();\n\n    const b = bar();\n  }\n}\n`,
+      errors: [{ messageId: "missing", line: 4, column: 5 }],
+    },
+    {
+      name: "distinguishes direct and optional call identities",
+      code: `const a = owner.load();\nconst b = owner.load?.();\n`,
+      output: `const a = owner.load();\n\nconst b = owner.load?.();\n`,
+      errors: [{ messageId: "missing", line: 2, column: 1 }],
+    },
+    {
+      name: "keeps assignment-root name flow tight",
+      code: `state.value = load();\n\nconst current = state.value;\n`,
+      output: `state.value = load();\nconst current = state.value;\n`,
+      errors: [{ messageId: "extra", line: 3, column: 1 }],
+    },
+    {
+      name: "separates a terminating try guard from a branch",
+      code: `if (isDone) {\n  try {\n    return;\n  } finally {\n    return;\n  }\n}\nif (isReady) run();\n`,
+      output: `if (isDone) {\n  try {\n    return;\n  } finally {\n    return;\n  }\n}\n\nif (isReady) run();\n`,
+      errors: [{ messageId: "missing", line: 8, column: 1 }],
+    },
+    {
+      name: "places JSX separation before leading documentation",
+      code: `const node = (\n  <div>\n    <span />\n    {/*\n      Documents the next child.\n    */}\n    <span />\n  </div>\n);\n`,
+      output: `const node = (\n  <div>\n    <span />\n\n    {/*\n      Documents the next child.\n    */}\n    <span />\n  </div>\n);\n`,
+      errors: [{ messageId: "missing", line: 7, column: 5 }],
+    },
+    {
+      name: "keeps conditional JSX text runs tight",
+      code: `const node = (\n  <div>\n    <span\n      x={1}\n    />\n\n    {condition ? "yes" : ""}\n\n    <span />\n  </div>\n);\n`,
+      output: `const node = (\n  <div>\n    <span\n      x={1}\n    />\n    {condition ? "yes" : ""}\n    <span />\n  </div>\n);\n`,
+      errors: [
+        { messageId: "extra", line: 7, column: 5 },
+        { messageId: "extra", line: 9, column: 5 },
+      ],
     },
   ],
 });
