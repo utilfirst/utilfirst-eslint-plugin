@@ -172,10 +172,9 @@ function unwrapExpression(expression: ESTree.Expression): ESTree.Expression {
 
 function isStableVariable(variable: Variable | null): variable is Variable {
   return (
-    variable !== null &&
-    variable.references.every(
+    variable?.references.every(
       (reference) => reference.init || !reference.isWrite(),
-    )
+    ) ?? false
   );
 }
 
@@ -369,7 +368,7 @@ export function visitExecutedNodes({
         ? getTestFrameworkCall(sourceCode, node)
         : null;
 
-    const visitorKeys = new Set(sourceCode.visitorKeys[node.type] ?? []);
+    const visitorKeys = new Set(sourceCode.visitorKeys[node.type]);
 
     // SAFETY: Visitor keys select ESTree child fields, and every selected value
     // is validated before traversal.

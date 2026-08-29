@@ -129,8 +129,8 @@ function isImportedConstant(
   const variable = resolveVariable(sourceCode, identifier);
 
   return (
-    variable !== null &&
-    variable.defs.some((definition) => definition.type === "ImportBinding")
+    variable?.defs.some((definition) => definition.type === "ImportBinding") ??
+    false
   );
 }
 

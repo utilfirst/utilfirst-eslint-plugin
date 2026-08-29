@@ -76,7 +76,7 @@ export default defineConfig({
 });
 ```
 
-The base config owns shared categories, environment defaults, unused-disable reporting, TypeScript type checking, browser React and accessibility plugins, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions. Non-browser React consumers must disable or replace browser accessibility policy at their platform boundary.
+The base config owns shared categories, environment defaults, unused-disable reporting, TypeScript type checking, browser React, accessibility, JSDoc, module-boundary, and test-precision policy, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions. Non-browser React consumers must disable or replace browser accessibility policy at their platform boundary.
 
 ## Rules
 

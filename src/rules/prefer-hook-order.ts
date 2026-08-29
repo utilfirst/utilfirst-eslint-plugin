@@ -63,7 +63,7 @@ export const preferHookOrderRule = defineRule({
   },
   createOnce(context) {
     const checkFunction = (node: FunctionNode) => {
-      if (node.body === null || node.body.type !== "BlockStatement") {
+      if (node.body?.type !== "BlockStatement") {
         return;
       }
 

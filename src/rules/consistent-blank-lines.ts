@@ -709,10 +709,11 @@ function collectIntroducedOrAssignedNames(
 function collectBindingNames(node: TSESTree.Node, set: Set<string>) {
   // oxlint-disable-next-line typescript/switch-exhaustiveness-check -- This walker intentionally ignores non-binding nodes.
   switch (node.type) {
-    case AST_NODE_TYPES.Identifier:
+    case AST_NODE_TYPES.Identifier: {
       set.add(node.name);
       break;
-    case AST_NODE_TYPES.ObjectPattern:
+    }
+    case AST_NODE_TYPES.ObjectPattern: {
       for (const prop of node.properties) {
         if (prop.type === AST_NODE_TYPES.Property) {
           collectBindingNames(prop.value, set);
@@ -722,7 +723,8 @@ function collectBindingNames(node: TSESTree.Node, set: Set<string>) {
       }
 
       break;
-    case AST_NODE_TYPES.ArrayPattern:
+    }
+    case AST_NODE_TYPES.ArrayPattern: {
       for (const el of node.elements) {
         if (el) {
           collectBindingNames(el, set);
@@ -730,14 +732,18 @@ function collectBindingNames(node: TSESTree.Node, set: Set<string>) {
       }
 
       break;
-    case AST_NODE_TYPES.RestElement:
+    }
+    case AST_NODE_TYPES.RestElement: {
       collectBindingNames(node.argument, set);
       break;
-    case AST_NODE_TYPES.AssignmentPattern:
+    }
+    case AST_NODE_TYPES.AssignmentPattern: {
       collectBindingNames(node.left, set);
       break;
-    default:
+    }
+    default: {
       break;
+    }
   }
 }
 

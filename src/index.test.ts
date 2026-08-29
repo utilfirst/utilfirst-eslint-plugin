@@ -9,5 +9,5 @@ test("enables every exported rule in the recommended config", () => {
     ]),
   );
 
-  expect(plugin.configs.recommended.rules).toEqual(expectedRules);
+  expect(plugin.configs.recommended.rules).toStrictEqual(expectedRules);
 });

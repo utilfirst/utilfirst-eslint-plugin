@@ -30,7 +30,9 @@ const runtimeDirectory = await mkdtemp(
 try {
   await execFileAsync("pnpm", ["pack", "--pack-destination", testDirectory]);
 
-  const archiveNames = (await readdir(testDirectory)).filter((name) =>
+  const testDirectoryEntries = await readdir(testDirectory);
+
+  const archiveNames = testDirectoryEntries.filter((name) =>
     name.endsWith(".tgz"),
   );
 
@@ -46,7 +48,8 @@ try {
   const entryPath = join(packageDirectory, "dist/index.js");
   const oxlintConfigPath = join(packageDirectory, "dist/oxlint.js");
 
-  const plugin = (await import(pathToFileURL(entryPath).href)).default;
+  const pluginModule = await import(pathToFileURL(entryPath).href);
+  const plugin = pluginModule.default;
 
   const { oxlintBaseConfig } = await import(
     pathToFileURL(oxlintConfigPath).href

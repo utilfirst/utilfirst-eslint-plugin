@@ -115,7 +115,7 @@ async function getOxlintOutput(): Promise<string> {
   const configPath = join(testDirectory, ".oxlintrc.json");
   const sourcePath = join(testDirectory, "fixture.tsx");
 
-  const pluginPath = new URL("./index.ts", import.meta.url).pathname;
+  const pluginPath = new URL("index.ts", import.meta.url).pathname;
   await writeFile(
     configPath,
     JSON.stringify({
@@ -166,7 +166,7 @@ test(
     const configPath = join(testDirectory, ".oxlintrc.json");
     const sourcePath = join(testDirectory, "fixture.ts");
 
-    const pluginPath = new URL("./index.ts", import.meta.url).pathname;
+    const pluginPath = new URL("index.ts", import.meta.url).pathname;
     const source = "const value = 1; // trailing\r\nfunction load() {}\r\n";
 
     await writeFile(
