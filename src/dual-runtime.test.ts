@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 import { expect, test } from "vitest";
 import plugin from "./index.ts";
 
+// oxlint-disable-next-line typescript/strict-void-return -- Node overload.
 const execFileAsync = promisify(execFile);
 
 // Oxlint process startup approaches Vitest's default timeout under suite load.

@@ -35,14 +35,9 @@ export default defineConfig({
   },
   overrides: [
     {
-      files: ["**/*.test.{ts,tsx,mts,cts}"],
-      rules: {
-        "typescript/no-unsafe-type-assertion": "off",
-        "typescript/strict-void-return": "off",
-      },
-    },
-    {
-      files: ["**/*.{js,cjs,mjs}"],
+      // These executable JavaScript entrypoints intentionally live outside the
+      // TypeScript program, so type-aware unsafe rules have no evidence source.
+      files: ["scripts/check-release-tag.mjs", "scripts/test-package.mjs"],
       rules: {
         "typescript/no-unsafe-argument": "off",
         "typescript/no-unsafe-assignment": "off",
