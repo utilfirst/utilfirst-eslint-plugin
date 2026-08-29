@@ -62,6 +62,22 @@ export default [
 - `allowFunctionNames` preserves named functions whose positional boolean or multi-input signature is fixed by an external protocol.
 - `allowParameterNames` preserves `unknown` parameters whose names identify an externally fixed callback or interface signature.
 
+For Oxlint TypeScript configuration, import the canonical shared policy and layer repository and platform boundaries after it:
+
+```ts
+// oxlint.config.ts
+import { defineConfig } from "oxlint";
+import { oxlintBaseConfig } from "@utilfirst/eslint-plugin/oxlint";
+
+export default defineConfig({
+  extends: [oxlintBaseConfig],
+  ignorePatterns: ["dist/**", "node_modules/**"],
+  plugins: ["jsx-a11y", "nextjs", "node"],
+});
+```
+
+The base config owns shared categories, environment defaults, plugins, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions.
+
 ```jsonc
 // .oxlintrc.json
 {

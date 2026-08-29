@@ -44,7 +44,14 @@ try {
 
   const packageDirectory = resolve(testDirectory, "package");
   const entryPath = join(packageDirectory, "dist/index.js");
+  const oxlintConfigPath = join(packageDirectory, "dist/oxlint.js");
+
   const plugin = (await import(pathToFileURL(entryPath).href)).default;
+
+  const { oxlintBaseConfig } = await import(
+    pathToFileURL(oxlintConfigPath).href
+  );
+
   const linter = new Linter();
 
   const eslintMessages = linter.verify(fixtureSource, [
@@ -57,6 +64,9 @@ try {
 
   if (!eslintMessages.some((message) => message.ruleId === ruleName)) {
     throw new Error("Packed plugin did not report through ESLint");
+  }
+  if (oxlintBaseConfig.rules[ruleName] !== "error") {
+    throw new Error("Packed Oxlint config did not enable every custom rule");
   }
 
   const configPath = join(runtimeDirectory, ".oxlintrc.json");

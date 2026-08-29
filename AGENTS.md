@@ -47,14 +47,14 @@ src/
 ## Commands
 
 - `pnpm install`: install dependencies
-- `pnpm run build`: bundle via tsdown to `dist/index.js` + `dist/index.d.ts`
+- `pnpm run build`: bundle the plugin and Oxlint config entries via tsdown
 - `pnpm run test`: run Vitest
 - `pnpm run lint`: run Oxlint with type checking, Prettier, and publint
 
 ## Build and bundling
 
 - `pnpm run build` runs tsdown. `prepack` chains it before `npm pack`/`publish`
-- Output is `dist/index.js` + `dist/index.d.ts`. The `outExtensions: () => ({ js: ".js" })` override is load-bearing. Tsdown defaults to `.mjs`, but the `exports` field references `.js` to match `"type": "module"` convention
+- Public output is `dist/index.js`, `dist/index.d.ts`, `dist/oxlint.js`, and `dist/oxlint.d.ts`, plus shared chunks. The `outExtensions: () => ({ js: ".js" })` override is load-bearing. Tsdown defaults to `.mjs`, but the `exports` field references `.js` to match `"type": "module"` convention
 - `@typescript-eslint/utils` is shipped as a runtime `dependency` and marked `external` in `tsdown.config.ts` so the package does not bundle another copy for each consumer
 
 ## Testing
