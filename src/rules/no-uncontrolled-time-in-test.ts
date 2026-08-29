@@ -2,30 +2,21 @@ import type { ESTree, SourceCode } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 import { resolveVariable } from "../shared/scope.ts";
 import {
-  isTestCaseCall,
+  getTestFrameworkCall,
   isTestFrameworkControlCall,
-  isTestHookCall,
-  isTestSetupHookCall,
-  isTestSuiteCall,
   staticMemberName,
+  type TestFrameworkCall,
+  visitExecutedNodes,
 } from "../shared/test-framework.ts";
 
 type WallClockNode = ESTree.CallExpression | ESTree.NewExpression;
+type TimeEvent = { kind: "control" } | { kind: "read"; node: WallClockNode };
 
-type SuiteScope = {
-  hasSharedControl: boolean;
-};
-
-type ExecutionFrame = {
-  hasLocalControl: boolean;
-  kind: "hook" | "test";
-  sharesControl: boolean;
-};
-
-type WallClockRead = {
-  hasControl: boolean;
-  node: WallClockNode;
-  sharedScopes: SuiteScope[];
+type SuiteExecution = {
+  events: TimeEvent[];
+  hooks: TestFrameworkCall[];
+  suites: SuiteExecution[];
+  tests: TestFrameworkCall[];
 };
 
 function isGlobalDate(
@@ -83,32 +74,123 @@ function controlsTime(
     : false;
 }
 
-function readsDateNow(
+function wallClockRead(
   sourceCode: SourceCode,
-  node: ESTree.CallExpression,
-): boolean {
-  if (
-    node.callee.type !== "MemberExpression" ||
-    staticMemberName(node.callee) !== "now" ||
-    node.callee.object.type !== "Identifier"
-  ) {
-    return false;
+  node: ESTree.Node,
+): WallClockNode | null {
+  if (node.type === "CallExpression") {
+    if (
+      node.callee.type === "MemberExpression" &&
+      staticMemberName(node.callee) === "now" &&
+      node.callee.object.type === "Identifier" &&
+      node.callee.object.name === "Date" &&
+      isGlobalDate(sourceCode, node.callee.object)
+    ) {
+      return node;
+    }
+    if (
+      node.callee.type === "Identifier" &&
+      node.callee.name === "Date" &&
+      isGlobalDate(sourceCode, node.callee)
+    ) {
+      return node;
+    }
   }
-
-  return (
-    node.callee.object.name === "Date" &&
-    isGlobalDate(sourceCode, node.callee.object)
-  );
-}
-
-function readsCurrentDate(
-  sourceCode: SourceCode,
-  node: ESTree.CallExpression,
-): boolean {
-  return (
+  if (
+    node.type === "NewExpression" &&
+    node.arguments.length === 0 &&
     node.callee.type === "Identifier" &&
     node.callee.name === "Date" &&
     isGlobalDate(sourceCode, node.callee)
+  ) {
+    return node;
+  }
+
+  return null;
+}
+
+function getTimeEvents({
+  root,
+  sourceCode,
+}: {
+  root: Parameters<typeof visitExecutedNodes>[0]["root"];
+  sourceCode: SourceCode;
+}): TimeEvent[] {
+  const events: TimeEvent[] = [];
+  visitExecutedNodes({
+    root,
+    sourceCode,
+    visit(node) {
+      if (node.type === "CallExpression" && controlsTime(sourceCode, node)) {
+        events.push({ kind: "control" });
+        return;
+      }
+
+      const read = wallClockRead(sourceCode, node);
+      if (read !== null) {
+        events.push({ kind: "read", node: read });
+      }
+    },
+  });
+  return events;
+}
+
+function getSuiteExecution({
+  root,
+  sourceCode,
+}: {
+  root: Parameters<typeof visitExecutedNodes>[0]["root"];
+  sourceCode: SourceCode;
+}): SuiteExecution {
+  const suite: SuiteExecution = {
+    events: getTimeEvents({ root, sourceCode }),
+    hooks: [],
+    suites: [],
+    tests: [],
+  };
+
+  visitExecutedNodes({
+    root,
+    sourceCode,
+    visit(node) {
+      if (node.type !== "CallExpression") {
+        return;
+      }
+
+      const frameworkCall = getTestFrameworkCall(sourceCode, node);
+      if (frameworkCall === null) {
+        return;
+      }
+      if (frameworkCall.kind === "test") {
+        suite.tests.push(frameworkCall);
+        return;
+      }
+      if (frameworkCall.kind === "suite") {
+        if (frameworkCall.callback !== null) {
+          suite.suites.push(
+            getSuiteExecution({
+              root: frameworkCall.callback,
+              sourceCode,
+            }),
+          );
+        }
+
+        return;
+      }
+
+      suite.hooks.push(frameworkCall);
+    },
+  });
+  return suite;
+}
+
+function testCountOf(suite: SuiteExecution): number {
+  return (
+    suite.tests.length +
+    suite.suites.reduce(
+      (count, childSuite) => count + testCountOf(childSuite),
+      0,
+    )
   );
 }
 
@@ -126,143 +208,98 @@ export const noUncontrolledTimeInTestRule = defineRule({
     },
   },
   createOnce(context) {
-    let hasTestCase = false;
-    let functionDepth = 0;
-    const executionFrames: ExecutionFrame[] = [];
-    const programScope: SuiteScope = { hasSharedControl: false };
-    const suiteScopes: SuiteScope[] = [];
-    const wallClockReads: WallClockRead[] = [];
+    const reportedReads = new Set<WallClockNode>();
 
-    function activeExecution(): ExecutionFrame | undefined {
-      return executionFrames.at(-1);
-    }
+    function reportUncontrolledEvents({
+      events,
+      hasInitialControl,
+    }: {
+      events: readonly TimeEvent[];
+      hasInitialControl: boolean;
+    }): boolean {
+      let hasControl = hasInitialControl;
+      for (const event of events) {
+        if (event.kind === "control") {
+          hasControl = true;
+          continue;
+        }
+        if (hasControl || reportedReads.has(event.node)) {
+          continue;
+        }
 
-    function currentSharedScopes(): SuiteScope[] {
-      return [programScope, ...suiteScopes];
-    }
-
-    function registerControl(): void {
-      const execution = activeExecution();
-      if (execution?.kind === "test") {
-        execution.hasLocalControl = true;
-        return;
+        reportedReads.add(event.node);
+        context.report({
+          node: event.node,
+          messageId: "uncontrolledTime",
+        });
       }
 
-      if (execution?.kind === "hook") {
-        execution.hasLocalControl = true;
-        if (!execution.sharesControl) {
-          return;
+      return hasControl;
+    }
+
+    function checkSuite({
+      suite,
+      hasInheritedControl,
+    }: {
+      suite: SuiteExecution;
+      hasInheritedControl: boolean;
+    }): void {
+      let hasSharedControl = reportUncontrolledEvents({
+        events: suite.events,
+        hasInitialControl: hasInheritedControl,
+      });
+
+      for (const hook of suite.hooks) {
+        if (hook.callback === null) {
+          continue;
+        }
+
+        const hasHookControl = reportUncontrolledEvents({
+          events: getTimeEvents({
+            root: hook.callback,
+            sourceCode: context.sourceCode,
+          }),
+          hasInitialControl: false,
+        });
+
+        if (hook.kind === "setup-hook" && hasHookControl) {
+          hasSharedControl = true;
         }
       }
 
-      const owner = suiteScopes.at(-1) ?? programScope;
-      owner.hasSharedControl = true;
-    }
+      for (const test of suite.tests) {
+        if (test.callback === null) {
+          continue;
+        }
 
-    function registerWallClockRead(node: WallClockNode): void {
-      const execution = activeExecution();
-
-      const isDirectSetup = functionDepth === suiteScopes.length;
-      if (execution === undefined && !isDirectSetup) {
-        return;
+        reportUncontrolledEvents({
+          events: getTimeEvents({
+            root: test.callback,
+            sourceCode: context.sourceCode,
+          }),
+          hasInitialControl: hasSharedControl,
+        });
       }
 
-      wallClockReads.push({
-        hasControl: execution?.hasLocalControl === true,
-        node,
-        sharedScopes: execution?.kind === "test" ? currentSharedScopes() : [],
-      });
+      for (const childSuite of suite.suites) {
+        checkSuite({
+          suite: childSuite,
+          hasInheritedControl: hasSharedControl,
+        });
+      }
     }
 
     return {
-      "Program"() {
-        hasTestCase = false;
-        functionDepth = 0;
-        executionFrames.length = 0;
-        programScope.hasSharedControl = false;
-        suiteScopes.length = 0;
-        wallClockReads.length = 0;
-      },
-      "CallExpression"(node) {
-        if (isTestCaseCall(context.sourceCode, node)) {
-          hasTestCase = true;
-          executionFrames.push({
-            hasLocalControl: false,
-            kind: "test",
-            sharesControl: false,
-          });
-        } else if (isTestHookCall(context.sourceCode, node)) {
-          executionFrames.push({
-            hasLocalControl: false,
-            kind: "hook",
-            sharesControl: isTestSetupHookCall(context.sourceCode, node),
-          });
-        } else if (isTestSuiteCall(context.sourceCode, node)) {
-          suiteScopes.push({ hasSharedControl: false });
-        }
-        if (controlsTime(context.sourceCode, node)) {
-          registerControl();
-        }
-        if (
-          readsDateNow(context.sourceCode, node) ||
-          readsCurrentDate(context.sourceCode, node)
-        ) {
-          registerWallClockRead(node);
-        }
-      },
-      "CallExpression:exit"(node) {
-        if (
-          isTestCaseCall(context.sourceCode, node) ||
-          isTestHookCall(context.sourceCode, node)
-        ) {
-          executionFrames.pop();
-        } else if (isTestSuiteCall(context.sourceCode, node)) {
-          suiteScopes.pop();
-        }
-      },
-      "ArrowFunctionExpression"() {
-        functionDepth += 1;
-      },
-      "ArrowFunctionExpression:exit"() {
-        functionDepth -= 1;
-      },
-      "FunctionDeclaration"() {
-        functionDepth += 1;
-      },
-      "FunctionDeclaration:exit"() {
-        functionDepth -= 1;
-      },
-      "FunctionExpression"() {
-        functionDepth += 1;
-      },
-      "FunctionExpression:exit"() {
-        functionDepth -= 1;
-      },
-      "NewExpression"(node) {
-        if (
-          node.arguments.length === 0 &&
-          node.callee.type === "Identifier" &&
-          node.callee.name === "Date" &&
-          isGlobalDate(context.sourceCode, node.callee)
-        ) {
-          registerWallClockRead(node);
-        }
-      },
-      "Program:exit"() {
-        if (!hasTestCase) {
-          return;
-        }
+      "Program:exit"(node) {
+        reportedReads.clear();
 
-        for (const read of wallClockReads) {
-          if (
-            !read.hasControl &&
-            !read.sharedScopes.some((scope) => scope.hasSharedControl)
-          ) {
-            context.report({
-              node: read.node,
-              messageId: "uncontrolledTime",
-            });
-          }
+        const suite = getSuiteExecution({
+          root: node,
+          sourceCode: context.sourceCode,
+        });
+
+        if (testCountOf(suite) > 0) {
+          checkSuite({ suite, hasInheritedControl: false });
         }
       },
     };

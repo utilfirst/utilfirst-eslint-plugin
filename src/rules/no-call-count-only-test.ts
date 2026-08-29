@@ -1,10 +1,10 @@
-import type { ESTree } from "@oxlint/plugins";
 import { defineRule } from "@oxlint/plugins";
 import { nodeAssertCall } from "../shared/node-assert.ts";
 import {
+  getTestFrameworkCall,
   isExpectationMatcher,
-  isTestCaseCall,
   staticMemberName,
+  visitExecutedNodes,
 } from "../shared/test-framework.ts";
 
 const interactionMatchers = new Set([
@@ -14,12 +14,6 @@ const interactionMatchers = new Set([
   "toHaveBeenCalledOnce",
   "toHaveBeenCalledTimes",
 ]);
-
-type TestEvidence = {
-  assertionCount: number;
-  interactionCount: number;
-  node: ESTree.CallExpression;
-};
 
 /** Require interaction assertions to accompany observable outcome evidence. */
 export const noCallCountOnlyTestRule = defineRule({
@@ -35,53 +29,40 @@ export const noCallCountOnlyTestRule = defineRule({
     },
   },
   createOnce(context) {
-    const activeTests: TestEvidence[] = [];
-
     return {
-      "Program"() {
-        activeTests.length = 0;
-      },
-      "CallExpression"(node) {
-        if (isTestCaseCall(context.sourceCode, node)) {
-          activeTests.push({
-            assertionCount: 0,
-            interactionCount: 0,
-            node,
-          });
+      CallExpression(node) {
+        const frameworkCall = getTestFrameworkCall(context.sourceCode, node);
+        if (frameworkCall?.kind !== "test" || frameworkCall.callback === null) {
           return;
         }
 
-        const activeTest = activeTests.at(-1);
-        if (activeTest === undefined) {
-          return;
-        }
-        if (nodeAssertCall(context.sourceCode, node) !== null) {
-          activeTest.assertionCount += 1;
-          return;
-        }
-        if (!isExpectationMatcher(context.sourceCode, node)) {
-          return;
-        }
+        let assertionCount = 0;
+        let interactionCount = 0;
+        visitExecutedNodes({
+          root: frameworkCall.callback,
+          sourceCode: context.sourceCode,
+          visit(candidate) {
+            if (candidate.type !== "CallExpression") {
+              return;
+            }
+            if (nodeAssertCall(context.sourceCode, candidate) !== null) {
+              assertionCount += 1;
+              return;
+            }
+            if (!isExpectationMatcher(context.sourceCode, candidate)) {
+              return;
+            }
 
-        activeTest.assertionCount += 1;
-        if (
-          node.callee.type === "MemberExpression" &&
-          interactionMatchers.has(staticMemberName(node.callee) ?? "")
-        ) {
-          activeTest.interactionCount += 1;
-        }
-      },
-      "CallExpression:exit"(node) {
-        const activeTest = activeTests.at(-1);
-        if (activeTest === undefined || activeTest.node !== node) {
-          return;
-        }
-
-        activeTests.pop();
-        if (
-          activeTest.assertionCount > 0 &&
-          activeTest.assertionCount === activeTest.interactionCount
-        ) {
+            assertionCount += 1;
+            if (
+              candidate.callee.type === "MemberExpression" &&
+              interactionMatchers.has(staticMemberName(candidate.callee) ?? "")
+            ) {
+              interactionCount += 1;
+            }
+          },
+        });
+        if (assertionCount > 0 && assertionCount === interactionCount) {
           context.report({ node, messageId: "callCountOnly" });
         }
       },

@@ -40,5 +40,13 @@ ruleTester.run("require-repository-test-subject", rule, {
       code: 'import { type Subject } from "./subject.ts"; test("library", () => {});',
       errors: [{ messageId: "missingSubject" }],
     },
+    {
+      code: 'function runTest() { expect([1].at(0)).toBe(1); } test("library", runTest);',
+      errors: [{ messageId: "missingSubject" }],
+    },
+    {
+      code: 'import { runTest } from "test-helpers"; test("library", runTest);',
+      errors: [{ messageId: "missingSubject" }],
+    },
   ],
 });
