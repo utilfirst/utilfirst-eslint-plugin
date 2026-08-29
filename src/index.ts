@@ -8,6 +8,7 @@ import { noConditionalUndefinedPropertiesRule } from "./rules/no-conditional-und
 import { noEnumDeclarationsRule } from "./rules/no-enum-declarations.ts";
 import { noKnownValueWideningRule } from "./rules/no-known-value-widening.ts";
 import { noModuleMockingRule } from "./rules/no-module-mocking.ts";
+import { noNegatedThrowAssertionRule } from "./rules/no-negated-throw-assertion.ts";
 import { noObjectParametersRule } from "./rules/no-object-parameters.ts";
 import { noPositionalBooleanParametersRule } from "./rules/no-positional-boolean-parameters.ts";
 import { noReflectApplyRule } from "./rules/no-reflect-apply.ts";
@@ -34,21 +35,22 @@ const meta = {
 const antiSlopPlugin = eslintCompatPlugin({
   meta,
   rules: {
+    "no-call-count-only-test": noCallCountOnlyTestRule,
     "no-chained-type-assertions": noChainedTypeAssertionsRule,
     "no-conditional-undefined-properties": noConditionalUndefinedPropertiesRule,
     "no-enum-declarations": noEnumDeclarationsRule,
     "no-known-value-widening": noKnownValueWideningRule,
-    "no-call-count-only-test": noCallCountOnlyTestRule,
     "no-module-mocking": noModuleMockingRule,
+    "no-negated-throw-assertion": noNegatedThrowAssertionRule,
     "no-object-parameters": noObjectParametersRule,
     "no-positional-boolean-parameters": noPositionalBooleanParametersRule,
     "no-reflect-apply": noReflectApplyRule,
     "no-reflect-get": noReflectGetRule,
+    "no-test-snapshots": noTestSnapshotsRule,
     "no-unknown-parameters": noUnknownParametersRule,
     "no-unknown-returns": noUnknownReturnsRule,
     "no-unknown-type-aliases": noUnknownTypeAliasesRule,
     "no-unsafe-dictionary-type": noUnsafeDictionaryTypeRule,
-    "no-test-snapshots": noTestSnapshotsRule,
     "no-unhandled-detached-promises": noUnhandledDetachedPromisesRule,
     "no-widen-then-assert": noWidenThenAssertRule,
     "prefer-options-parameter": preferOptionsParameterRule,

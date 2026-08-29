@@ -69,6 +69,7 @@ export default [
   ],
   "rules": {
     "utilfirst/consistent-blank-lines": "error",
+    "utilfirst/no-call-count-only-test": "error",
     "utilfirst/no-chained-type-assertions": "error",
     "utilfirst/no-conditional-undefined-properties": "error",
     "utilfirst/no-enum-declarations": "error",
@@ -77,6 +78,7 @@ export default [
       "error",
       { "internalModulePrefixes": ["@workspace/"] },
     ],
+    "utilfirst/no-negated-throw-assertion": "error",
     "utilfirst/no-object-parameters": "error",
     "utilfirst/no-positional-boolean-parameters": [
       "error",
@@ -84,6 +86,7 @@ export default [
     ],
     "utilfirst/no-reflect-apply": "error",
     "utilfirst/no-reflect-get": "error",
+    "utilfirst/no-test-snapshots": "error",
     "utilfirst/no-unknown-parameters": [
       "error",
       { "allowParameterNames": ["externalPayload"] },
@@ -100,6 +103,7 @@ export default [
     "utilfirst/prefer-switch-discriminator-chain": "error",
     "utilfirst/prefer-top-level-function-declarations": "error",
     "utilfirst/require-lint-suppression-reason": "error",
+    "utilfirst/require-repository-test-subject": "error",
     "utilfirst/require-safety-comment-for-type-assertion": "error",
   },
 }
@@ -112,17 +116,18 @@ export default [
 | Rule                                                                                    | Description                                                                       |
 | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | [`consistent-blank-lines`](./docs/rules/consistent-blank-lines.md)                      | Apply tight, separate, or preserved gaps between statements and JSX children      |
+| [`no-call-count-only-test`](./docs/rules.md#ownership-and-tests)                        | Reject tests supported only by mock call counts or omission                       |
 | [`no-chained-type-assertions`](./docs/rules.md#type-evidence)                           | Reject chained TypeScript assertions                                              |
 | [`no-conditional-undefined-properties`](./docs/rules.md#object-and-api-construction)    | Reject conditional undefined object properties                                    |
 | [`no-enum-declarations`](./docs/rules.md#object-and-api-construction)                   | Reject repository-owned enums other than ambient declarations                     |
 | [`no-known-value-widening`](./docs/rules.md#type-evidence)                              | Reject known values widened into broad target types                               |
-| [`no-call-count-only-test`](./docs/rules.md#ownership-and-tests)                        | Reject tests supported only by mock call counts or omission                       |
 | [`no-module-mocking`](./docs/rules.md#ownership-and-tests)                              | Reject Vitest and Jest mocking of repository-owned modules                        |
-| [`no-test-snapshots`](./docs/rules.md#ownership-and-tests)                              | Require explicit observable assertions instead of snapshots                       |
+| [`no-negated-throw-assertion`](./docs/rules.md#ownership-and-tests)                     | Replace negated throw assertions with direct execution                            |
 | [`no-object-parameters`](./docs/rules.md#boundary-contracts)                            | Reject `object` function parameters                                               |
 | [`no-positional-boolean-parameters`](./docs/rules.md#object-and-api-construction)       | Reject positional boolean flags on named functions and methods                    |
 | [`no-reflect-apply`](./docs/rules.md#object-and-api-construction)                       | Reject `Reflect.apply`                                                            |
 | [`no-reflect-get`](./docs/rules.md#object-and-api-construction)                         | Reject `Reflect.get`                                                              |
+| [`no-test-snapshots`](./docs/rules.md#ownership-and-tests)                              | Require explicit observable assertions instead of snapshots                       |
 | [`no-unknown-parameters`](./docs/rules.md#boundary-contracts)                           | Keep explicit `unknown` parameters at decoding boundaries                         |
 | [`no-unknown-returns`](./docs/rules.md#boundary-contracts)                              | Reject `unknown` return contracts                                                 |
 | [`no-unknown-type-aliases`](./docs/rules.md#boundary-contracts)                         | Reject type aliases that resolve to `unknown`                                     |
@@ -138,7 +143,7 @@ export default [
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-positional-boolean-parameters`, `no-test-snapshots`, `no-unhandled-detached-promises`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-test-snapshots`, `no-unhandled-detached-promises`, `prefer-options-parameter`, `require-lint-suppression-reason`, and `require-repository-test-subject`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 

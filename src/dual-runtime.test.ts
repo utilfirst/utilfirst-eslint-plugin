@@ -42,6 +42,9 @@ test("interaction only", () => {
 test("snapshot", () => {
   expect(value).toMatchSnapshot();
 });
+test("negated throw", () => {
+  expect(run).not.toThrow();
+});
 
 const chained = input as unknown as string;
 const narrowed = widened as { name: string };

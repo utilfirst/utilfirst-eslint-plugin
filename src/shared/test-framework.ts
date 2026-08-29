@@ -60,24 +60,84 @@ function isTestFrameworkIdentifier({
   });
 }
 
-function rootCalleeIdentifier(
+function isTestFrameworkNamespace(
+  sourceCode: SourceCode,
+  identifier: ESTree.IdentifierReference,
+): boolean {
+  const variable = resolveVariable(sourceCode, identifier);
+  if (variable === null) {
+    return false;
+  }
+
+  return variable.defs.some(
+    (definition) =>
+      definition.type === "ImportBinding" &&
+      definition.node.type === "ImportNamespaceSpecifier" &&
+      definition.parent?.type === "ImportDeclaration" &&
+      testFrameworkSources.has(definition.parent.source.value),
+  );
+}
+
+function memberChain(
   expression: ESTree.Expression | ESTree.Super,
-): ESTree.IdentifierReference | null {
+): { names: string[]; root: ESTree.IdentifierReference } | null {
   if (expression.type === "Identifier") {
-    return expression;
+    return { names: [], root: expression };
   }
   if (expression.type === "MemberExpression") {
-    return rootCalleeIdentifier(expression.object);
+    const parentChain = memberChain(expression.object);
+
+    const memberName = staticMemberName(expression);
+    if (parentChain === null || memberName === null) {
+      return null;
+    }
+
+    return {
+      names: [...parentChain.names, memberName],
+      root: parentChain.root,
+    };
   }
   if (
     expression.type === "CallExpression" &&
     expression.callee.type !== "Super" &&
     expression.callee.type !== "V8IntrinsicExpression"
   ) {
-    return rootCalleeIdentifier(expression.callee);
+    return memberChain(expression.callee);
   }
 
   return null;
+}
+
+function isTestFrameworkReference({
+  acceptedNames,
+  expression,
+  sourceCode,
+}: {
+  acceptedNames: ReadonlySet<string>;
+  expression: ESTree.Expression | ESTree.Super;
+  sourceCode: SourceCode;
+}): boolean {
+  const chain = memberChain(expression);
+  if (chain === null) {
+    return false;
+  }
+  if (
+    isTestFrameworkIdentifier({
+      acceptedNames,
+      identifier: chain.root,
+      sourceCode,
+    })
+  ) {
+    return true;
+  }
+
+  const [frameworkMember] = chain.names;
+
+  return (
+    frameworkMember !== undefined &&
+    acceptedNames.has(frameworkMember) &&
+    isTestFrameworkNamespace(sourceCode, chain.root)
+  );
 }
 
 export function isTestCaseCall(
@@ -94,16 +154,11 @@ export function isTestCaseCall(
     return false;
   }
 
-  const rootIdentifier = rootCalleeIdentifier(node.callee);
-
-  return (
-    rootIdentifier !== null &&
-    isTestFrameworkIdentifier({
-      acceptedNames: testCaseNames,
-      identifier: rootIdentifier,
-      sourceCode,
-    })
-  );
+  return isTestFrameworkReference({
+    acceptedNames: testCaseNames,
+    expression: node.callee,
+    sourceCode,
+  });
 }
 
 function isFunction(argument: ESTree.Argument | ESTree.SpreadElement): boolean {
@@ -126,16 +181,13 @@ export function isExpectationMatcher(
     expression = expression.object;
   }
 
-  if (
-    expression.type !== "CallExpression" ||
-    expression.callee.type !== "Identifier"
-  ) {
+  if (expression.type !== "CallExpression") {
     return false;
   }
 
-  return isTestFrameworkIdentifier({
+  return isTestFrameworkReference({
     acceptedNames: expectationNames,
-    identifier: expression.callee,
+    expression: expression.callee,
     sourceCode,
   });
 }
@@ -144,16 +196,13 @@ export function isExpectationMemberCall(
   sourceCode: SourceCode,
   node: ESTree.CallExpression,
 ): boolean {
-  if (
-    node.callee.type !== "MemberExpression" ||
-    node.callee.object.type !== "Identifier"
-  ) {
+  if (node.callee.type !== "MemberExpression") {
     return false;
   }
 
-  return isTestFrameworkIdentifier({
+  return isTestFrameworkReference({
     acceptedNames: expectationNames,
-    identifier: node.callee.object,
+    expression: node.callee.object,
     sourceCode,
   });
 }

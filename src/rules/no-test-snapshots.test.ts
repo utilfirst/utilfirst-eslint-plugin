@@ -31,5 +31,9 @@ ruleTester.run("no-test-snapshots", rule, {
       code: "expect.addSnapshotSerializer(serializer);",
       errors: [{ messageId: "snapshot" }],
     },
+    {
+      code: 'import * as vitest from "vitest"; vitest.expect.addSnapshotSerializer(serializer);',
+      errors: [{ messageId: "snapshot" }],
+    },
   ],
 });

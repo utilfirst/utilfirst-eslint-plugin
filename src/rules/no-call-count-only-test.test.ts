@@ -31,5 +31,9 @@ ruleTester.run("no-call-count-only-test", rule, {
       code: 'test.each([1, 2])("calls", () => { expect(send).toHaveBeenCalled(); });',
       errors: [{ messageId: "callCountOnly" }],
     },
+    {
+      code: 'import * as vitest from "vitest"; vitest.test("calls", () => { vitest.expect(send).toHaveBeenCalled(); });',
+      errors: [{ messageId: "callCountOnly" }],
+    },
   ],
 });
