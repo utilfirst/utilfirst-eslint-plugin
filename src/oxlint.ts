@@ -9,7 +9,7 @@ const utilfirstRules = Object.fromEntries(
   ]),
 );
 
-/** Shared Oxlint policy for TypeScript and React repositories. */
+/** Shared Oxlint policy for TypeScript and browser React repositories. */
 export const oxlintBaseConfig = defineConfig({
   categories: {
     correctness: "error",
@@ -28,6 +28,7 @@ export const oxlintBaseConfig = defineConfig({
     },
   ],
   options: {
+    reportUnusedDisableDirectives: "error",
     typeAware: true,
     typeCheck: true,
   },
@@ -58,6 +59,7 @@ export const oxlintBaseConfig = defineConfig({
   plugins: [
     "eslint",
     "import",
+    "jsx-a11y",
     "oxc",
     "promise",
     "react",

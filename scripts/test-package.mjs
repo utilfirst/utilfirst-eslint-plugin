@@ -107,6 +107,63 @@ try {
     );
   }
 
+  const canonicalConfigPath = join(runtimeDirectory, "oxlint.config.ts");
+  const canonicalSourcePath = join(runtimeDirectory, "canonical.tsx");
+
+  await writeFile(
+    canonicalConfigPath,
+    `import { oxlintBaseConfig } from ${JSON.stringify(
+      pathToFileURL(oxlintConfigPath).href,
+    )};
+
+export default {
+  extends: [{
+    ...oxlintBaseConfig,
+    jsPlugins: [{ name: "utilfirst", specifier: ${JSON.stringify(entryPath)} }],
+  }],
+  options: { typeAware: false, typeCheck: false },
+};
+`,
+  );
+  await writeFile(
+    canonicalSourcePath,
+    `// oxlint-disable-next-line no-console -- Stale suppression.
+const image = <img src="image.png" />;
+void image;
+`,
+  );
+
+  let canonicalOutput = "";
+  try {
+    await execFileAsync("node_modules/.bin/oxlint", [
+      "--config",
+      canonicalConfigPath,
+      "--no-ignore",
+      canonicalSourcePath,
+    ]);
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !("stdout" in error) ||
+      !("stderr" in error)
+    ) {
+      throw error;
+    }
+
+    canonicalOutput = `${String(error.stdout)}\n${String(error.stderr)}`;
+  }
+
+  if (!canonicalOutput.includes("Unused oxlint-disable directive")) {
+    throw new Error(
+      `Packed Oxlint config did not report an unused suppression:\n${canonicalOutput}`,
+    );
+  }
+  if (!canonicalOutput.includes("jsx-a11y(alt-text)")) {
+    throw new Error(
+      `Packed Oxlint config did not report browser accessibility:\n${canonicalOutput}`,
+    );
+  }
+
   const packageManifest = JSON.parse(
     await readFile(join(packageDirectory, "package.json"), "utf8"),
   );

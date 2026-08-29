@@ -72,12 +72,11 @@ import { oxlintBaseConfig } from "@utilfirst/eslint-plugin/oxlint";
 export default defineConfig({
   extends: [oxlintBaseConfig],
   ignorePatterns: ["dist/**", "node_modules/**"],
-  options: { reportUnusedDisableDirectives: "error" },
-  plugins: ["jsx-a11y", "nextjs", "node"],
+  plugins: ["nextjs", "node"],
 });
 ```
 
-The base config owns shared categories, environment defaults, plugins, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain root-only unused-disable reporting, ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions.
+The base config owns shared categories, environment defaults, unused-disable reporting, TypeScript type checking, browser React and accessibility plugins, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions. Non-browser React consumers must disable or replace browser accessibility policy at their platform boundary.
 
 ## Rules
 
