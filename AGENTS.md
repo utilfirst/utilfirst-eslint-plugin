@@ -10,6 +10,13 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 - Update `docs/rules/consistent-blank-lines.md` in the same change when `src/rules/consistent-blank-lines.ts` changes the rule's source-owned behavior or specification.
 - After finishing a set of related changes: `pnpm run test` and `pnpm run lint:oxlint`
 
+## Test retention
+
+- Treat every repository test as a deletion candidate. Retain it only when its failure uniquely identifies a settled harmful behavior loss that types, schemas, static analysis, direct source inspection, and existing tests do not already expose.
+- Keep the smallest test set that protects user-visible behavior, public or persisted boundaries, destructive or external-write safeguards, known regressions, concurrency or lifecycle hazards, difficult algorithms, and security or privacy controls.
+- Delete tests that restate implementation, types, schemas, constants, trivial transformations, library behavior, generated structure, unreviewed snapshots, or another test's signal. Fast execution and existing coverage do not justify retention.
+- Do not add a test by default when changing implementation. Add one only when its distinct failure signal is worth its review burden, fixture upkeep, refactor resistance, and change amplification.
+
 ## Boundaries
 
 - Ask first before bumping the major version (most consumers are pinned to `^X.Y.Z`, so a major bump forces an upgrade across projects that depend on this plugin).
