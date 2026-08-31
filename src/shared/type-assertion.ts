@@ -1,8 +1,7 @@
 import type { ESTree } from "@oxlint/plugins";
 
 export type TypeAssertionExpression =
-  | ESTree.TSAsExpression
-  | ESTree.TSTypeAssertion;
+  ESTree.TSAsExpression | ESTree.TSTypeAssertion;
 
 export function isTypeAssertionExpression(
   node: ESTree.Node,
