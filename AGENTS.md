@@ -10,8 +10,8 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 - Update `docs/rules/consistent-blank-lines.md` in the same change when `src/rules/consistent-blank-lines.ts` changes the rule's source-owned behavior or specification.
 - Follow `docs/runbooks/upgrade-oxlint.md` when upgrading Oxlint.
 - After finishing a set of related changes: `pnpm run test` and `pnpm run lint:oxlint`
-- Do not run commands with substantial CPU, memory, wall-time, network, or disk cost as routine or speculative checks. Run an expensive command only when the user explicitly asks or no cheaper targeted signal can settle a task-required claim.
-- Treat full application builds such as `next build`, development servers such as `next dev`, broad test or lint suites, dependency installs, and benchmarks as expensive commands.
+- Verify changes with the lowest-cost sufficient check. Start with direct source inspection or a targeted check, and escalate only when it cannot establish the required result. Skip routine or speculative verification.
+- Treat full builds, development servers, broad test or lint suites, dependency installs, and benchmarks as expensive commands. Run one only when the user explicitly asks or no cheaper targeted signal can settle the claim.
 - Stop verification work when the user declines it.
 
 ## Test retention
