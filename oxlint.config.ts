@@ -3,12 +3,6 @@ import { defineConfig } from "oxlint";
 import { oxlintBaseConfig } from "./src/oxlint.ts";
 
 export default defineConfig({
-  categories: {
-    correctness: "error",
-    pedantic: "error",
-    perf: "error",
-    suspicious: "error",
-  },
   env: {
     builtin: true,
     es2024: true,
@@ -28,11 +22,6 @@ export default defineConfig({
       specifier: "./src/index.ts",
     },
   ],
-  options: {
-    reportUnusedDisableDirectives: "error",
-    typeAware: true,
-    typeCheck: true,
-  },
   overrides: [
     {
       // These executable JavaScript entrypoints intentionally live outside the
