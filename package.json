@@ -1,6 +1,6 @@
 {
   "name": "@utilfirst/eslint-plugin",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Shared lint rules for ESLint and Oxlint",
   "keywords": [
     "eslint",
