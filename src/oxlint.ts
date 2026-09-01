@@ -98,8 +98,10 @@ export const oxlintBaseConfig = defineConfig({
     "max-lines-per-function": "off",
     "no-await-in-loop": "off",
     "no-alert": "error",
-    "no-bitwise": "error",
-    "no-console": ["error", { allow: ["error", "warn"] }],
+    // Bitwise syntax is valid for masks, binary formats, and low-level transforms.
+    "no-bitwise": "off",
+    // Logging policy depends on boundary ownership and payload sensitivity.
+    "no-console": "off",
     "no-div-regex": "error",
     "no-empty": "error",
     "no-empty-function": "error",
@@ -146,7 +148,8 @@ export const oxlintBaseConfig = defineConfig({
     "react/jsx-pascal-case": "error",
     "react/no-unescaped-entities": "off",
     "react/no-clone-element": "error",
-    "react/no-danger": "error",
+    // Sink safety depends on the value's trust boundary, not the JSX syntax.
+    "react/no-danger": "off",
     "react/no-react-children": "error",
     "react/no-unknown-property": "error",
     "react/prefer-function-component": "error",
