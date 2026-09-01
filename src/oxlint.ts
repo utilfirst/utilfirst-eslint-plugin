@@ -36,6 +36,7 @@ export const oxlintBaseConfig = defineConfig({
     {
       files: ["**/*.{ts,tsx,mts,cts}"],
       rules: {
+        // Type-aware analysis owns these base correctness checks for TypeScript.
         "constructor-super": "off",
         "getter-return": "off",
         "no-class-assign": "off",
@@ -52,6 +53,7 @@ export const oxlintBaseConfig = defineConfig({
     {
       files: ["**/*.test.{ts,tsx,mts,cts}"],
       rules: {
+        // Async fakes may preserve a promise boundary without performing work.
         "no-empty-function": ["error", { allow: ["asyncFunctions"] }],
         "typescript/require-await": "off",
       },
@@ -89,13 +91,16 @@ export const oxlintBaseConfig = defineConfig({
     "import/no-dynamic-require": "error",
     "import/no-mutable-exports": "error",
     "import/no-named-default": "error",
+    // Stylesheets, polyfills, and registration modules use side-effect imports.
     "import/no-unassigned-import": "off",
     "import/no-webpack-loader-syntax": "error",
     "jsdoc/require-param": "off",
     "jsdoc/require-returns": "off",
     "logical-assignment-operators": "error",
+    // Ownership and extraction decisions depend on behavior, not line counts.
     "max-lines": "off",
     "max-lines-per-function": "off",
+    // Retry, pagination, and ordered transition loops may require serial awaits.
     "no-await-in-loop": "off",
     "no-alert": "error",
     // Bitwise syntax is valid for masks, binary formats, and low-level transforms.
@@ -113,6 +118,7 @@ export const oxlintBaseConfig = defineConfig({
     "no-lone-blocks": "error",
     "no-multi-assign": "error",
     "no-new-func": "error",
+    // Negative guard clauses are valid when they keep the main path terminal.
     "no-negated-condition": "off",
     "no-nested-ternary": "error",
     "no-param-reassign": "error",
@@ -122,6 +128,7 @@ export const oxlintBaseConfig = defineConfig({
     "no-script-url": "error",
     "no-sequences": "error",
     "no-template-curly-in-string": "error",
+    // External protocols and generated shapes may own leading-underscore names.
     "no-underscore-dangle": "off",
     "no-useless-assignment": "error",
     "object-shorthand": "error",
@@ -141,7 +148,7 @@ export const oxlintBaseConfig = defineConfig({
     "promise/no-nesting": "error",
     "promise/no-return-in-finally": "error",
     "promise/param-names": "error",
-    // The established exhaustive-deps rule retains missing-dependency checks.
+    // The category-enabled exhaustive-deps rule retains missing-dependency checks.
     "react/exhaustive-effect-dependencies": "off",
     "react/function-component-definition": "error",
     // DOM dataset mutation conflicts with the canonical dataset API rule.
@@ -150,22 +157,25 @@ export const oxlintBaseConfig = defineConfig({
     "react/jsx-curly-brace-presence": "error",
     "react/jsx-fragments": "error",
     "react/jsx-pascal-case": "error",
-    "react/no-unescaped-entities": "off",
     "react/no-clone-element": "error",
     // Sink safety depends on the value's trust boundary, not the JSX syntax.
     "react/no-danger": "off",
+    "react/no-react-children": "error",
+    // React escapes text nodes; typographic source characters are safe here.
+    "react/no-unescaped-entities": "off",
+    "react/no-unknown-property": "error",
+    // Render-prop APIs intentionally accept caller-owned component functions.
     "react/no-unstable-nested-components": ["error", { allowAsProps: true }],
-    // Compiler ref analysis currently reports ordinary ref props and callbacks.
-    "react/refs": "off",
-    // External-system and hydration effects legitimately synchronize local state.
-    "react/set-state-in-effect": "off",
+    "react/prefer-function-component": "error",
     // Compiler optimization bailouts are not runtime or maintainability defects.
     "react/preserve-manual-memoization": "off",
-    "react/no-react-children": "error",
-    "react/no-unknown-property": "error",
-    "react/prefer-function-component": "error",
     "react/react-in-jsx-scope": "off",
+    // Compiler ref analysis currently reports ordinary ref props and callbacks.
+    "react/refs": "off",
     "react/self-closing-comp": "error",
+    // External-system and hydration effects legitimately synchronize local state.
+    "react/set-state-in-effect": "off",
+    // Type-aware require-await owns TypeScript functions without duplicate reports.
     "require-await": "off",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/array-type": "error",
@@ -205,6 +215,7 @@ export const oxlintBaseConfig = defineConfig({
     "typescript/prefer-literal-enum-member": "error",
     "typescript/prefer-optional-chain": "error",
     "typescript/prefer-readonly": "error",
+    // Readonly parameter pressure can reject valid local mutation before aliasing.
     "typescript/prefer-readonly-parameter-types": "off",
     "typescript/prefer-reduce-type-parameter": "error",
     "typescript/prefer-regexp-exec": "error",
@@ -257,6 +268,7 @@ export const oxlintBaseConfig = defineConfig({
     "unicorn/no-unreadable-array-destructuring": "error",
     "unicorn/no-useless-collection-argument": "error",
     "unicorn/no-zero-fractions": "error",
+    // Explicit undefined can communicate an optional boundary or reset operation.
     "unicorn/no-useless-undefined": "off",
     "unicorn/numeric-separators-style": [
       "error",
@@ -294,6 +306,7 @@ export const oxlintBaseConfig = defineConfig({
     "unicorn/switch-case-break-position": "error",
     "unicorn/text-encoding-identifier-case": "error",
     "unicorn/throw-new-error": "error",
+    // Module-scope awaits hide import-time I/O before callers can intervene.
     "unicorn/prefer-top-level-await": "off",
     "vitest/expect-expect": "off",
     "vitest/no-conditional-in-test": "off",
