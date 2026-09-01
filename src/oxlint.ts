@@ -150,6 +150,13 @@ export const oxlintBaseConfig = defineConfig({
     "react/no-clone-element": "error",
     // Sink safety depends on the value's trust boundary, not the JSX syntax.
     "react/no-danger": "off",
+    "react/no-unstable-nested-components": ["error", { allowAsProps: true }],
+    // Compiler ref analysis currently reports ordinary ref props and callbacks.
+    "react/refs": "off",
+    // External-system and hydration effects legitimately synchronize local state.
+    "react/set-state-in-effect": "off",
+    // Compiler optimization bailouts are not runtime or maintainability defects.
+    "react/preserve-manual-memoization": "off",
     "react/no-react-children": "error",
     "react/no-unknown-property": "error",
     "react/prefer-function-component": "error",
