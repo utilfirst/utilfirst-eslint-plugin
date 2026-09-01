@@ -141,7 +141,11 @@ export const oxlintBaseConfig = defineConfig({
     "promise/no-nesting": "error",
     "promise/no-return-in-finally": "error",
     "promise/param-names": "error",
+    // The established exhaustive-deps rule retains missing-dependency checks.
+    "react/exhaustive-effect-dependencies": "off",
     "react/function-component-definition": "error",
+    // DOM dataset mutation conflicts with the canonical dataset API rule.
+    "react/immutability": "off",
     "react/jsx-boolean-value": "error",
     "react/jsx-curly-brace-presence": "error",
     "react/jsx-fragments": "error",
