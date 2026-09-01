@@ -52,6 +52,7 @@ export const oxlintBaseConfig = defineConfig({
     {
       files: ["**/*.test.{ts,tsx,mts,cts}"],
       rules: {
+        "no-empty-function": ["error", { allow: ["asyncFunctions"] }],
         "typescript/require-await": "off",
       },
     },
@@ -243,7 +244,16 @@ export const oxlintBaseConfig = defineConfig({
     "unicorn/no-useless-collection-argument": "error",
     "unicorn/no-zero-fractions": "error",
     "unicorn/no-useless-undefined": "off",
-    "unicorn/numeric-separators-style": "error",
+    "unicorn/numeric-separators-style": [
+      "error",
+      {
+        number: {
+          groupLength: 3,
+          minimumDigits: 4,
+          onlyIfContainsSeparator: true,
+        },
+      },
+    ],
     "unicorn/prefer-array-index-of": "error",
     "unicorn/prefer-bigint-literals": "error",
     "unicorn/prefer-class-fields": "error",
