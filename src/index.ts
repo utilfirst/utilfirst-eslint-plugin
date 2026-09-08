@@ -28,7 +28,6 @@ import { preferForwardedPropsOrderRule } from "./rules/prefer-forwarded-props-or
 import { preferHookOrderRule } from "./rules/prefer-hook-order.ts";
 import { preferJsxBooleanAndRule } from "./rules/prefer-jsx-boolean-and.ts";
 import { preferOptionsParameterRule } from "./rules/prefer-options-parameter.ts";
-import { preferReactPropsReferenceRule } from "./rules/prefer-react-props-reference.ts";
 import { preferSwitchDiscriminatorChainRule } from "./rules/prefer-switch-discriminator-chain.ts";
 import { preferTopLevelFunctionDeclarationsRule } from "./rules/prefer-top-level-function-declarations.ts";
 import { requireLintSuppressionReasonRule } from "./rules/require-lint-suppression-reason.ts";
@@ -71,7 +70,6 @@ const antiSlopPlugin = eslintCompatPlugin({
     "prefer-hook-order": preferHookOrderRule,
     "prefer-jsx-boolean-and": preferJsxBooleanAndRule,
     "prefer-options-parameter": preferOptionsParameterRule,
-    "prefer-react-props-reference": preferReactPropsReferenceRule,
     "prefer-switch-discriminator-chain": preferSwitchDiscriminatorChainRule,
     "prefer-top-level-function-declarations":
       preferTopLevelFunctionDeclarationsRule,

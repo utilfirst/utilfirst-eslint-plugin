@@ -128,7 +128,6 @@ The base config owns shared categories, environment defaults, unused-disable rep
 | [`prefer-hook-order`](./docs/reference/rule-policy.md#react-source-form)                                | Order built-in hooks by context, state, derivation, and effect role             |
 | [`prefer-jsx-boolean-and`](./docs/reference/rule-policy.md#jsx-conditionals)                            | Require boolean JSX guards and normalize null-branch conditionals               |
 | [`prefer-options-parameter`](./docs/reference/rule-policy.md#object-and-api-construction)               | Require options objects for named callable contracts with three or more inputs  |
-| [`prefer-react-props-reference`](./docs/reference/rule-policy.md#react-source-form)                     | Keep React props behind canonical access and bounded destructuring              |
 | [`prefer-switch-discriminator-chain`](./docs/reference/rule-policy.md#object-and-api-construction)      | Require a switch for four or more equality branches on one discriminator        |
 | [`prefer-top-level-function-declarations`](./docs/reference/rule-policy.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports |
 | [`require-lint-suppression-reason`](./docs/reference/rule-policy.md#lint-policy)                        | Require a forcing reason on lint disable directives                             |
@@ -138,7 +137,7 @@ The base config owns shared categories, environment defaults, unused-disable rep
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-forwarded-props-order`, `prefer-hook-order`, `prefer-jsx-boolean-and`, `prefer-options-parameter`, `prefer-react-props-reference`, `require-lint-suppression-reason`, `require-repository-test-subject`, and `require-special-comment-tag`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-forwarded-props-order`, `prefer-hook-order`, `prefer-jsx-boolean-and`, `prefer-options-parameter`, `require-lint-suppression-reason`, `require-repository-test-subject`, and `require-special-comment-tag`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 

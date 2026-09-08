@@ -15,7 +15,7 @@ The package is ESM-only. Its root export provides plugin metadata, the complete 
 
 ## Rule ownership
 
-Each file under `src/rules/` owns one rule’s executable behavior. Colocated tests own accepted and rejected runtime cases. `src/index.ts` owns the public registry and recommended ESLint configuration, while its registry-completeness test enforces that every exported rule remains recommended at error severity.
+Each file under `src/rules/` owns one rule’s executable behavior. Colocated tests own accepted and rejected runtime cases. `src/index.ts` owns the public registry and recommended ESLint configuration, while its registry-completeness test enforces that every exported rule remains recommended at error severity. Removed rules leave no registry alias or compatibility stub.
 
 Shared parsers and boundary classifiers live under `src/shared/`. A helper belongs there only when several rules consume the same semantic contract.
 
