@@ -2,7 +2,7 @@ import { env } from "node:process";
 import pkg from "../package.json" with { type: "json" };
 
 const expectedTag = `v${pkg.version}`;
-const releaseTag = env.RELEASE_TAG;
+const releaseTag = env["RELEASE_TAG"];
 if (releaseTag !== expectedTag) {
   throw new Error(
     `Release tag ${JSON.stringify(releaseTag)} does not match ${expectedTag}`,

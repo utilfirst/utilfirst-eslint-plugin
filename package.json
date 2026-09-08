@@ -42,9 +42,9 @@
     "lint:prettier": "prettier --check .",
     "lint:publint": "publint",
     "prepack": "pnpm run build",
-    "release-check-tag": "node scripts/check-release-tag.mjs",
+    "release-check-tag": "node scripts/check-release-tag.ts",
     "test": "pnpm run test-unit && pnpm run test-package",
-    "test-package": "node scripts/test-package.mjs",
+    "test-package": "node scripts/test-package.ts",
     "test-unit": "vitest run"
   },
   "dependencies": {

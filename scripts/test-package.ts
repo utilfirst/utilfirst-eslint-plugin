@@ -1,5 +1,4 @@
-import { Linter } from "eslint";
-import { execFile } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import {
   mkdir,
   mkdtemp,
@@ -10,11 +9,8 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { execPath } from "node:process";
 import { pathToFileURL } from "node:url";
-import { promisify } from "node:util";
-import tseslint from "typescript-eslint";
-
-const execFileAsync = promisify(execFile);
 
 const ruleName = "utilfirst/no-unknown-type-aliases";
 const fixtureSource = "type Payload = unknown;\n";
@@ -28,7 +24,7 @@ const runtimeDirectory = await mkdtemp(
 );
 
 try {
-  await execFileAsync("pnpm", ["pack", "--pack-destination", testDirectory]);
+  execFileSync("pnpm", ["pack", "--pack-destination", testDirectory]);
 
   const testDirectoryEntries = await readdir(testDirectory);
 
@@ -40,7 +36,7 @@ try {
     throw new Error("Package smoke test expected one tarball");
   }
 
-  await execFileAsync("tar", ["-xzf", archiveNames[0]], {
+  execFileSync("tar", ["-xzf", archiveNames[0]], {
     cwd: testDirectory,
   });
 
@@ -48,29 +44,30 @@ try {
   const entryPath = join(packageDirectory, "dist/index.js");
   const oxlintConfigPath = join(packageDirectory, "dist/oxlint.js");
 
-  const pluginModule = await import(pathToFileURL(entryPath).href);
-  const plugin = pluginModule.default;
+  const entryUrl = pathToFileURL(entryPath).href;
+  const oxlintConfigUrl = pathToFileURL(oxlintConfigPath).href;
 
-  const { oxlintBaseConfig } = await import(
-    pathToFileURL(oxlintConfigPath).href
-  );
+  const eslintUrl = import.meta.resolve("eslint");
+  const typescriptEslintUrl = import.meta.resolve("typescript-eslint");
 
-  const linter = new Linter();
+  const eslintConsumer = `import { Linter } from ${JSON.stringify(eslintUrl)};
+import tseslint from ${JSON.stringify(typescriptEslintUrl)};
+import plugin from ${JSON.stringify(entryUrl)};
+import { oxlintBaseConfig } from ${JSON.stringify(oxlintConfigUrl)};
+const ruleName = ${JSON.stringify(ruleName)};
+const messages = new Linter().verify(${JSON.stringify(fixtureSource)}, [{
+  languageOptions: { parser: tseslint.parser },
+  plugins: { utilfirst: plugin },
+  rules: { [ruleName]: "error" },
+}]);
+if (!messages.some((message) => message.ruleId === ruleName)) {
+  throw new Error("Packed plugin did not report through ESLint");
+}
+if (oxlintBaseConfig.rules[ruleName] !== "error") {
+  throw new Error("Packed Oxlint config did not enable every custom rule");
+}`;
 
-  const eslintMessages = linter.verify(fixtureSource, [
-    {
-      languageOptions: { parser: tseslint.parser },
-      plugins: { utilfirst: plugin },
-      rules: { [ruleName]: "error" },
-    },
-  ]);
-
-  if (!eslintMessages.some((message) => message.ruleId === ruleName)) {
-    throw new Error("Packed plugin did not report through ESLint");
-  }
-  if (oxlintBaseConfig.rules[ruleName] !== "error") {
-    throw new Error("Packed Oxlint config did not enable every custom rule");
-  }
+  execFileSync(execPath, ["--input-type=module", "--eval", eslintConsumer]);
 
   const configPath = join(runtimeDirectory, ".oxlintrc.json");
   const sourcePath = join(runtimeDirectory, "fixture.ts");
@@ -84,26 +81,7 @@ try {
   );
   await writeFile(sourcePath, fixtureSource);
 
-  let oxlintOutput = "";
-  try {
-    await execFileAsync("node_modules/.bin/oxlint", [
-      "--config",
-      configPath,
-      "--no-ignore",
-      sourcePath,
-    ]);
-  } catch (error) {
-    if (
-      !(error instanceof Error) ||
-      !("stdout" in error) ||
-      !("stderr" in error)
-    ) {
-      throw error;
-    }
-
-    oxlintOutput = `${String(error.stdout)}\n${String(error.stderr)}`;
-  }
-
+  const oxlintOutput = runOxlint({ configPath, sourcePath });
   if (!oxlintOutput.includes("utilfirst(no-unknown-type-aliases)")) {
     throw new Error(
       `Packed plugin did not report through Oxlint:\n${oxlintOutput}`,
@@ -115,9 +93,7 @@ try {
 
   await writeFile(
     canonicalConfigPath,
-    `import { oxlintBaseConfig } from ${JSON.stringify(
-      pathToFileURL(oxlintConfigPath).href,
-    )};
+    `import { oxlintBaseConfig } from ${JSON.stringify(oxlintConfigUrl)};
 
 export default {
   extends: [{
@@ -136,25 +112,10 @@ void image;
 `,
   );
 
-  let canonicalOutput = "";
-  try {
-    await execFileAsync("node_modules/.bin/oxlint", [
-      "--config",
-      canonicalConfigPath,
-      "--no-ignore",
-      canonicalSourcePath,
-    ]);
-  } catch (error) {
-    if (
-      !(error instanceof Error) ||
-      !("stdout" in error) ||
-      !("stderr" in error)
-    ) {
-      throw error;
-    }
-
-    canonicalOutput = `${String(error.stdout)}\n${String(error.stderr)}`;
-  }
+  const canonicalOutput = runOxlint({
+    configPath: canonicalConfigPath,
+    sourcePath: canonicalSourcePath,
+  });
 
   if (!canonicalOutput.includes("Unused oxlint-disable directive")) {
     throw new Error(
@@ -167,11 +128,11 @@ void image;
     );
   }
 
-  const packageManifest = JSON.parse(
+  const packageManifest: unknown = JSON.parse(
     await readFile(join(packageDirectory, "package.json"), "utf8"),
   );
 
-  if (packageManifest.engines?.node !== ">=24.11.0") {
+  if (decodeNodeEngine(packageManifest) !== ">=24.11.0") {
     throw new Error("Packed package does not declare the Node 24 minimum");
   }
 } finally {
@@ -179,4 +140,41 @@ void image;
     rm(testDirectory, { force: true, recursive: true }),
     rm(runtimeDirectory, { force: true, recursive: true }),
   ]);
+}
+
+type OxlintInput = {
+  configPath: string;
+  sourcePath: string;
+};
+
+function runOxlint({ configPath, sourcePath }: OxlintInput): string {
+  const result = spawnSync(
+    "node_modules/.bin/oxlint",
+    ["--config", configPath, "--no-ignore", sourcePath],
+    { encoding: "utf8" },
+  );
+
+  if (result.error !== undefined) {
+    throw result.error;
+  }
+
+  return `${result.stdout}\n${result.stderr}`;
+}
+
+function decodeNodeEngine(value: unknown): string {
+  if (typeof value !== "object" || value === null || !("engines" in value)) {
+    throw new Error("Packed package has no engines object");
+  }
+
+  const { engines } = value;
+  if (
+    typeof engines !== "object" ||
+    engines === null ||
+    !("node" in engines) ||
+    typeof engines.node !== "string"
+  ) {
+    throw new Error("Packed package has no Node engine string");
+  }
+
+  return engines.node;
 }
