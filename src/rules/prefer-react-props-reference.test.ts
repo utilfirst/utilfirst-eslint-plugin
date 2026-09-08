@@ -27,7 +27,9 @@ ruleTester.run("prefer-react-props-reference", rule, {
     "function Label(props: { value: string }) { const { value } = props; return <p>{value}{value}{value}</p>; }",
     "const format = ({ value }: { value: string }) => value;",
     "export function GET(request: Request) { return Response.json({ method: request.method }); }",
+    "export function GET({ method }: { method: string }) { return Response.json({ method }); }",
     "export async function POST(request: Request) { return Response.json({ body: await request.json() }); }",
+    "export async function POST(req: Request) { return Response.json({ body: await req.json() }); }",
     "export const PATCH = (request: Request) => Response.json({ method: request.method });",
   ],
   invalid: [
@@ -37,10 +39,6 @@ ruleTester.run("prefer-react-props-reference", rule, {
     },
     {
       code: "function GET({ method }: { method: string }) { return <p>{method}</p>; }",
-      errors: [{ messageId: "nameProps" }],
-    },
-    {
-      code: "export function GET({ method }: { method: string }) { return <p>{method}</p>; }",
       errors: [{ messageId: "nameProps" }],
     },
     {

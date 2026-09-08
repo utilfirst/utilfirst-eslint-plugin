@@ -49,14 +49,7 @@ function isHttpMethodHandlerExport(
   node: ComponentFunction,
   name: string,
 ): boolean {
-  const [requestParameter] = node.params;
-
-  return (
-    HTTP_METHOD_EXPORT_NAMES.has(name) &&
-    isNamedExport(node) &&
-    requestParameter?.type === "Identifier" &&
-    requestParameter.name === "request"
-  );
+  return HTTP_METHOD_EXPORT_NAMES.has(name) && isNamedExport(node);
 }
 
 function isComponent(node: ComponentFunction): boolean {
