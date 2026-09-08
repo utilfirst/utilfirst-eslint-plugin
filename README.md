@@ -2,6 +2,23 @@
 
 Shared rules for ESLint 10 and Oxlint.
 
+The repository contains the ESM plugin, canonical Oxlint configuration, rule specifications, package architecture, and release tooling.
+
+## Start
+
+```sh
+mise install
+pnpm install
+pnpm test
+```
+
+## Documentation
+
+- [Architecture](docs/architecture.md) defines public exports, configuration composition, build output, and verification boundaries.
+- [Rule policy](docs/reference/rule-policy.md) explains universal rule rationale and expected replacements.
+- [Consistent blank lines](docs/specs/consistent-blank-lines.md) defines the detailed classification and fixer contract.
+- [Upgrade Oxlint](docs/runbooks/upgrade-oxlint.md) covers the dependency and policy upgrade procedure.
+
 ## Policy
 
 Every exported rule must express universal project policy. The recommended config enables the complete registry at error severity, and the test suite rejects registry entries that are absent from that config. A rule that cannot justify universal error severity must be redesigned or removed rather than moved to an optional preset. Rule options adapt repository ownership or boundary conventions without disabling the rule.
