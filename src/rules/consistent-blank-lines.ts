@@ -97,7 +97,7 @@ export const consistentBlankLines: TSESLint.RuleModule<MessageIds> = {
     docs: {
       description:
         "Apply explicit gap policies between adjacent statement-list and JSXChild items.",
-      url: "https://github.com/utilfirst/utilfirst-eslint-plugin/blob/main/docs/rules/consistent-blank-lines.md",
+      url: "https://github.com/utilfirst/utilfirst-eslint-plugin/blob/main/docs/specs/consistent-blank-lines.md",
     },
     fixable: "whitespace",
     defaultOptions: [],

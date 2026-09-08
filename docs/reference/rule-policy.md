@@ -1,6 +1,14 @@
 # Rule policy
 
-The rule implementations in [`src/rules/`](../src/rules/) own accepted syntax and diagnostics. Their colocated tests own executable examples. This reference explains why each rule is universal policy, which boundary it protects, and what replacement a violation should produce.
+This reference owns the universal rationale, protected boundary, and expected replacement for every exported rule. Read it before changing whether a rule belongs in the recommended policy.
+
+| Decision                                                        | Read                                                         |
+| --------------------------------------------------------------- | ------------------------------------------------------------ |
+| Public exports, registry, canonical config, or build boundaries | [Architecture](../architecture.md)                           |
+| Detailed blank-line behavior and fixer contract                 | [Consistent blank lines](../specs/consistent-blank-lines.md) |
+| Installation and consumer configuration                         | [README](../../README.md)                                    |
+
+The rule implementations in [`src/rules/`](../../src/rules/) own accepted syntax and diagnostics. Their colocated tests own executable examples. This reference explains why each rule is universal policy, which boundary it protects, and what replacement a violation should produce.
 
 Every exported rule is enabled at error severity by `configs.recommended`. Options adapt repository ownership or externally fixed signatures while leaving the rule enabled.
 
@@ -75,4 +83,8 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 ## Layout
 
-- [`consistent-blank-lines`](./rules/consistent-blank-lines.md) assigns tight, separate, or preserved gaps between statements and JSX children based on name flow, declaration families, control flow, hooks, comments, and line span. Its detailed specification owns the formatting contract and fixer behavior.
+- [`consistent-blank-lines`](../specs/consistent-blank-lines.md) assigns tight, separate, or preserved gaps between statements and JSX children based on name flow, declaration families, control flow, hooks, comments, and line span. Its detailed specification owns the formatting contract and fixer behavior.
+
+## Maintenance
+
+Update this reference when a rule’s universal rationale, protected boundary, exception policy, or expected replacement changes. Keep accepted syntax and diagnostics in source and tests.

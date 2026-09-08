@@ -1,5 +1,13 @@
 # consistent-blank-lines
 
+This specification owns the `consistent-blank-lines` classification and fixer contract. Read it before changing how the rule treats adjacent statements or JSX children.
+
+| Decision                                               | Read                                       |
+| ------------------------------------------------------ | ------------------------------------------ |
+| Universal rationale and expected replacement           | [Rule policy](../reference/rule-policy.md) |
+| Public registry, runtime composition, or package build | [Architecture](../architecture.md)         |
+| Installation and consumer configuration                | [README](../../README.md)                  |
+
 Apply one explicit gap policy between adjacent statement-list and `JSXChild` items.
 - **Type**: `layout`
 - **Fixable**: yes (`--fix`)
@@ -34,3 +42,7 @@ The rule filters pure-whitespace `JSXText` children before comparing adjacent no
 2. **Local text run**: Tight applies when either child is or directly neighbors a literal-text child. A literal-text child is non-whitespace `JSXText` or a `JSXExpressionContainer` guaranteed to produce text or no rendered child: a string literal, a template literal, transparent TypeScript wrappers around either form, a logical `&&` expression whose right side qualifies, or a conditional expression whose two branches qualify.
 3. **Visual weight**: Tight applies when both children are single-line.
 4. **Default**: Separate applies.
+
+## Maintenance
+
+Update this specification with the source comment and executable cases when classification, precedence, fixer behavior, line-ending preservation, or supported syntax changes.
