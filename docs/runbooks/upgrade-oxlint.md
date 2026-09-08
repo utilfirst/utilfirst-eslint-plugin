@@ -1,27 +1,27 @@
 # Upgrade Oxlint
 
-This runbook upgrades Oxlint and reconciles its built-in rules and category configuration with the canonical policy. `AGENTS.md` owns repository boundaries and shared policy routing, source files own exact enforcement, and the release workflow owns publication acceptance.
+Upgrade Oxlint and reconcile its built-in rules and category configuration with the canonical policy. `AGENTS.md` owns repository boundaries and shared policy routing, source files own exact enforcement, and the release workflow owns publication acceptance. This runbook owns final verification of the upgraded rule surface and representative consumer. Unfinished work stays in task context. Publication remains a separate transition.
 
-## Preconditions
+## Target and preconditions
 
 - Start from a classified worktree and keep unrelated changes outside the upgrade commit.
 - Read `package.json` and `mise.toml` for the runtime, peer, dependency, and toolchain contracts.
 - Read `src/oxlint.ts`, `oxlint.config.ts`, `src/index.ts`, and `docs/reference/rule-policy.md` for the canonical config, repository config, custom-rule registry, and rule-policy owners.
 - Identify a representative consumer that can load the package through a temporary `link:` dependency and run its canonical lint and test gates.
 
-## Capture the current rule surface
+## Audit
 
 1. Record the pinned Oxlint version and the effective config for representative TypeScript, React, JavaScript, and test files with `pnpm exec oxlint --print-config <file>`.
 2. Record the registered built-in rule list from a neutral directory so repository config cannot mask category membership:
 
-   ```sh
-   plugin_repo=$PWD
-   audit_dir=$(mktemp -d)
-   (
-     cd "$audit_dir"
-     "$plugin_repo/node_modules/.bin/oxlint" --disable-nested-config --type-aware -D all -D nursery --import-plugin --react-plugin --vitest-plugin --promise-plugin --print-config representative.ts
-   )
-   ```
+    ```sh
+    plugin_repo=$PWD
+    audit_dir=$(mktemp -d)
+    (
+      cd "$audit_dir"
+      "$plugin_repo/node_modules/.bin/oxlint" --disable-nested-config --type-aware -D all -D nursery --import-plugin --react-plugin --vitest-plugin --promise-plugin --print-config representative.ts
+    )
+    ```
 
 3. Keep noisy comparison output under `.tmp/` and retain only the rule additions, removals, category changes, default changes, and option-schema changes needed for the decision.
 
