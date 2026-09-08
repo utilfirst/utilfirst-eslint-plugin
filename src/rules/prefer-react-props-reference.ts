@@ -209,10 +209,8 @@ export const preferReactPropsReferenceRule = defineRule({
         "Keep React component props behind one named parameter and bounded body-local destructuring.",
     },
     messages: {
-      canonicalName:
-        "Name the React component parameter `props` so prop access has one canonical form.",
       childrenReference:
-        "Render `props.children` explicitly when the component props contract declares children.",
+        "Render the component parameter's `children` field explicitly when its contract declares children.",
       destructureLocally:
         "Keep prop access as `props.X`; destructure inside the body only to strip owned fields before forwarding or when every field is read at least three times.",
       nameProps:
@@ -231,10 +229,6 @@ export const preferReactPropsReferenceRule = defineRule({
         return;
       }
       if (parameter?.type !== "Identifier") {
-        return;
-      }
-      if (parameter.name !== "props") {
-        context.report({ node: parameter, messageId: "canonicalName" });
         return;
       }
 
