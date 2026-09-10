@@ -55,7 +55,7 @@
   "devDependencies": {
     "@types/node": "24.13.3",
     "@typescript-eslint/rule-tester": "8.68.0",
-    "@utilfirst/prettier-plugin": "0.1.1",
+    "@utilfirst/prettier-plugin": "0.1.2",
     "@vitest/coverage-v8": "4.1.11",
     "changelogithub": "15.0.5",
     "eslint": "10.9.1",

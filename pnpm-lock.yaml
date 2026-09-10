@@ -25,8 +25,8 @@ importers:
         specifier: 8.68.0
         version: 8.68.0(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       '@utilfirst/prettier-plugin':
-        specifier: 0.1.1
-        version: 0.1.1(prettier@3.9.6)
+        specifier: 0.1.2
+        version: 0.1.2(prettier@3.9.6)
       '@vitest/coverage-v8':
         specifier: 4.1.11
         version: 4.1.11(vitest@4.1.11)
@@ -533,9 +533,9 @@ packages:
     resolution: {integrity: sha512-YR65gGdGvTUAWLldC3xLOvOzamdGzB4A5/N8rehEaHs3Zvoe39BhgY+u0SPch1OvrVTfLcc55wsSgK2NcnTS/A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@utilfirst/prettier-plugin@0.1.1':
-    resolution: {integrity: sha512-WbZNvKyFeQ8nOKQsEkwB7ZbUJi9JHvupjj1GwkKQViP4kbTJpM6VE+y/Wy7+saHgd+DunTsuzw0dBDPJ8LDkvA==}
-    engines: {node: '>=20.19.0'}
+  '@utilfirst/prettier-plugin@0.1.2':
+    resolution: {integrity: sha512-TvZYVB+Vvyq4T9N3q/4J4mzIXP1gZtw2Btmkp6+LAEhhwtDDI969qZDAq5uMi8roBEZzMEhIMyEI6Cq4ng3f4Q==}
+    engines: {node: '>=24.11.0'}
     peerDependencies:
       prettier: ^3.0.0
 
@@ -2086,7 +2086,7 @@ snapshots:
       '@typescript-eslint/types': 8.68.0
       eslint-visitor-keys: 5.0.1
 
-  '@utilfirst/prettier-plugin@0.1.1(prettier@3.9.6)':
+  '@utilfirst/prettier-plugin@0.1.2(prettier@3.9.6)':
     dependencies:
       prettier: 3.9.6
 
