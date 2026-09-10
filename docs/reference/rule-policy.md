@@ -38,7 +38,6 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 ## Object and API construction
 
-- `no-conditional-undefined-properties` rejects object properties whose conditional value is `undefined`, including conditions and undefined branches wrapped in TypeScript assertions. Omit the property through a branched call or a typed local object so presence has one meaning.
 - `no-enum-declarations` rejects repository-owned TypeScript enums, including const enums. Use literal unions or inferred constant objects. Ambient and declaration-file enums remain valid when a boundary requires them.
 - `no-positional-boolean-parameters` rejects direct and aliased boolean flags on repository-owned named functions, methods, and declaration-only callable contracts. Use a named options object. `allowFunctionNames` preserves signatures fixed by an external protocol.
 - `no-reflect-apply` rejects dynamic invocation through `Reflect.apply`. Call a typed function directly or place dynamic dispatch behind a named interface.

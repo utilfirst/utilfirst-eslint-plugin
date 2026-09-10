@@ -104,7 +104,6 @@ The base config owns shared categories, environment defaults, unused-disable rep
 | [`consistent-blank-lines`](./docs/specs/consistent-blank-lines.md)                                      | Apply tight, separate, or preserved gaps between statements and JSX children    |
 | [`no-call-count-only-test`](./docs/reference/rule-policy.md#ownership-and-tests)                        | Reject tests supported only by mock call counts or omission                     |
 | [`no-chained-type-assertions`](./docs/reference/rule-policy.md#type-evidence)                           | Reject chained TypeScript assertions                                            |
-| [`no-conditional-undefined-properties`](./docs/reference/rule-policy.md#object-and-api-construction)    | Reject conditional undefined object properties                                  |
 | [`no-enum-declarations`](./docs/reference/rule-policy.md#object-and-api-construction)                   | Reject repository-owned enums other than ambient declarations                   |
 | [`no-imported-constant-restatement`](./docs/reference/rule-policy.md#ownership-and-tests)               | Require behavior evidence instead of imported constant restatements             |
 | [`no-known-value-widening`](./docs/reference/rule-policy.md#type-evidence)                              | Reject known values widened into broad target types                             |
@@ -137,7 +136,7 @@ The base config owns shared categories, environment defaults, unused-disable rep
 
 ## Attribution
 
-The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-conditional-undefined-properties`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-forwarded-props-order`, `prefer-hook-order`, `prefer-jsx-boolean-and`, `prefer-options-parameter`, `require-lint-suppression-reason`, `require-repository-test-subject`, and `require-special-comment-tag`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
+The rules other than `consistent-blank-lines`, `no-call-count-only-test`, `no-enum-declarations`, `no-imported-constant-restatement`, `no-negated-throw-assertion`, `no-positional-boolean-parameters`, `no-promise-settlement-only-assertion`, `no-test-snapshots`, `no-truthy-falsy-assertion`, `no-uncontrolled-time-in-test`, `no-unhandled-detached-promises`, `prefer-forwarded-props-order`, `prefer-hook-order`, `prefer-jsx-boolean-and`, `prefer-options-parameter`, `require-lint-suppression-reason`, `require-repository-test-subject`, and `require-special-comment-tag`, along with their helpers, are adapted from [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop/) under the MIT License. The package's [LICENSE](./LICENSE) retains the copyright and permission notice.
 
 ## Develop
 

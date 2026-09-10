@@ -4,7 +4,6 @@ import pkg from "../package.json" with { type: "json" };
 import { consistentBlankLines } from "./rules/consistent-blank-lines.ts";
 import { noCallCountOnlyTestRule } from "./rules/no-call-count-only-test.ts";
 import { noChainedTypeAssertionsRule } from "./rules/no-chained-type-assertions.ts";
-import { noConditionalUndefinedPropertiesRule } from "./rules/no-conditional-undefined-properties.ts";
 import { noEnumDeclarationsRule } from "./rules/no-enum-declarations.ts";
 import { noImportedConstantRestatementRule } from "./rules/no-imported-constant-restatement.ts";
 import { noKnownValueWideningRule } from "./rules/no-known-value-widening.ts";
@@ -45,7 +44,6 @@ const antiSlopPlugin = eslintCompatPlugin({
   rules: {
     "no-call-count-only-test": noCallCountOnlyTestRule,
     "no-chained-type-assertions": noChainedTypeAssertionsRule,
-    "no-conditional-undefined-properties": noConditionalUndefinedPropertiesRule,
     "no-enum-declarations": noEnumDeclarationsRule,
     "no-imported-constant-restatement": noImportedConstantRestatementRule,
     "no-known-value-widening": noKnownValueWideningRule,
