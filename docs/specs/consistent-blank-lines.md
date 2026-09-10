@@ -2,11 +2,11 @@
 
 This specification owns the `consistent-blank-lines` classification and fixer contract. Read it before changing how the rule treats adjacent statements or JSX children.
 
-| Decision                                               | Read                                       |
-| ------------------------------------------------------ | ------------------------------------------ |
-| Universal rationale and expected replacement           | [Rule policy](../reference/rule-policy.md) |
-| Public registry, runtime composition, or package build | [Architecture](../architecture.md)         |
-| Installation and consumer configuration                | [README](../../README.md)                  |
+| Decision | Read |
+| --- | --- |
+| Universal rationale and expected replacement | [Rule policy](../reference/rule-policy.md) |
+| Public registry, runtime composition, or package build | [Architecture](../architecture.md) |
+| Installation and consumer configuration | [README](../../README.md) |
 
 Apply one explicit gap policy between adjacent statement-list and `JSXChild` items.
 - **Type**: `layout`

@@ -2,12 +2,12 @@
 
 This document owns the plugin’s public exports, rule registry, canonical configuration composition, build outputs, and verification boundaries. Read it before changing how consumers load or execute the package.
 
-| Decision                                           | Read                                                      |
-| -------------------------------------------------- | --------------------------------------------------------- |
-| Universal rule rationale and expected replacements | [Rule policy](reference/rule-policy.md)                   |
-| Detailed blank-line behavior and fixer contract    | [Consistent blank lines](specs/consistent-blank-lines.md) |
-| Oxlint dependency and policy upgrade procedure     | [Upgrade Oxlint](runbooks/upgrade-oxlint.md)              |
-| Installation and consumer configuration            | [README](../README.md)                                    |
+| Decision | Read |
+| --- | --- |
+| Universal rule rationale and expected replacements | [Rule policy](reference/rule-policy.md) |
+| Detailed blank-line behavior and fixer contract | [Consistent blank lines](specs/consistent-blank-lines.md) |
+| Oxlint dependency and policy upgrade procedure | [Upgrade Oxlint](runbooks/upgrade-oxlint.md) |
+| Installation and consumer configuration | [README](../README.md) |
 
 ## Public surface
 

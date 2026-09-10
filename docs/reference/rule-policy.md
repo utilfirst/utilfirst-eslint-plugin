@@ -2,11 +2,11 @@
 
 This reference owns the universal rationale, protected boundary, and expected replacement for every exported rule. Read it before changing whether a rule belongs in the recommended policy.
 
-| Decision                                                        | Read                                                         |
-| --------------------------------------------------------------- | ------------------------------------------------------------ |
-| Public exports, registry, canonical config, or build boundaries | [Architecture](../architecture.md)                           |
-| Detailed blank-line behavior and fixer contract                 | [Consistent blank lines](../specs/consistent-blank-lines.md) |
-| Installation and consumer configuration                         | [README](../../README.md)                                    |
+| Decision | Read |
+| --- | --- |
+| Public exports, registry, canonical config, or build boundaries | [Architecture](../architecture.md) |
+| Detailed blank-line behavior and fixer contract | [Consistent blank lines](../specs/consistent-blank-lines.md) |
+| Installation and consumer configuration | [README](../../README.md) |
 
 The rule implementations in [`src/rules/`](../../src/rules/) own accepted syntax and diagnostics. Their colocated tests own executable examples. This reference explains why each rule is universal policy, which boundary it protects, and what replacement a violation should produce.
 
