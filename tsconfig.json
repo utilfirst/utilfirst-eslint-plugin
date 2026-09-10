@@ -6,7 +6,6 @@
     "declaration": true,
     "erasableSyntaxOnly": true,
     "esModuleInterop": true,
-    "exactOptionalPropertyTypes": true,
     "incremental": true,
     "isolatedModules": true,
     "lib": ["esnext"],
