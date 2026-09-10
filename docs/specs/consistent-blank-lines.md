@@ -9,6 +9,7 @@ This specification owns the `consistent-blank-lines` classification and fixer co
 | Installation and consumer configuration | [README](../../README.md) |
 
 Apply one explicit gap policy between adjacent statement-list and `JSXChild` items.
+
 - **Type**: `layout`
 - **Fixable**: yes (`--fix`)
 - **Configuration**: none (no options)
@@ -16,6 +17,7 @@ Apply one explicit gap policy between adjacent statement-list and `JSXChild` ite
 ## Gap policies
 
 Each adjacent pair receives one policy:
+
 - **Tight** requires zero blank lines.
 - **Separate** requires exactly one blank line.
 - **Preserve** leaves the existing gap unchanged.
@@ -25,6 +27,7 @@ Tight and Preserve do not split items that share a source line. Separate splits 
 ## Statement lists
 
 The rule checks adjacent items in Program, BlockStatement, SwitchCase consequent, and StaticBlock bodies. It chooses the first matching policy below.
+
 1. **Leading documentation**: A contiguous comment beginning on the current effective ending line attaches to the earlier statement and extends that ending line. Remaining comments before the later statement attach to the later statement. If the later statement's leading comment group spans multiple lines, Separate applies.
 2. **Hooks**: A hook call is a direct `use[A-Z]` call in a one-declarator variable declaration or bare expression statement. Export wrappers do not change the classification. If either statement is a hook call, Tight applies only when both are single-line hook variable declarations with matching export-ness. Separate applies to every other hook pair.
 3. **User-owned grouping**: Preserve applies when both statements are imports, both are re-exports (`export ... from` or `export *`), or both are non-hook expression statements.
@@ -38,6 +41,7 @@ The rule checks adjacent items in Program, BlockStatement, SwitchCase consequent
 ## JSX children
 
 The rule filters pure-whitespace `JSXText` children before comparing adjacent non-comment items. Comment-only `JSXExpressionContainer` children attach to the next non-comment child. A trailing comment-only container without a later child is outside this rule's scope. The first matching policy below applies.
+
 1. **Leading documentation**: Separate applies when the later child's attached comment-only group spans multiple lines.
 2. **Local text run**: Tight applies when either child is or directly neighbors a literal-text child. A literal-text child is non-whitespace `JSXText` or a `JSXExpressionContainer` guaranteed to produce text or no rendered child: a string literal, a template literal, transparent TypeScript wrappers around either form, a logical `&&` expression whose right side qualifies, or a conditional expression whose two branches qualify.
 3. **Visual weight**: Tight applies when both children are single-line.
