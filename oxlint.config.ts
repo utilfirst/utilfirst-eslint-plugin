@@ -4,8 +4,6 @@ import { oxlintBaseConfig } from "./src/oxlint.ts";
 
 export default defineConfig({
   env: {
-    builtin: true,
-    es2024: true,
     node: true,
   },
   extends: [{ ...oxlintBaseConfig, jsPlugins: [] }],

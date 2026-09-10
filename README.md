@@ -93,6 +93,8 @@ export default defineConfig({
 });
 ```
 
+The base config owns the shared environment, rule set, and the pattern-level overrides for config modules, plain JavaScript, and CommonJS files. A repository config adds only its ignore patterns, framework plugins, and repository-specific rules. Keep file-specific exceptions inline at the owning line with a reason instead of adding file-targeted overrides.
+
 The base config owns shared categories, environment defaults, unused-disable reporting, TypeScript type checking, browser React, accessibility, JSDoc, module-boundary, and test-precision policy, compiler-diagnostic overrides, React settings, native rules, and every exported custom rule. Repositories retain ignore paths, platform plugins, platform environments, generated-file treatment, and reasoned exceptions. Non-browser React consumers must disable or replace browser accessibility policy at their platform boundary.
 
 ## Rules

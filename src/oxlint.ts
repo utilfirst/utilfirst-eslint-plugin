@@ -19,6 +19,7 @@ export const oxlintBaseConfig = defineConfig({
   },
   env: {
     "builtin": true,
+    "es2024": true,
     "shared-node-browser": true,
   },
   jsPlugins: [
@@ -33,6 +34,83 @@ export const oxlintBaseConfig = defineConfig({
     typeCheck: true,
   },
   overrides: [
+    {
+      // Config modules run under Node regardless of the repository runtime.
+      files: ["*.config.{js,cjs,mjs,ts,mts}", "app.config.ts"],
+      env: {
+        node: true,
+      },
+    },
+    {
+      // Plain JavaScript modules carry no type information, so type-aware
+      // rules only produce noise there.
+      files: ["**/*.{js,cjs,mjs}"],
+      env: {
+        node: true,
+      },
+      rules: {
+        "no-undef": "error",
+        "typescript/await-thenable": "off",
+        "typescript/consistent-type-exports": "off",
+        "typescript/dot-notation": "off",
+        "typescript/no-array-delete": "off",
+        "typescript/no-base-to-string": "off",
+        "typescript/no-deprecated": "off",
+        "typescript/no-duplicate-type-constituents": "off",
+        "typescript/no-floating-promises": "off",
+        "typescript/no-for-in-array": "off",
+        "typescript/no-implied-eval": "off",
+        "typescript/no-meaningless-void-operator": "off",
+        "typescript/no-misused-spread": "off",
+        "typescript/no-mixed-enums": "off",
+        "typescript/no-redundant-type-constituents": "off",
+        "typescript/no-unnecessary-boolean-literal-compare": "off",
+        "typescript/no-unnecessary-condition": "off",
+        "typescript/no-unnecessary-qualifier": "off",
+        "typescript/no-unnecessary-template-expression": "off",
+        "typescript/no-unnecessary-type-arguments": "off",
+        "typescript/no-unnecessary-type-assertion": "off",
+        "typescript/no-unnecessary-type-conversion": "off",
+        "typescript/no-unnecessary-type-parameters": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-enum-comparison": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/no-unsafe-type-assertion": "off",
+        "typescript/no-unsafe-unary-minus": "off",
+        "typescript/no-useless-default-assignment": "off",
+        "typescript/non-nullable-type-assertion-style": "off",
+        "typescript/only-throw-error": "off",
+        "typescript/prefer-find": "off",
+        "typescript/prefer-includes": "off",
+        "typescript/prefer-promise-reject-errors": "off",
+        "typescript/prefer-readonly": "off",
+        "typescript/prefer-reduce-type-parameter": "off",
+        "typescript/prefer-regexp-exec": "off",
+        "typescript/prefer-return-this-type": "off",
+        "typescript/prefer-string-starts-ends-with": "off",
+        "typescript/promise-function-async": "off",
+        "typescript/related-getter-setter-pairs": "off",
+        "typescript/require-array-sort-compare": "off",
+        "typescript/restrict-plus-operands": "off",
+        "typescript/return-await": "off",
+        "typescript/strict-boolean-expressions": "off",
+        "typescript/strict-void-return": "off",
+        "typescript/switch-exhaustiveness-check": "off",
+        "typescript/unbound-method": "off",
+        "typescript/use-unknown-in-catch-callback-variable": "off",
+      },
+    },
+    {
+      // CommonJS config files exist only where a tool requires them.
+      files: ["**/*.cjs"],
+      rules: {
+        "import/no-commonjs": "off",
+        "typescript/no-require-imports": "off",
+      },
+    },
     {
       files: ["**/*.{ts,tsx,mts,cts}"],
       rules: {
@@ -131,6 +209,7 @@ export const oxlintBaseConfig = defineConfig({
     // External protocols and generated shapes may own leading-underscore names.
     "no-underscore-dangle": "off",
     "no-useless-assignment": "error",
+    "no-warning-comments": "off",
     "object-shorthand": "error",
     "operator-assignment": "error",
     "oxc/no-map-spread": "off",
@@ -146,11 +225,13 @@ export const oxlintBaseConfig = defineConfig({
     "prefer-template": "error",
     "promise/catch-or-return": "error",
     "promise/no-nesting": "error",
+    "promise/no-return-wrap": "error",
     "promise/no-return-in-finally": "error",
     "promise/param-names": "error",
     // The category-enabled exhaustive-deps rule retains missing-dependency checks.
     "react/exhaustive-effect-dependencies": "off",
     "react/function-component-definition": "error",
+    "react/hook-use-state": "error",
     "react/jsx-boolean-value": "error",
     "react/jsx-curly-brace-presence": "error",
     "react/jsx-fragments": "error",
