@@ -34,6 +34,7 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "check": "pnpm run '/^(lint|test)$/'",
     "fix": "pnpm run --sequential '/^fix:[^:]+$/'",
     "fix:oxlint": "oxlint . --fix",
     "fix:prettier": "pnpm run lint:prettier --write",
@@ -43,9 +44,9 @@
     "lint:publint": "publint",
     "prepack": "pnpm run build",
     "release-check-tag": "node scripts/check-release-tag.ts",
-    "test": "pnpm run test-unit && pnpm run test-package",
-    "test-package": "node scripts/test-package.ts",
-    "test-unit": "vitest run"
+    "test": "pnpm run --sequential '/^test:[^:]+$/'",
+    "test:package": "node scripts/test-package.ts",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@oxlint/plugins": "1.80.0",
