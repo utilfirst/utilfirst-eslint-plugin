@@ -36,7 +36,7 @@
     "build": "tsdown",
     "check": "pnpm run '/^(lint|test)$/'",
     "fix": "pnpm run --sequential '/^fix:[^:]+$/'",
-    "fix:oxlint": "oxlint . --fix",
+    "fix:oxlint": "pnpm run lint:oxlint --fix",
     "fix:prettier": "pnpm run lint:prettier --write",
     "lint": "pnpm run --sequential '/^lint:[^:]+$/'",
     "lint:oxlint": "oxlint .",
