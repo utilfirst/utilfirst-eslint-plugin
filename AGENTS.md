@@ -18,7 +18,7 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 
 ## Boundaries
 
-- Ask first before bumping the major version (most consumers are pinned to `^X.Y.Z`, so a major bump forces an upgrade across projects that depend on this plugin).
+- Ask first before bumping the major version (a major bump changes the public compatibility contract and requires explicit consumer adoption).
 - Ask first before adding a new rule to `configs.recommended` (consumers that auto-upgrade pick it up on the next install).
 - Ask first before the one-time package bootstrap through local `npm publish --provenance=false`.
 - Never publish manually after the package has an npm trusted publisher. The OIDC publisher in `publish.yml` is the sanctioned release path.
@@ -95,4 +95,4 @@ src/
 
 ## Consumer linking
 
-- Sibling repos consume this plugin from npm at `^X.Y.Z`. For local iteration against unpublished changes, swap to `link:../utilfirst-eslint-plugin` (not `file:`, which triggers pnpm's ignored-build-scripts gate).
+- Application consumers pin exact npm versions. For local iteration against unpublished changes, swap to `link:../utilfirst-eslint-plugin` (not `file:`, which triggers pnpm's ignored-build-scripts gate).
