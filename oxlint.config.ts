@@ -1,8 +1,8 @@
-import { defineConfig } from "oxlint";
+import { defineConfig, type OxlintConfig } from "oxlint";
 
 import { oxlintBaseConfig } from "./src/oxlint.ts";
 
-export default defineConfig({
+const config: OxlintConfig = defineConfig({
   env: {
     node: true,
   },
@@ -22,3 +22,5 @@ export default defineConfig({
   ],
   plugins: ["node"],
 });
+
+export default config;

@@ -1,4 +1,4 @@
-import { defineConfig } from "oxlint";
+import { defineConfig, type OxlintConfig } from "oxlint";
 
 import plugin from "./index.ts";
 
@@ -9,8 +9,12 @@ const utilfirstRules = Object.fromEntries(
   ]),
 );
 
-/** Shared Oxlint policy for TypeScript and browser React repositories. */
-export const oxlintBaseConfig = defineConfig({
+/**
+ * Shared Oxlint policy for TypeScript and browser React repositories. The
+ * OxlintConfig annotation keeps the emitted declaration on Oxlint's own type, so
+ * consumers with exactOptionalPropertyTypes can pass it to `extends`.
+ */
+export const oxlintBaseConfig: OxlintConfig = defineConfig({
   categories: {
     correctness: "error",
     pedantic: "error",
