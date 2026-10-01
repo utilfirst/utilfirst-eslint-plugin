@@ -58,10 +58,12 @@ function isStableConstVariable(
 }
 
 function hasKnownEvidence({
+  environment,
   expression,
   sourceCode,
   visitedVariables = new Set<Variable>(),
 }: {
+  environment: TypeEnvironment;
   expression: ESTree.Expression;
   sourceCode: SourceCode;
   visitedVariables?: Set<Variable>;
@@ -91,9 +93,20 @@ function hasKnownEvidence({
     return false;
   }
 
+  // A binding annotated with a broad target already decided its own widening,
+  // which its declarator reports or exempts. Reading it carries no evidence
+  // beyond that annotation.
+  if (
+    declarator.id.type === "Identifier" &&
+    annotationTarget(declarator.id.typeAnnotation, environment) !== null
+  ) {
+    return false;
+  }
+
   visitedVariables.add(variable);
 
   return hasKnownEvidence({
+    environment,
     expression: declarator.init,
     sourceCode,
     visitedVariables,
@@ -214,7 +227,14 @@ export const noKnownValueWideningRule = defineRule({
       ) {
         return;
       }
-      if (!hasKnownEvidence({ expression, sourceCode: context.sourceCode })) {
+      if (
+        environment === null ||
+        !hasKnownEvidence({
+          environment,
+          expression,
+          sourceCode: context.sourceCode,
+        })
+      ) {
         return;
       }
 

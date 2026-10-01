@@ -12,6 +12,8 @@ ruleTester.run("no-known-value-widening", rule, {
     "const handlers = { start } satisfies Record<string, Handler>;",
     "type Handlers = { start: Handler }; const handlers: Handlers = { start };",
     "const value = ({} as unknown)! as string;",
+    "function collect(): Record<string, string> { const fields: Record<string, string> = {}; return fields; }",
+    "function read(): unknown { const value: unknown = parse(); return value; }",
   ],
   invalid: [
     {
@@ -24,6 +26,14 @@ ruleTester.run("no-known-value-widening", rule, {
     },
     {
       code: "function create(): unknown { return {}; }",
+      errors: [{ messageId: "widening" }],
+    },
+    {
+      code: "function create(): unknown { const value = { id: 1 }; return value; }",
+      errors: [{ messageId: "widening" }],
+    },
+    {
+      code: "function create(): Record<string, unknown> { const value = { id: 1 }; return value; }",
       errors: [{ messageId: "widening" }],
     },
     {
