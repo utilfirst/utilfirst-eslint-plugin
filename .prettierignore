@@ -1,4 +1,3 @@
-/.tmp/
-/dist/
-/node_modules/
+# Prettier reads `.gitignore` by default, so this file only adds tracked paths
+# that must stay unformatted.
 /pnpm-lock.yaml
