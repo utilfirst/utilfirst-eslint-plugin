@@ -4,8 +4,11 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "editor.rulers": [80],
+  "editor.rulers": [
+    80
+  ],
   "files.readonlyInclude": {
+    ".pnpm-store/**": true,
     ".tmp/**": true,
     "dist/**": true,
     "node_modules/**": true,
