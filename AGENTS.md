@@ -4,17 +4,13 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 
 ## Workflow
 
-1. After changing an Oxlint-supported file: `pnpm exec oxlint --fix <file>` and `pnpm exec prettier --write <file>`
-2. After changing another Prettier-supported file: `pnpm exec prettier --write <file>`
-3. Update `README.md` in the same change when package installation, configuration usage, the published rule list, or development commands change.
-4. Update `docs/architecture.md` in the same change when public exports, registry ownership, canonical config composition, build output, or verification boundaries change.
-5. Update `docs/reference/rule-policy.md` in the same change when universal rule rationale, boundary guidance, or expected replacements change.
-6. Update `docs/specs/consistent-blank-lines.md` in the same change when `src/rules/consistent-blank-lines.ts` changes the rule's source-owned behavior or specification.
-7. Follow `docs/runbooks/upgrade-oxlint.md` when upgrading Oxlint.
-8. After finishing a set of related changes: `pnpm run test` and `pnpm run lint:oxlint`
-9. Verify changes with the lowest-cost sufficient check. Start with direct source inspection or a targeted check, and escalate only when it cannot establish the required result. Skip routine or speculative verification.
-10. Treat full builds, development servers, broad test or lint suites, dependency installs, and benchmarks as expensive commands. Run one only when the user explicitly asks or no cheaper targeted signal can settle the claim.
-11. Stop verification work when the user declines it.
+1. Read the document listed in `Structure` before changing the files or behavior it covers. Update it in the same change when its maintenance trigger applies.
+2. Format touched JavaScript and TypeScript with `pnpm exec oxlint --fix <file>` and `pnpm exec prettier --write <file>`.
+3. Format touched JSON, Markdown, and prose with `pnpm exec prettier --write <file>`.
+4. Run the affected lint and test leaves for bounded work. Run `pnpm run check` before reporting broad cross-owner work complete when no cheaper targeted signal can cover the changed contracts.
+5. Verify changes with the lowest-cost sufficient check. Start with direct source inspection or a targeted check, and escalate only when it cannot establish the required result. Skip routine or speculative verification.
+6. Treat full builds, development servers, broad test or lint suites, dependency installs, and benchmarks as expensive commands. Run one only when the user explicitly asks or no cheaper targeted signal can settle the claim.
+7. Stop verification work when the user declines it.
 
 ## Boundaries
 
@@ -29,6 +25,16 @@ Shared rules for ESLint 10 and Oxlint. The package is ESM-only and supports ESLi
 - ESM-only ESLint and Oxlint plugin bundled with tsdown and tested through Vitest, the TypeScript ESLint rule tester, and an Oxlint runtime fixture.
 
 ## Structure
+
+The documentation map accounts for each living owner. Read the named owner before its governed change and update it in the same change when its contract changes.
+
+| Path | Family | Read before changing | Update in the same change when changing |
+| --- | --- | --- | --- |
+| `README.md` | Repository entry | Package installation, configuration usage, or development commands | Package installation, configuration usage, the published rule list, or development commands |
+| `docs/architecture.md` | Architecture | Public exports, registry ownership, canonical config composition, build output, or verification boundaries | Public exports, registry ownership, canonical config composition, build output, or verification boundaries |
+| `docs/reference/rule-policy.md` | Reference | Adding, removing, or changing a universal rule | Universal rule rationale, boundary guidance, or expected replacements |
+| `docs/specs/consistent-blank-lines.md` | Specification | Changing `src/rules/consistent-blank-lines.ts` | The rule's source-owned behavior or specification |
+| `docs/runbooks/upgrade-oxlint.md` | Runbook | Upgrading Oxlint | The procedure's target, preconditions, execution, recovery, or verification |
 
 - Read `package.json` and `mise.toml` for the peer contract, dependencies, scripts, and toolchain versions.
 - Let `oxlint.config.ts` own repository lint and type-check policy by extending the canonical config and retaining repository-only boundaries.
