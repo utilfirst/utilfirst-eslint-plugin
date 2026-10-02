@@ -46,7 +46,7 @@
     "release-check-tag": "node scripts/check-release-tag.ts",
     "test": "pnpm run --sequential '/^test:[^:]+$/'",
     "test:package": "node scripts/test-package.ts",
-    "test:unit": "vitest run"
+    "test:vitest": "vitest run"
   },
   "dependencies": {
     "@oxlint/plugins": "1.80.0",
