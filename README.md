@@ -128,6 +128,7 @@ The base config owns shared categories, environment defaults, unused-disable rep
 | [`prefer-forwarded-props-order`](./docs/reference/rule-policy.md#react-source-form) | Put forwarded props before component-controlled JSX attributes |
 | [`prefer-hook-order`](./docs/reference/rule-policy.md#react-source-form) | Order built-in hooks by context, state, derivation, and effect role |
 | [`prefer-jsx-boolean-and`](./docs/reference/rule-policy.md#jsx-conditionals) | Require boolean JSX guards and normalize null-branch conditionals |
+| [`prefer-named-react-type-imports`](./docs/reference/rule-policy.md#react-source-form) | Require named `react` type imports instead of the ambient `React` namespace |
 | [`prefer-options-parameter`](./docs/reference/rule-policy.md#object-and-api-construction) | Require options objects for named callable contracts with three or more inputs |
 | [`prefer-switch-discriminator-chain`](./docs/reference/rule-policy.md#object-and-api-construction) | Require a switch for four or more equality branches on one discriminator |
 | [`prefer-top-level-function-declarations`](./docs/reference/rule-policy.md#object-and-api-construction) | Require declarations for direct top-level function bindings and default exports |

@@ -58,6 +58,7 @@ Every exported rule is enabled at error severity by `configs.recommended`. Optio
 
 - `prefer-forwarded-props-order` requires a `{...props}` JSX spread to precede component-controlled attributes. Later attributes then retain the values owned by the wrapper.
 - `prefer-hook-order` orders recognized built-in hooks as context, state and refs, derivations, then effects. A derivation may precede the state hook that consumes its binding as an initializer. Custom hooks remain unclassified because their domain role is not inferable from syntax.
+- `prefer-named-react-type-imports` rejects types qualified through the ambient UMD `React` namespace, such as `React.ReactNode`, when the module declares no `React` binding. Import each type by name with `import type { ReactNode } from "react"`, so every annotation names its exact dependency and no module relies on the global namespace. A module-local `React` import keeps its qualified names valid.
 
 ## Comments
 

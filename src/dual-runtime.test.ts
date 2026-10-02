@@ -24,6 +24,7 @@ function createNextValue() {}
 type RawValue = unknown;
 type Metadata = Record<string, unknown>;
 type UserShape = { name: string };
+type ChildContent = React.ReactNode;
 
 const input: unknown = { name: "Ada" };
 const widened: unknown = { name: "Ada" };

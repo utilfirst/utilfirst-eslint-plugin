@@ -26,6 +26,7 @@ import { noWidenThenAssertRule } from "./rules/no-widen-then-assert.ts";
 import { preferForwardedPropsOrderRule } from "./rules/prefer-forwarded-props-order.ts";
 import { preferHookOrderRule } from "./rules/prefer-hook-order.ts";
 import { preferJsxBooleanAndRule } from "./rules/prefer-jsx-boolean-and.ts";
+import { preferNamedReactTypeImportsRule } from "./rules/prefer-named-react-type-imports.ts";
 import { preferOptionsParameterRule } from "./rules/prefer-options-parameter.ts";
 import { preferSwitchDiscriminatorChainRule } from "./rules/prefer-switch-discriminator-chain.ts";
 import { preferTopLevelFunctionDeclarationsRule } from "./rules/prefer-top-level-function-declarations.ts";
@@ -67,6 +68,7 @@ const antiSlopPlugin = eslintCompatPlugin({
     "prefer-forwarded-props-order": preferForwardedPropsOrderRule,
     "prefer-hook-order": preferHookOrderRule,
     "prefer-jsx-boolean-and": preferJsxBooleanAndRule,
+    "prefer-named-react-type-imports": preferNamedReactTypeImportsRule,
     "prefer-options-parameter": preferOptionsParameterRule,
     "prefer-switch-discriminator-chain": preferSwitchDiscriminatorChainRule,
     "prefer-top-level-function-declarations":
