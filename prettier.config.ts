@@ -1,5 +1,6 @@
-/** @type {import("prettier").Config} */
-const config = {
+import type { Config } from "prettier";
+
+const config: Config = {
   proseWrap: "never",
   quoteProps: "consistent",
   plugins: [
