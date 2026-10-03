@@ -34,11 +34,11 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "check": "pnpm run '/^(lint|test)$/'",
+    "check": "pnpm run lint && pnpm run test",
     "fix": "pnpm run --sequential '/^fix:[^:]+$/'",
     "fix:oxlint": "pnpm run lint:oxlint --fix",
     "fix:prettier": "pnpm run lint:prettier --write",
-    "lint": "pnpm run --sequential '/^lint:[^:]+$/'",
+    "lint": "pnpm run build && pnpm run '/^lint:[^:]+$/'",
     "lint:oxlint": "oxlint .",
     "lint:prettier": "prettier --check .",
     "lint:publint": "publint",

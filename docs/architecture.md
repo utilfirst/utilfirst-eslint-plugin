@@ -29,6 +29,8 @@ Tsdown bundles JavaScript and declarations into the paths named by `package.json
 
 ## Verification boundaries
 
+The lint gate builds the package before its read-only leaves inspect exports. The complete check finishes lint before starting tests because the packed-artifact test runs the prepack build against the same output directory.
+
 Unit tests exercise rules through the TypeScript ESLint rule tester. Dual-runtime fixtures compare ESLint and Oxlint behavior. The package test builds and inspects the packed public artifact, while Publint verifies package metadata and exported files.
 
 ## Work routing
